@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:budgi/model/sort.dart';
 import 'package:budgi/service/impl/budget_category_memory.dart';
 import 'package:test/test.dart';
 
@@ -37,6 +40,48 @@ void main() {
         toDate: toDate,
       );
       expect(list.length, equals(0));
+    }
+  });
+
+  test('.listAmounts() with sort', () async {
+    final service = BudgetCategoryMemoryService();
+
+    final fromDate = DateTime.now();
+    final toDate = DateTime.now()..add(const Duration(days: 2));
+    final random = Random();
+    for (var i = 0; i < 20; i++) {
+      final name = 'category-$i';
+      final category = await service.saveAmount(
+        categoryName: name,
+        fromDate: fromDate,
+        toDate: toDate,
+        amount: random.nextDouble(),
+      );
+      expect(category.budgetCategory.code, isNotEmpty);
+    }
+
+    // ASC
+    var list = await service.listAmounts(
+      fromDate: fromDate,
+      toDate: toDate,
+      amountSort: Sort.asc,
+    );
+    var lastAmount = -1.0;
+    for (var value in list) {
+      expect(value.amount, greaterThanOrEqualTo(lastAmount));
+      lastAmount = value.amount;
+    }
+
+    // DESC
+    list = await service.listAmounts(
+      fromDate: fromDate,
+      toDate: toDate,
+      amountSort: Sort.desc,
+    );
+    lastAmount = double.infinity;
+    for (var value in list) {
+      expect(value.amount, lessThanOrEqualTo(lastAmount));
+      lastAmount = value.amount;
     }
   });
 }

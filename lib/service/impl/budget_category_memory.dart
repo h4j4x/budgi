@@ -1,4 +1,5 @@
 import '../../model/budget_category.dart';
+import '../../model/sort.dart';
 import '../../util/string.dart';
 import '../budget_category.dart';
 
@@ -30,10 +31,22 @@ class BudgetCategoryMemoryService implements BudgetCategoryService {
   Future<List<BudgetCategoryAmount>> listAmounts({
     required DateTime fromDate,
     required DateTime toDate,
+    Sort? amountSort,
   }) {
     final amountCode = _datesCode(fromDate, toDate);
     final set = values[amountCode] ?? {};
-    return Future.value(set.toList());
+    return Future.value(set.toList()
+      ..sort(
+        (value1, value2) {
+          if (amountSort == Sort.asc) {
+            return value1.amount.compareTo(value2.amount);
+          }
+          if (amountSort == Sort.desc) {
+            return value2.amount.compareTo(value1.amount);
+          }
+          return 0;
+        },
+      ));
   }
 
   @override
