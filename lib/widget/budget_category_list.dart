@@ -20,7 +20,7 @@ class BudgetCategoryList extends StatefulWidget {
 }
 
 class _BudgetCategoryListState extends State<BudgetCategoryList> {
-  final list = <BudgetCategoryAmount>{};
+  final list = <BudgetCategoryAmount>[];
 
   bool loading = false;
 
@@ -44,6 +44,7 @@ class _BudgetCategoryListState extends State<BudgetCategoryList> {
           fromDate: fromDate,
           toDate: toDate,
         );
+    list.clear();
     list.addAll(values);
     setState(() {
       loading = false;
@@ -61,14 +62,26 @@ class _BudgetCategoryListState extends State<BudgetCategoryList> {
   }
 
   Widget mobile() {
-    return const Center(
-      child: Text('MOBILE'), // TODO
+    return ListView.separated(
+      itemBuilder: (_, index) {
+        return listItem(list[index]);
+      },
+      separatorBuilder: (_, __) {
+        return const Divider();
+      },
+      itemCount: list.length,
     );
   }
 
   Widget desktop() {
     return const Center(
       child: Text('DESKTOP'), // TODO
+    );
+  }
+
+  Widget listItem(BudgetCategoryAmount item) {
+    return ListTile(
+      title: Text(item.budgetCategory.name),
     );
   }
 }
