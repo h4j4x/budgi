@@ -1,7 +1,9 @@
+import 'package:budgi/di.dart';
 import 'package:budgi/page/budget_category.dart';
 import 'package:flutter/material.dart';
 
 void main() {
+  DI().setup();
   runApp(const MyApp());
 }
 
