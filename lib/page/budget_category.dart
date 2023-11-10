@@ -1,10 +1,14 @@
-import 'package:budgi/model/crud_handler.dart';
+import 'package:budgi/model/budget_category.dart';
+import 'package:budgi/widget/budget_category_edit.dart';
 import 'package:flutter/material.dart';
 
-import '../widget/budget_category_list.dart';
-
 class BudgetCategoryPage extends StatefulWidget {
-  const BudgetCategoryPage({super.key});
+  final BudgetCategoryAmount? value;
+
+  const BudgetCategoryPage({
+    super.key,
+    this.value,
+  });
 
   @override
   State<StatefulWidget> createState() {
@@ -13,26 +17,16 @@ class BudgetCategoryPage extends StatefulWidget {
 }
 
 class _BudgetCategoryPageState extends State<BudgetCategoryPage> {
-  final crudHandler = CrudHandler();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text('BudgetCategoryPage'), // TODO
-        actions: [
-          IconButton(
-            onPressed: crudHandler.reload,
-            icon: const Icon(Icons.refresh),
-          ),
-        ],
+        title: const Text('BudgetCategory'),
       ),
-      body: BudgetCategoryList(crudHandler: crudHandler),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        tooltip: 'Add', // TODO
-        child: const Icon(Icons.add),
+      body: Padding(
+        padding: const EdgeInsets.only(left: 8.0, top: 8.0, right: 8.0),
+        child: BudgetCategoryEdit(value: widget.value),
       ),
     );
   }

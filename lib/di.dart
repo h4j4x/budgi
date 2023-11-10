@@ -18,7 +18,7 @@ class DI {
         BudgetCategoryMemoryService());
   }
 
-  BudgetCategoryService getBudgetCategoryService() {
+  BudgetCategoryService budgetCategoryService() {
     return _getIt<BudgetCategoryService>();
   }
 }

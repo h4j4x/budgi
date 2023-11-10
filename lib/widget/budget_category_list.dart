@@ -6,7 +6,7 @@ import '../di.dart';
 import '../model/crud_handler.dart';
 
 class BudgetCategoryList extends StatefulWidget {
-  final CrudHandler crudHandler;
+  final CrudHandler<BudgetCategoryAmount> crudHandler;
 
   const BudgetCategoryList({
     super.key,
@@ -40,7 +40,7 @@ class _BudgetCategoryListState extends State<BudgetCategoryList> {
     });
     final fromDate = DateTime.now(); // TODO
     final toDate = fromDate.add(const Duration(days: 1)); // TODO
-    final values = await DI().getBudgetCategoryService().listAmounts(
+    final values = await DI().budgetCategoryService().listAmounts(
           fromDate: fromDate,
           toDate: toDate,
         );
@@ -82,6 +82,10 @@ class _BudgetCategoryListState extends State<BudgetCategoryList> {
   Widget listItem(BudgetCategoryAmount item) {
     return ListTile(
       title: Text(item.budgetCategory.name),
+      subtitle: Text(item.budgetCategory.code),
+      onTap: () {
+        widget.crudHandler.onItemAction(context, item);
+      },
     );
   }
 }

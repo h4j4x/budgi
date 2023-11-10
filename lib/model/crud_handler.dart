@@ -1,5 +1,11 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
-class CrudHandler {
+class CrudHandler<T> {
   VoidCallback reload = () {};
+
+  Function(BuildContext, T) onItemAction;
+
+  CrudHandler({
+    required this.onItemAction,
+  });
 }
