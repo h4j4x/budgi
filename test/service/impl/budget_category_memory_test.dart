@@ -84,4 +84,39 @@ void main() {
       lastAmount = value.amount;
     }
   });
+
+  test('.saveAmount() with update', () async {
+    final service = BudgetCategoryMemoryService();
+
+    final fromDate = DateTime.now();
+    final toDate = DateTime.now()..add(const Duration(days: 2));
+    final category = await service.saveAmount(
+      categoryName: 'test',
+      fromDate: fromDate,
+      toDate: toDate,
+      amount: 10.0,
+    );
+    expect(category.budgetCategory.code, isNotEmpty);
+
+    var list = await service.listAmounts(
+      fromDate: fromDate,
+      toDate: toDate,
+    );
+    expect(list.length, equals(1));
+
+    final updated = await service.saveAmount(
+      categoryCode: category.budgetCategory.code,
+      categoryName: category.budgetCategory.name,
+      fromDate: fromDate,
+      toDate: toDate,
+      amount: 20.0,
+    );
+    expect(updated.budgetCategory.code, equals(category.budgetCategory.code));
+
+    list = await service.listAmounts(
+      fromDate: fromDate,
+      toDate: toDate,
+    );
+    expect(list.length, equals(1));
+  });
 }

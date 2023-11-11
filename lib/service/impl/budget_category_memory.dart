@@ -71,6 +71,21 @@ class _BudgetCategory implements BudgetCategory {
 
   @override
   String name;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is _BudgetCategory &&
+        runtimeType == other.runtimeType &&
+        code == other.code;
+  }
+
+  @override
+  int get hashCode {
+    return code.hashCode;
+  }
 }
 
 class _BudgetCategoryAmount implements BudgetCategoryAmount {
@@ -88,4 +103,19 @@ class _BudgetCategoryAmount implements BudgetCategoryAmount {
 
   @override
   double amount;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is _BudgetCategoryAmount &&
+        runtimeType == other.runtimeType &&
+        budgetCategory == other.budgetCategory;
+  }
+
+  @override
+  int get hashCode {
+    return budgetCategory.code.hashCode;
+  }
 }
