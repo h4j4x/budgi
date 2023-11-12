@@ -108,14 +108,16 @@ void main() {
     );
     expect(list.length, equals(1));
 
+    final updatedName = '${category.budgetCategory.name}-updated';
     final updated = await service.saveAmount(
       categoryCode: category.budgetCategory.code,
-      categoryName: category.budgetCategory.name,
+      categoryName: updatedName,
       fromDate: fromDate,
       toDate: toDate,
       amount: 20.0,
     );
     expect(updated.budgetCategory.code, equals(category.budgetCategory.code));
+    expect(updated.budgetCategory.name, equals(updatedName));
 
     list = await service.listAmounts(
       fromDate: fromDate,

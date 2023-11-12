@@ -32,31 +32,40 @@ class _BudgetCategoriesPageState extends State<BudgetCategoriesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text('BudgetCategories'), // TODO
-        actions: [
-          IconButton(
-            onPressed: crudHandler.reload,
-            icon: const Icon(Icons.refresh),
-          ),
-        ],
-      ),
-      body: BudgetCategoryList(
-        crudHandler: crudHandler,
-        fromDate: fromDate,
-        toDate: toDate,
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          await Navigator.of(context).push(MaterialPageRoute<void>(
-            builder: (BuildContext context) => const BudgetCategoryPage(),
-          ));
-          crudHandler.reload();
-        },
-        tooltip: 'Add', // TODO
-        child: const Icon(Icons.add),
-      ),
+      appBar: appBar(),
+      body: body(),
+      floatingActionButton: addButton(),
+    );
+  }
+
+  PreferredSizeWidget appBar() {
+    return AppBar(
+      backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+      title: const Text('BudgetCategories'), // TODO
+      actions: [
+        IconButton(
+          onPressed: crudHandler.reload,
+          icon: const Icon(Icons.refresh),
+        ),
+      ],
+    );
+  }
+
+  Widget body() {
+    return BudgetCategoryList(
+      crudHandler: crudHandler,
+      fromDate: fromDate,
+      toDate: toDate,
+      onFromDateChange: (value) {
+        setState(() {
+          fromDate = value;
+        });
+      },
+      onToDateChange: (value) {
+        setState(() {
+          toDate = value;
+        });
+      },
     );
   }
 
@@ -69,7 +78,11 @@ class _BudgetCategoriesPageState extends State<BudgetCategoriesPage> {
       case ItemAction.select:
         {
           await Navigator.of(context).push(MaterialPageRoute<void>(
-            builder: (BuildContext context) => BudgetCategoryPage(value: item),
+            builder: (BuildContext context) => BudgetCategoryPage(
+              value: item,
+              fromDate: fromDate,
+              toDate: toDate,
+            ),
           ));
           break;
         }
@@ -84,5 +97,21 @@ class _BudgetCategoriesPageState extends State<BudgetCategoriesPage> {
         }
     }
     crudHandler.reload();
+  }
+
+  Widget addButton() {
+    return FloatingActionButton(
+      onPressed: () async {
+        await Navigator.of(context).push(MaterialPageRoute<void>(
+          builder: (BuildContext context) => BudgetCategoryPage(
+            fromDate: fromDate,
+            toDate: toDate,
+          ),
+        ));
+        crudHandler.reload();
+      },
+      tooltip: 'Add', // TODO
+      child: const Icon(Icons.add),
+    );
   }
 }

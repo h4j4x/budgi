@@ -6,10 +6,14 @@ import 'common/max_width.dart';
 
 class BudgetCategoryEdit extends StatefulWidget {
   final BudgetCategoryAmount? value;
+  final DateTime fromDate;
+  final DateTime toDate;
 
   const BudgetCategoryEdit({
     super.key,
     this.value,
+    required this.fromDate,
+    required this.toDate,
   });
 
   @override
@@ -78,10 +82,8 @@ class _BudgetCategoryEditState extends State<BudgetCategoryEdit> {
     await DI().budgetCategoryService().saveAmount(
           categoryCode: widget.value?.budgetCategory.code,
           categoryName: nameController.text,
-          fromDate: DateTime.now(),
-          // TODO
-          toDate: DateTime.now().add(const Duration(days: 1)),
-          // TODO
+          fromDate: widget.fromDate,
+          toDate: widget.toDate,
           amount: 1.0, // TODO
         );
     setState(() {

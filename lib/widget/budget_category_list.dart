@@ -9,6 +9,8 @@ import '../model/item_action.dart';
 class BudgetCategoryList extends StatefulWidget {
   final DateTime fromDate;
   final DateTime toDate;
+  final Function(DateTime) onFromDateChange;
+  final Function(DateTime) onToDateChange;
 
   final CrudHandler<BudgetCategoryAmount> crudHandler;
 
@@ -17,6 +19,8 @@ class BudgetCategoryList extends StatefulWidget {
     required this.crudHandler,
     required this.fromDate,
     required this.toDate,
+    required this.onFromDateChange,
+    required this.onToDateChange,
   });
 
   @override
@@ -62,24 +66,35 @@ class _BudgetCategoryListState extends State<BudgetCategoryList> {
         child: CircularProgressIndicator.adaptive(),
       );
     }
-    return ResponsiveWidget(mobile: mobile(), desktop: desktop());
-  }
-
-  Widget mobile() {
-    return ListView.separated(
-      itemBuilder: (_, index) {
-        return listItem(list[index]);
-      },
-      separatorBuilder: (_, __) {
-        return const Divider();
-      },
-      itemCount: list.length,
+    return ResponsiveWidget(
+      mobile: mobile(),
+      desktop: mobile(),
     );
   }
 
-  Widget desktop() {
-    return const Center(
-      child: Text('DESKTOP'), // TODO
+  Widget mobile() {
+    return Column(
+      children: [
+        toolBar(),
+        ListView.separated(
+          shrinkWrap: true,
+          itemBuilder: (_, index) {
+            return listItem(list[index]);
+          },
+          separatorBuilder: (_, __) {
+            return const Divider();
+          },
+          itemCount: list.length,
+        ),
+      ],
+    );
+  }
+
+  Widget toolBar() {
+    return Row(
+      children: [
+        Text('fromDate ${widget.fromDate}'),
+      ],
     );
   }
 
