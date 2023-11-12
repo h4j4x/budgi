@@ -16,5 +16,9 @@ abstract class BudgetCategoryService {
     Sort? amountSort,
   });
 
-  Future<void> removeAmount(String code);
+  Future<void> deleteAmount({
+    required String code,
+    required DateTime fromDate,
+    required DateTime toDate,
+  });
 }

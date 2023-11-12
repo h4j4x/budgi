@@ -50,11 +50,14 @@ class BudgetCategoryMemoryService implements BudgetCategoryService {
   }
 
   @override
-  Future<void> removeAmount(String code) {
-    categories.remove(code);
-    for (var set in values.values) {
-      set.removeWhere((amount) => amount.budgetCategory.code == code);
-    }
+  Future<void> deleteAmount({
+    required String code,
+    required DateTime fromDate,
+    required DateTime toDate,
+  }) {
+    final amountCode = _datesCode(fromDate, toDate);
+    final set = values[amountCode] ?? {};
+    set.removeWhere((amount) => amount.budgetCategory.code == code);
     return Future.value();
   }
 

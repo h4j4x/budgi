@@ -4,13 +4,19 @@ import 'package:flutter/material.dart';
 
 import '../di.dart';
 import '../model/crud_handler.dart';
+import '../model/item_action.dart';
 
 class BudgetCategoryList extends StatefulWidget {
+  final DateTime fromDate;
+  final DateTime toDate;
+
   final CrudHandler<BudgetCategoryAmount> crudHandler;
 
   const BudgetCategoryList({
     super.key,
     required this.crudHandler,
+    required this.fromDate,
+    required this.toDate,
   });
 
   @override
@@ -38,11 +44,9 @@ class _BudgetCategoryListState extends State<BudgetCategoryList> {
     setState(() {
       loading = true;
     });
-    final fromDate = DateTime.now(); // TODO
-    final toDate = fromDate.add(const Duration(days: 1)); // TODO
     final values = await DI().budgetCategoryService().listAmounts(
-          fromDate: fromDate,
-          toDate: toDate,
+          fromDate: widget.fromDate,
+          toDate: widget.toDate,
         );
     list.clear();
     list.addAll(values);
@@ -82,9 +86,15 @@ class _BudgetCategoryListState extends State<BudgetCategoryList> {
   Widget listItem(BudgetCategoryAmount item) {
     return ListTile(
       title: Text(item.budgetCategory.name),
-      subtitle: Text(item.budgetCategory.code),
+      subtitle: Text('\$${item.amount.toStringAsFixed(2)}'),
+      trailing: IconButton(
+        icon: const Icon(Icons.delete),
+        onPressed: () {
+          widget.crudHandler.onItemAction(context, item, ItemAction.delete);
+        },
+      ),
       onTap: () {
-        widget.crudHandler.onItemAction(context, item);
+        widget.crudHandler.onItemAction(context, item, ItemAction.select);
       },
     );
   }

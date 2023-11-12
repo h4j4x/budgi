@@ -34,7 +34,11 @@ void main() {
       );
       expect(list.length, equals(1));
 
-      await service.removeAmount(category.budgetCategory.code);
+      await service.deleteAmount(
+        code: category.budgetCategory.code,
+        fromDate: fromDate,
+        toDate: toDate,
+      );
       list = await service.listAmounts(
         fromDate: fromDate,
         toDate: toDate,

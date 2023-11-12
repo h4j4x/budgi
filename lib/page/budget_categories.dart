@@ -1,5 +1,7 @@
+import 'package:budgi/di.dart';
 import 'package:budgi/model/budget_category.dart';
 import 'package:budgi/model/crud_handler.dart';
+import 'package:budgi/model/item_action.dart';
 import 'package:budgi/page/budget_category.dart';
 import 'package:flutter/material.dart';
 
@@ -16,11 +18,15 @@ class BudgetCategoriesPage extends StatefulWidget {
 
 class _BudgetCategoriesPageState extends State<BudgetCategoriesPage> {
   late CrudHandler<BudgetCategoryAmount> crudHandler;
+  late DateTime fromDate;
+  late DateTime toDate;
 
   @override
   void initState() {
     super.initState();
     crudHandler = CrudHandler(onItemAction: onItemAction);
+    fromDate = DateTime.now(); // TODO
+    toDate = fromDate.add(const Duration(days: 1)); // TODO
   }
 
   @override
@@ -36,7 +42,11 @@ class _BudgetCategoriesPageState extends State<BudgetCategoriesPage> {
           ),
         ],
       ),
-      body: BudgetCategoryList(crudHandler: crudHandler),
+      body: BudgetCategoryList(
+        crudHandler: crudHandler,
+        fromDate: fromDate,
+        toDate: toDate,
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           await Navigator.of(context).push(MaterialPageRoute<void>(
@@ -50,10 +60,29 @@ class _BudgetCategoriesPageState extends State<BudgetCategoriesPage> {
     );
   }
 
-  void onItemAction(BuildContext context, BudgetCategoryAmount item) async {
-    await Navigator.of(context).push(MaterialPageRoute<void>(
-      builder: (BuildContext context) => BudgetCategoryPage(value: item),
-    ));
+  void onItemAction(
+    BuildContext context,
+    BudgetCategoryAmount item,
+    ItemAction action,
+  ) async {
+    switch (action) {
+      case ItemAction.select:
+        {
+          await Navigator.of(context).push(MaterialPageRoute<void>(
+            builder: (BuildContext context) => BudgetCategoryPage(value: item),
+          ));
+          break;
+        }
+      case ItemAction.delete:
+        {
+          await DI().budgetCategoryService().deleteAmount(
+                code: item.budgetCategory.code,
+                fromDate: fromDate,
+                toDate: toDate,
+              );
+          break;
+        }
+    }
     crudHandler.reload();
   }
 }
