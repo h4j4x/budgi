@@ -1,10 +1,12 @@
 import 'package:budgi/model/budget_category.dart';
+import 'package:budgi/widget/common/max_width.dart';
 import 'package:budgi/widget/common/responsive.dart';
 import 'package:flutter/material.dart';
 
 import '../di.dart';
 import '../model/crud_handler.dart';
 import '../model/item_action.dart';
+import 'common/date_input.dart';
 
 class BudgetCategoryList extends StatefulWidget {
   final DateTime fromDate;
@@ -91,10 +93,20 @@ class _BudgetCategoryListState extends State<BudgetCategoryList> {
   }
 
   Widget toolBar() {
-    return Row(
-      children: [
-        Text('fromDate ${widget.fromDate}'),
-      ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+      child: Row(
+        children: [
+          MaxWidthWidget(
+            maxWidth: 200,
+            child: DateInputWidget(
+              label: 'FROM DATE', // TODO
+              value: widget.fromDate,
+              onChange: widget.onFromDateChange,
+            ),
+          ),
+        ],
+      ),
     );
   }
 

@@ -41,7 +41,6 @@ class _BudgetCategoriesPageState extends State<BudgetCategoriesPage> {
 
   PreferredSizeWidget appBar() {
     return AppBar(
-      backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       title: const Text('BudgetCategories'), // TODO
       actions: [
         IconButton(
