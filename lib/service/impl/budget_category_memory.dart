@@ -23,6 +23,8 @@ class BudgetCategoryMemoryService implements BudgetCategoryService {
         _BudgetCategoryAmount(category, fromDate, toDate, amount);
     final amountCode = _datesCode(fromDate, toDate);
     values[amountCode] ??= <BudgetCategoryAmount>{};
+    values[amountCode]!.removeWhere(
+        (amount) => amount.budgetCategory.code == budgetCategoryCode);
     values[amountCode]!.add(categoryAmount);
     return Future.value(categoryAmount);
   }

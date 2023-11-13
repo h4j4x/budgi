@@ -124,5 +124,6 @@ void main() {
       toDate: toDate,
     );
     expect(list.length, equals(1));
+    expect(list[0].budgetCategory.name, equals(updatedName));
   });
 }

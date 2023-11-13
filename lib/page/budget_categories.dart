@@ -5,6 +5,7 @@ import 'package:budgi/model/item_action.dart';
 import 'package:budgi/page/budget_category.dart';
 import 'package:flutter/material.dart';
 
+import '../util/datetime.dart';
 import '../widget/budget_category_list.dart';
 
 class BudgetCategoriesPage extends StatefulWidget {
@@ -25,7 +26,7 @@ class _BudgetCategoriesPageState extends State<BudgetCategoriesPage> {
   void initState() {
     super.initState();
     crudHandler = CrudHandler(onItemAction: onItemAction);
-    fromDate = DateTime.now(); // TODO
+    fromDate = DateTime.now().atStartOfDay(); // TODO
     toDate = fromDate.add(const Duration(days: 1)); // TODO
   }
 
