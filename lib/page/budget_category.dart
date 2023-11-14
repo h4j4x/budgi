@@ -18,8 +18,8 @@ class BudgetCategoryPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text('BudgetCategory'),
+        title:
+            Text('BudgetCategory ${value != null ? 'edit' : 'create'}'), // TODO
       ),
       body: Padding(
         padding: const EdgeInsets.only(left: 8.0, top: 8.0, right: 8.0),

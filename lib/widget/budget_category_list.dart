@@ -39,7 +39,13 @@ class _BudgetCategoryListState extends State<BudgetCategoryList> {
   @override
   void initState() {
     super.initState();
-    widget.crudHandler.reload = loadList;
+    widget.crudHandler.reload = () {
+      Future.delayed(Duration.zero, () {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          loadList();
+        });
+      });
+    };
     Future.delayed(Duration.zero, loadList);
   }
 
@@ -78,6 +84,7 @@ class _BudgetCategoryListState extends State<BudgetCategoryList> {
     return Column(
       children: [
         toolBar(),
+        const Divider(),
         ListView.separated(
           shrinkWrap: true,
           itemBuilder: (_, index) {
@@ -95,7 +102,9 @@ class _BudgetCategoryListState extends State<BudgetCategoryList> {
   Widget toolBar() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-      child: Row(
+      child: Wrap(
+        runSpacing: 8,
+        spacing: 8,
         children: [
           MaxWidthWidget(
             maxWidth: 200,
@@ -103,6 +112,14 @@ class _BudgetCategoryListState extends State<BudgetCategoryList> {
               label: 'FROM DATE', // TODO
               value: widget.fromDate,
               onChange: widget.onFromDateChange,
+            ),
+          ),
+          MaxWidthWidget(
+            maxWidth: 200,
+            child: DateInputWidget(
+              label: 'TO DATE', // TODO
+              value: widget.toDate,
+              onChange: widget.onToDateChange,
             ),
           ),
         ],

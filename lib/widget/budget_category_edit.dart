@@ -2,6 +2,8 @@ import 'package:budgi/di.dart';
 import 'package:budgi/model/budget_category.dart';
 import 'package:flutter/material.dart';
 
+import '../error/validation.dart';
+import '../service/impl/budget_category_validator.dart';
 import 'common/max_width.dart';
 
 class BudgetCategoryEdit extends StatefulWidget {
@@ -24,6 +26,7 @@ class BudgetCategoryEdit extends StatefulWidget {
 
 class _BudgetCategoryEditState extends State<BudgetCategoryEdit> {
   final nameController = TextEditingController();
+  final errors = <String, String>{};
 
   bool saving = false;
 
@@ -36,20 +39,22 @@ class _BudgetCategoryEditState extends State<BudgetCategoryEdit> {
   @override
   Widget build(BuildContext context) {
     final items = <Widget>[
-      const Text(
-        'CATEGGG TODO', // TODO
-        textScaleFactor: 1.2,
-      ),
       TextField(
         controller: nameController,
         textInputAction: TextInputAction.next,
         autofocus: true,
         maxLength: 200,
         enabled: !saving,
-        decoration: const InputDecoration(
+        decoration: InputDecoration(
           labelText: 'Category name', // TODO
           hintText: 'Enter category name...', // TODO
+          errorText: errors[BudgetCategoryAmountValidator.categoryName], // TODO
         ),
+        onChanged: (_) {
+          setState(() {
+            errors.remove(BudgetCategoryAmountValidator.categoryName);
+          });
+        },
       ),
       Center(
         child: MaxWidthWidget(
@@ -77,20 +82,26 @@ class _BudgetCategoryEditState extends State<BudgetCategoryEdit> {
       return;
     }
     setState(() {
+      errors.clear();
       saving = true;
     });
-    await DI().budgetCategoryService().saveAmount(
-          categoryCode: widget.value?.budgetCategory.code,
-          categoryName: nameController.text,
-          fromDate: widget.fromDate,
-          toDate: widget.toDate,
-          amount: 1.0, // TODO
-        );
-    setState(() {
-      saving = false;
-    });
-    if (mounted) {
-      Navigator.of(context).pop();
+    try {
+      await DI().budgetCategoryService().saveAmount(
+            categoryCode: widget.value?.budgetCategory.code,
+            categoryName: nameController.text,
+            fromDate: widget.fromDate,
+            toDate: widget.toDate,
+            amount: 1.0, // TODO
+          );
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+    } on ValidationError catch (e) {
+      errors.addAll(e.errors);
+    } finally {
+      setState(() {
+        saving = false;
+      });
     }
   }
 }

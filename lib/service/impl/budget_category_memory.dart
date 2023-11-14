@@ -1,11 +1,16 @@
+import '../../error/validation.dart';
 import '../../model/budget_category.dart';
 import '../../model/sort.dart';
 import '../../util/string.dart';
 import '../budget_category.dart';
+import '../validator.dart';
 
 class BudgetCategoryMemoryService implements BudgetCategoryService {
+  final Validator<BudgetCategoryAmount>? validator;
   final categories = <String, BudgetCategory>{};
   final values = <String, Set<BudgetCategoryAmount>>{};
+
+  BudgetCategoryMemoryService({this.validator});
 
   @override
   Future<BudgetCategoryAmount> saveAmount({
@@ -15,12 +20,16 @@ class BudgetCategoryMemoryService implements BudgetCategoryService {
     required DateTime toDate,
     required double amount,
   }) {
-    // TODO: validations
     final budgetCategoryCode = categoryCode ?? randomString(6);
     final category = _BudgetCategory(budgetCategoryCode, categoryName);
     categories[budgetCategoryCode] = category;
     final categoryAmount =
         _BudgetCategoryAmount(category, fromDate, toDate, amount);
+    final errors = validator?.validate(categoryAmount);
+    if (errors?.isNotEmpty ?? false) {
+      throw ValidationError(errors!);
+    }
+
     final amountCode = _datesCode(fromDate, toDate);
     values[amountCode] ??= <BudgetCategoryAmount>{};
     values[amountCode]!.removeWhere(

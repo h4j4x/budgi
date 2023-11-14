@@ -59,11 +59,13 @@ class _BudgetCategoriesPageState extends State<BudgetCategoriesPage> {
       onFromDateChange: (value) {
         setState(() {
           fromDate = value;
+          crudHandler.reload();
         });
       },
       onToDateChange: (value) {
         setState(() {
           toDate = value;
+          crudHandler.reload();
         });
       },
     );

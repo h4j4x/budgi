@@ -2,6 +2,7 @@ import '../model/budget_category.dart';
 import '../model/sort.dart';
 
 abstract class BudgetCategoryService {
+  /// @throws ValidationError
   Future<BudgetCategoryAmount> saveAmount({
     String? categoryCode,
     required String categoryName,

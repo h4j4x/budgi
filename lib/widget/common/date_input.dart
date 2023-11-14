@@ -32,10 +32,10 @@ class DateInputWidget extends StatelessWidget {
           context: context,
           initialDate: value,
           firstDate: DateTime(now.year - 1),
-          lastDate: now,
+          lastDate: DateTime(now.year + 1),
         );
         if (selected != null) {
-          onChange(selected);
+          onChange(selected.atStartOfDay());
         }
       },
       child: Row(
