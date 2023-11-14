@@ -1,6 +1,8 @@
-import 'package:budgi/di.dart';
-import 'package:budgi/page/budget_categories.dart';
 import 'package:flutter/material.dart';
+
+import 'di.dart';
+import 'l10n/l10n.dart';
+import 'page/budget_categories.dart';
 
 void main() {
   DI().setup();
@@ -13,12 +15,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo', // TODO
+      onGenerateTitle: (context) => L10n.of(context).appTitle,
       theme: ThemeData(
         // TODO
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
+      localizationsDelegates: L10n.localizationsDelegates,
+      supportedLocales: L10n.supportedLocales,
       home: const BudgetCategoriesPage(), // TODO
     );
   }

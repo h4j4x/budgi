@@ -11,6 +11,7 @@ extension DateTimeExtension on DateTime {
     );
   }
 
+  // TODO: https://docs.flutter.dev/ui/accessibility-and-internationalization/internationalization#messages-with-dates
   String toStringFormatted(String pattern) {
     return Jiffy.parseFromDateTime(this).format(pattern: pattern);
   }

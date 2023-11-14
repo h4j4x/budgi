@@ -1,8 +1,8 @@
-import 'package:budgi/di.dart';
-import 'package:budgi/model/budget_category.dart';
 import 'package:flutter/material.dart';
 
+import '../di.dart';
 import '../error/validation.dart';
+import '../model/budget_category.dart';
 import '../service/impl/budget_category_validator.dart';
 import 'common/max_width.dart';
 

@@ -1,7 +1,8 @@
-import 'package:budgi/service/budget_category.dart';
-import 'package:budgi/service/impl/budget_category_memory.dart';
-import 'package:budgi/service/impl/budget_category_validator.dart';
 import 'package:get_it/get_it.dart';
+
+import 'service/budget_category.dart';
+import 'service/impl/budget_category_memory.dart';
+import 'service/impl/budget_category_validator.dart';
 
 class DI {
   static final DI _singleton = DI._();

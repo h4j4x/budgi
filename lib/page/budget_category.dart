@@ -1,6 +1,7 @@
-import 'package:budgi/model/budget_category.dart';
-import 'package:budgi/widget/budget_category_edit.dart';
 import 'package:flutter/material.dart';
+
+import '../model/budget_category.dart';
+import '../widget/budget_category_edit.dart';
 
 class BudgetCategoryPage extends StatelessWidget {
   final BudgetCategoryAmount? value;

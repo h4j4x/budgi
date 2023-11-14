@@ -1,12 +1,12 @@
-import 'package:budgi/di.dart';
-import 'package:budgi/model/budget_category.dart';
-import 'package:budgi/model/crud_handler.dart';
-import 'package:budgi/model/item_action.dart';
-import 'package:budgi/page/budget_category.dart';
 import 'package:flutter/material.dart';
 
+import '../di.dart';
+import '../model/budget_category.dart';
+import '../model/crud_handler.dart';
+import '../model/item_action.dart';
 import '../util/datetime.dart';
 import '../widget/budget_category_list.dart';
+import 'budget_category.dart';
 
 class BudgetCategoriesPage extends StatefulWidget {
   const BudgetCategoriesPage({super.key});

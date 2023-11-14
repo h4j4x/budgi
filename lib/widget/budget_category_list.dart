@@ -1,12 +1,12 @@
-import 'package:budgi/model/budget_category.dart';
-import 'package:budgi/widget/common/max_width.dart';
-import 'package:budgi/widget/common/responsive.dart';
 import 'package:flutter/material.dart';
 
 import '../di.dart';
+import '../model/budget_category.dart';
 import '../model/crud_handler.dart';
 import '../model/item_action.dart';
 import 'common/date_input.dart';
+import 'common/max_width.dart';
+import 'common/responsive.dart';
 
 class BudgetCategoryList extends StatefulWidget {
   final DateTime fromDate;
