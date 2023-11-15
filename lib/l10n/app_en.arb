@@ -1,3 +1,17 @@
 {
-  "appTitle": "Budg1"
+  "appTitle": "Budg1",
+  "fromDate": "From date",
+  "prefixWithDate": "{prefix}{date}",
+  "@prefixWithDate": {
+    "placeholders": {
+      "prefix": {
+        "type": "String"
+      },
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMd"
+      }
+    }
+  },
+  "toDate": "To date"
 }

@@ -96,6 +96,24 @@ abstract class L10n {
   /// In en, this message translates to:
   /// **'Budg1'**
   String get appTitle;
+
+  /// No description provided for @fromDate.
+  ///
+  /// In en, this message translates to:
+  /// **'From date'**
+  String get fromDate;
+
+  /// No description provided for @prefixWithDate.
+  ///
+  /// In en, this message translates to:
+  /// **'{prefix}{date}'**
+  String prefixWithDate(String prefix, DateTime date);
+
+  /// No description provided for @toDate.
+  ///
+  /// In en, this message translates to:
+  /// **'To date'**
+  String get toDate;
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {

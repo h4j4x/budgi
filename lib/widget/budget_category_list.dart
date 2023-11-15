@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../di.dart';
+import '../l10n/l10n.dart';
 import '../model/budget_category.dart';
 import '../model/crud_handler.dart';
 import '../model/item_action.dart';
@@ -100,6 +101,7 @@ class _BudgetCategoryListState extends State<BudgetCategoryList> {
   }
 
   Widget toolBar() {
+    final l10n = L10n.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       child: Wrap(
@@ -109,15 +111,17 @@ class _BudgetCategoryListState extends State<BudgetCategoryList> {
           MaxWidthWidget(
             maxWidth: 200,
             child: DateInputWidget(
-              label: 'FROM DATE', // TODO
+              label: l10n.fromDate,
               value: widget.fromDate,
+              maxValue: widget.toDate.add(const Duration(days: -1)),
               onChange: widget.onFromDateChange,
             ),
           ),
           MaxWidthWidget(
             maxWidth: 200,
             child: DateInputWidget(
-              label: 'TO DATE', // TODO
+              label: l10n.toDate,
+              minValue: widget.fromDate.add(const Duration(days: 1)),
               value: widget.toDate,
               onChange: widget.onToDateChange,
             ),

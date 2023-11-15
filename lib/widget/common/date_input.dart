@@ -1,27 +1,32 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/l10n.dart';
 import '../../util/datetime.dart';
 
 class DateInputWidget extends StatelessWidget {
+  final DateTime? minValue;
   final DateTime value;
+  final DateTime? maxValue;
   final String? label;
   final String pattern;
   final Function(DateTime) onChange;
 
   const DateInputWidget({
     super.key,
+    this.minValue,
     required this.value,
+    this.maxValue,
     this.label,
     this.pattern = 'dd/MM/yyyy',
     required this.onChange,
   });
 
-  String get text {
+  String text(BuildContext context) {
     String prefix = '';
     if (label != null) {
       prefix = '$label: ';
     }
-    return '$prefix ${value.toStringFormatted(pattern)}';
+    return L10n.of(context).prefixWithDate(prefix, value);
   }
 
   @override
@@ -32,8 +37,8 @@ class DateInputWidget extends StatelessWidget {
         final selected = await showDatePicker(
           context: context,
           initialDate: value,
-          firstDate: DateTime(now.year - 1),
-          lastDate: DateTime(now.year + 1),
+          firstDate: minValue ?? DateTime(now.year - 1),
+          lastDate: maxValue ?? DateTime(now.year + 1),
         );
         if (selected != null) {
           onChange(selected.atStartOfDay());
@@ -47,7 +52,7 @@ class DateInputWidget extends StatelessWidget {
           ),
           Expanded(
             child: Center(
-              child: Text(text),
+              child: Text(text(context)),
             ),
           ),
         ],
