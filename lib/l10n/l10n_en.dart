@@ -16,7 +16,22 @@ class L10nEn extends L10n {
   String get budget => 'Budget';
 
   @override
+  String get budgetAmount => 'Budget amount';
+
+  @override
+  String get budgetAmountHint => 'Enter budget amount...';
+
+  @override
   String get budgets => 'Budgets';
+
+  @override
+  String get cancelAction => 'Cancel';
+
+  @override
+  String get categoryName => 'Category name';
+
+  @override
+  String get categoryNameHint => 'Enter category name...';
 
   @override
   String get createAction => 'Create';
@@ -28,7 +43,10 @@ class L10nEn extends L10n {
   String get fromDate => 'From date';
 
   @override
-  String get invalidBudgetCategoryName => 'Invalid budget category name';
+  String get invalidBudgetAmount => 'Invalid budget amount. Enter a non negative number for amount.';
+
+  @override
+  String get invalidBudgetCategoryName => 'Invalid budget category name. Enter a non empty name with no more than 255 characters.';
 
   @override
   String prefixWithDate(String prefix, DateTime date) {
@@ -37,6 +55,9 @@ class L10nEn extends L10n {
 
     return '$prefix$dateString';
   }
+
+  @override
+  String get saveAction => 'Save';
 
   @override
   String get toDate => 'To date';

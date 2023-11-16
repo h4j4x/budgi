@@ -109,11 +109,41 @@ abstract class L10n {
   /// **'Budget'**
   String get budget;
 
+  /// No description provided for @budgetAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget amount'**
+  String get budgetAmount;
+
+  /// No description provided for @budgetAmountHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter budget amount...'**
+  String get budgetAmountHint;
+
   /// No description provided for @budgets.
   ///
   /// In en, this message translates to:
   /// **'Budgets'**
   String get budgets;
+
+  /// No description provided for @cancelAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancelAction;
+
+  /// No description provided for @categoryName.
+  ///
+  /// In en, this message translates to:
+  /// **'Category name'**
+  String get categoryName;
+
+  /// No description provided for @categoryNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter category name...'**
+  String get categoryNameHint;
 
   /// No description provided for @createAction.
   ///
@@ -133,10 +163,16 @@ abstract class L10n {
   /// **'From date'**
   String get fromDate;
 
+  /// No description provided for @invalidBudgetAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid budget amount. Enter a non negative number for amount.'**
+  String get invalidBudgetAmount;
+
   /// No description provided for @invalidBudgetCategoryName.
   ///
   /// In en, this message translates to:
-  /// **'Invalid budget category name'**
+  /// **'Invalid budget category name. Enter a non empty name with no more than 255 characters.'**
   String get invalidBudgetCategoryName;
 
   /// No description provided for @prefixWithDate.
@@ -144,6 +180,12 @@ abstract class L10n {
   /// In en, this message translates to:
   /// **'{prefix}{date}'**
   String prefixWithDate(String prefix, DateTime date);
+
+  /// No description provided for @saveAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get saveAction;
 
   /// No description provided for @toDate.
   ///

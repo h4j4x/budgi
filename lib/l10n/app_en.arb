@@ -2,11 +2,17 @@
   "addAction": "Add",
   "appTitle": "Budg1",
   "budget": "Budget",
+  "budgetAmount": "Budget amount",
+  "budgetAmountHint": "Enter budget amount...",
   "budgets": "Budgets",
+  "cancelAction": "Cancel",
+  "categoryName": "Category name",
+  "categoryNameHint": "Enter category name...",
   "createAction": "Create",
   "editAction": "Edit",
   "fromDate": "From date",
-  "invalidBudgetCategoryName": "Invalid budget category name",
+  "invalidBudgetAmount": "Invalid budget amount. Enter a non negative number for amount.",
+  "invalidBudgetCategoryName": "Invalid budget category name. Enter a non empty name with no more than 255 characters.",
   "prefixWithDate": "{prefix}{date}",
   "@prefixWithDate": {
     "placeholders": {
@@ -19,5 +25,6 @@
       }
     }
   },
+  "saveAction": "Save",
   "toDate": "To date"
 }

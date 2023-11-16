@@ -6,7 +6,6 @@ import '../model/budget_category.dart';
 import '../model/crud_handler.dart';
 import '../model/item_action.dart';
 import 'common/date_input.dart';
-import 'common/max_width.dart';
 import 'common/responsive.dart';
 
 class BudgetCategoryList extends StatefulWidget {
@@ -108,8 +107,8 @@ class _BudgetCategoryListState extends State<BudgetCategoryList> {
         runSpacing: 8,
         spacing: 8,
         children: [
-          MaxWidthWidget(
-            maxWidth: 200,
+          Container(
+            constraints: const BoxConstraints(maxWidth: 200),
             child: DateInputWidget(
               label: l10n.fromDate,
               value: widget.fromDate,
@@ -117,8 +116,8 @@ class _BudgetCategoryListState extends State<BudgetCategoryList> {
               onChange: widget.onFromDateChange,
             ),
           ),
-          MaxWidthWidget(
-            maxWidth: 200,
+          Container(
+            constraints: const BoxConstraints(maxWidth: 200),
             child: DateInputWidget(
               label: l10n.toDate,
               minValue: widget.fromDate.add(const Duration(days: 1)),
