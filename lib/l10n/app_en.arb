@@ -1,6 +1,12 @@
 {
+  "addAction": "Add",
   "appTitle": "Budg1",
+  "budget": "Budget",
+  "budgets": "Budgets",
+  "createAction": "Create",
+  "editAction": "Edit",
   "fromDate": "From date",
+  "invalidBudgetCategoryName": "Invalid budget category name",
   "prefixWithDate": "{prefix}{date}",
   "@prefixWithDate": {
     "placeholders": {

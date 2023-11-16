@@ -1,5 +1,5 @@
-class ValidationError extends Error {
-  final Map<String, String> errors;
+class ValidationError<E> extends Error {
+  final Map<String, E> errors;
 
   ValidationError(this.errors);
 }

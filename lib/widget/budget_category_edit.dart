@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../di.dart';
 import '../error/validation.dart';
 import '../model/budget_category.dart';
+import '../model/budget_category_error.dart';
 import '../service/impl/budget_category_validator.dart';
 import 'common/max_width.dart';
 
@@ -26,7 +27,7 @@ class BudgetCategoryEdit extends StatefulWidget {
 
 class _BudgetCategoryEditState extends State<BudgetCategoryEdit> {
   final nameController = TextEditingController();
-  final errors = <String, String>{};
+  final errors = <String, BudgetCategoryError>{};
 
   bool saving = false;
 
@@ -48,7 +49,8 @@ class _BudgetCategoryEditState extends State<BudgetCategoryEdit> {
         decoration: InputDecoration(
           labelText: 'Category name', // TODO
           hintText: 'Enter category name...', // TODO
-          errorText: errors[BudgetCategoryAmountValidator.categoryName], // TODO
+          errorText:
+              errors[BudgetCategoryAmountValidator.categoryName]?.l10n(context),
         ),
         onChanged: (_) {
           setState(() {
@@ -96,7 +98,7 @@ class _BudgetCategoryEditState extends State<BudgetCategoryEdit> {
       if (mounted) {
         Navigator.of(context).pop();
       }
-    } on ValidationError catch (e) {
+    } on ValidationError<BudgetCategoryError> catch (e) {
       errors.addAll(e.errors);
     } finally {
       setState(() {

@@ -91,17 +91,53 @@ abstract class L10n {
     Locale('en')
   ];
 
+  /// No description provided for @addAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get addAction;
+
   /// No description provided for @appTitle.
   ///
   /// In en, this message translates to:
   /// **'Budg1'**
   String get appTitle;
 
+  /// No description provided for @budget.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget'**
+  String get budget;
+
+  /// No description provided for @budgets.
+  ///
+  /// In en, this message translates to:
+  /// **'Budgets'**
+  String get budgets;
+
+  /// No description provided for @createAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get createAction;
+
+  /// No description provided for @editAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get editAction;
+
   /// No description provided for @fromDate.
   ///
   /// In en, this message translates to:
   /// **'From date'**
   String get fromDate;
+
+  /// No description provided for @invalidBudgetCategoryName.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid budget category name'**
+  String get invalidBudgetCategoryName;
 
   /// No description provided for @prefixWithDate.
   ///

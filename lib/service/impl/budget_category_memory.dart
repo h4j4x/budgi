@@ -1,12 +1,13 @@
 import '../../error/validation.dart';
 import '../../model/budget_category.dart';
+import '../../model/budget_category_error.dart';
 import '../../model/sort.dart';
 import '../../util/string.dart';
 import '../budget_category.dart';
 import '../validator.dart';
 
 class BudgetCategoryMemoryService implements BudgetCategoryService {
-  final Validator<BudgetCategoryAmount>? validator;
+  final Validator<BudgetCategoryAmount, BudgetCategoryError>? validator;
   final categories = <String, BudgetCategory>{};
   final values = <String, Set<BudgetCategoryAmount>>{};
 

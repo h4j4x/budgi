@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../di.dart';
+import '../l10n/l10n.dart';
 import '../model/budget_category.dart';
 import '../model/crud_handler.dart';
 import '../model/item_action.dart';
@@ -41,7 +42,7 @@ class _BudgetCategoriesPageState extends State<BudgetCategoriesPage> {
 
   PreferredSizeWidget appBar() {
     return AppBar(
-      title: const Text('BudgetCategories'), // TODO
+      title: Text(L10n.of(context).budgets),
       actions: [
         IconButton(
           onPressed: crudHandler.reload,
@@ -112,7 +113,7 @@ class _BudgetCategoriesPageState extends State<BudgetCategoriesPage> {
         ));
         crudHandler.reload();
       },
-      tooltip: 'Add', // TODO
+      tooltip: L10n.of(context).addAction,
       child: const Icon(Icons.add),
     );
   }

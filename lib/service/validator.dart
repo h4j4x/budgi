@@ -1,3 +1,3 @@
-abstract class Validator<T> {
-  Map<String, String> validate(T item);
+abstract class Validator<T, E> {
+  Map<String, E> validate(T item);
 }
