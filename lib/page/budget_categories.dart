@@ -88,7 +88,7 @@ class _BudgetCategoriesPageState extends State<BudgetCategoriesPage> {
     return FloatingActionButton(
       onPressed: () async {
         await Navigator.of(context).push(MaterialPageRoute<void>(
-          builder: (BuildContext context) => BudgetCategoryPage(),
+          builder: (BuildContext context) => const BudgetCategoryPage(),
         ));
         crudHandler.reload();
       },

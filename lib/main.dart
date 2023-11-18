@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'di.dart';
 import 'l10n/l10n.dart';
 import 'page/budget_categories_amount.dart';
+import 'theme.dart';
 
 void main() {
   DI().setup();
@@ -16,11 +17,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       onGenerateTitle: (context) => L10n.of(context).appTitle,
-      theme: ThemeData(
-        // TODO
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
+      theme: lightTheme,
+      darkTheme: darkTheme,
       localizationsDelegates: L10n.localizationsDelegates,
       supportedLocales: L10n.supportedLocales,
       home: const BudgetCategoriesAmountPage(), // TODO
