@@ -16,10 +16,12 @@ class DI {
   DI._() : _getIt = GetIt.instance;
 
   void setup() {
-    final budgetCategoryValidator = BudgetCategoryAmountValidator();
+    final budgetCategoryValidator = BudgetCategoryValidator();
+    final budgetCategoryAmountValidator = BudgetCategoryAmountValidator();
     _getIt.registerSingleton<BudgetCategoryService>(
       BudgetCategoryMemoryService(
-        validator: budgetCategoryValidator,
+        categoryValidator: budgetCategoryValidator,
+        amountValidator: budgetCategoryAmountValidator,
       ),
     );
   }

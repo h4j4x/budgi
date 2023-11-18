@@ -5,6 +5,33 @@ import 'package:budgi/service/impl/budget_category_memory.dart';
 import 'package:test/test.dart';
 
 void main() {
+  test('.saveCategory(), .listCategories(), .removeCategory()', () async {
+    final service = BudgetCategoryMemoryService();
+
+    const total = 10;
+    var lastCode = '';
+    for (var i = 1; i <= total; i++) {
+      final name = 'category-$i';
+      final category = await service.saveCategory(
+        name: name,
+      );
+      expect(category.code, isNotEmpty);
+      expect(category.name, equals(name));
+
+      final list = await service.listCategories();
+      expect(list.length, equals(i));
+
+      lastCode = category.code;
+    }
+
+    expect(lastCode, isNotEmpty);
+    await service.deleteCategory(
+      code: lastCode,
+    );
+    final list = await service.listCategories();
+    expect(list.length, equals(total - 1));
+  });
+
   test('.saveAmount(), .listAmounts(), .removeAmount()', () async {
     final service = BudgetCategoryMemoryService();
 
@@ -13,20 +40,23 @@ void main() {
     const totalDays = 10;
     for (var i = 1; i <= totalDays; i++) {
       final name = 'category-$i';
+      final category = await service.saveCategory(
+        name: name,
+      );
+
       final fromDate = startDate.add(Duration(days: i));
       final toDate = fromDate.add(const Duration(days: daysDiff));
       final amount = i.toDouble();
-      final category = await service.saveAmount(
-        categoryName: name,
+      final categoryAmount = await service.saveAmount(
+        categoryCode: category.code,
         fromDate: fromDate,
         toDate: toDate,
         amount: amount,
       );
-      expect(category.budgetCategory.code, isNotEmpty);
-      expect(category.budgetCategory.name, equals(name));
-      expect(category.fromDate, equals(fromDate));
-      expect(category.toDate, equals(toDate));
-      expect(category.amount, equals(amount));
+      expect(categoryAmount.category, equals(category));
+      expect(categoryAmount.fromDate, equals(fromDate));
+      expect(categoryAmount.toDate, equals(toDate));
+      expect(categoryAmount.amount, equals(amount));
 
       var list = await service.listAmounts(
         fromDate: fromDate,
@@ -35,7 +65,7 @@ void main() {
       expect(list.length, equals(1));
 
       await service.deleteAmount(
-        code: category.budgetCategory.code,
+        categoryCode: category.code,
         fromDate: fromDate,
         toDate: toDate,
       );
@@ -55,13 +85,17 @@ void main() {
     final random = Random();
     for (var i = 0; i < 20; i++) {
       final name = 'category-$i';
-      final category = await service.saveAmount(
-        categoryName: name,
+      final category = await service.saveCategory(
+        name: name,
+      );
+
+      final categoryAmount = await service.saveAmount(
+        categoryCode: category.code,
         fromDate: fromDate,
         toDate: toDate,
         amount: random.nextDouble(),
       );
-      expect(category.budgetCategory.code, isNotEmpty);
+      expect(categoryAmount.category, equals(category));
     }
 
     // ASC
@@ -92,15 +126,19 @@ void main() {
   test('.saveAmount() with update', () async {
     final service = BudgetCategoryMemoryService();
 
+    final category = await service.saveCategory(
+      name: 'test',
+    );
+
     final fromDate = DateTime.now();
     final toDate = DateTime.now()..add(const Duration(days: 2));
-    final category = await service.saveAmount(
-      categoryName: 'test',
+    final categoryAmount = await service.saveAmount(
+      categoryCode: category.code,
       fromDate: fromDate,
       toDate: toDate,
       amount: 10.0,
     );
-    expect(category.budgetCategory.code, isNotEmpty);
+    expect(categoryAmount.category, equals(category));
 
     var list = await service.listAmounts(
       fromDate: fromDate,
@@ -108,22 +146,21 @@ void main() {
     );
     expect(list.length, equals(1));
 
-    final updatedName = '${category.budgetCategory.name}-updated';
+    const updatedAmount = 20.0;
     final updated = await service.saveAmount(
-      categoryCode: category.budgetCategory.code,
-      categoryName: updatedName,
+      categoryCode: category.code,
       fromDate: fromDate,
       toDate: toDate,
-      amount: 20.0,
+      amount: updatedAmount,
     );
-    expect(updated.budgetCategory.code, equals(category.budgetCategory.code));
-    expect(updated.budgetCategory.name, equals(updatedName));
+    expect(updated.category, equals(category));
+    expect(updated.amount, equals(updatedAmount));
 
     list = await service.listAmounts(
       fromDate: fromDate,
       toDate: toDate,
     );
     expect(list.length, equals(1));
-    expect(list[0].budgetCategory.name, equals(updatedName));
+    expect(list[0].amount, equals(updatedAmount));
   });
 }

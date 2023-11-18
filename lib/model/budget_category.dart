@@ -9,9 +9,9 @@ abstract class BudgetCategory {
 }
 
 abstract class BudgetCategoryAmount {
-  BudgetCategory get budgetCategory;
+  BudgetCategory get category;
 
-  set budgetCategory(BudgetCategory value);
+  set category(BudgetCategory value);
 
   DateTime get fromDate;
 

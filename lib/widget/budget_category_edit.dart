@@ -8,15 +8,11 @@ import '../model/budget_category_error.dart';
 import '../service/impl/budget_category_validator.dart';
 
 class BudgetCategoryEdit extends StatefulWidget {
-  final BudgetCategoryAmount? value;
-  final DateTime fromDate;
-  final DateTime toDate;
+  final BudgetCategory? value;
 
   const BudgetCategoryEdit({
     super.key,
     this.value,
-    required this.fromDate,
-    required this.toDate,
   });
 
   @override
@@ -27,8 +23,6 @@ class BudgetCategoryEdit extends StatefulWidget {
 
 class _BudgetCategoryEditState extends State<BudgetCategoryEdit> {
   final nameController = TextEditingController();
-  final amountController = TextEditingController();
-  final amountFocus = FocusNode();
   final errors = <String, BudgetCategoryError>{};
 
   bool saving = false;
@@ -37,9 +31,7 @@ class _BudgetCategoryEditState extends State<BudgetCategoryEdit> {
   void initState() {
     super.initState();
     if (widget.value != null) {
-      nameController.text = widget.value!.budgetCategory.name;
-      amountController.text =
-          widget.value!.amount.toStringAsFixed(2).toString();
+      nameController.text = widget.value!.name;
     }
   }
 
@@ -47,7 +39,6 @@ class _BudgetCategoryEditState extends State<BudgetCategoryEdit> {
   Widget build(BuildContext context) {
     final items = <Widget>[
       categoryNameField(),
-      amountField(),
       const SizedBox(height: 24),
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -79,36 +70,11 @@ class _BudgetCategoryEditState extends State<BudgetCategoryEdit> {
       decoration: InputDecoration(
         labelText: l10n.categoryName,
         hintText: l10n.categoryNameHint,
-        errorText:
-            errors[BudgetCategoryAmountValidator.categoryName]?.l10n(context),
+        errorText: errors[BudgetCategoryValidator.name]?.l10n(context),
       ),
       onChanged: (_) {
         setState(() {
-          errors.remove(BudgetCategoryAmountValidator.categoryName);
-        });
-      },
-      onSubmitted: (_) {
-        amountFocus.requestFocus();
-      },
-    );
-  }
-
-  Widget amountField() {
-    final l10n = L10n.of(context);
-    return TextField(
-      controller: amountController,
-      textInputAction: TextInputAction.next,
-      enabled: !saving,
-      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-      focusNode: amountFocus,
-      decoration: InputDecoration(
-        labelText: l10n.budgetAmount,
-        hintText: l10n.budgetAmountHint,
-        errorText: errors[BudgetCategoryAmountValidator.amount]?.l10n(context),
-      ),
-      onChanged: (_) {
-        setState(() {
-          errors.remove(BudgetCategoryAmountValidator.amount);
+          errors.remove(BudgetCategoryValidator.name);
         });
       },
     );
@@ -151,13 +117,9 @@ class _BudgetCategoryEditState extends State<BudgetCategoryEdit> {
       saving = true;
     });
     try {
-      final amount = double.tryParse(amountController.text) ?? -1;
-      await DI().budgetCategoryService().saveAmount(
-            categoryCode: widget.value?.budgetCategory.code,
-            categoryName: nameController.text,
-            fromDate: widget.fromDate,
-            toDate: widget.toDate,
-            amount: amount,
+      await DI().budgetCategoryService().saveCategory(
+            code: widget.value?.code,
+            name: nameController.text,
           );
       if (mounted) {
         Navigator.of(context).pop();

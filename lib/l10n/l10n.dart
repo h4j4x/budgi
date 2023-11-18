@@ -115,6 +115,12 @@ abstract class L10n {
   /// **'Budget amount'**
   String get budgetAmount;
 
+  /// No description provided for @budgetAmountCategoryHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select budget category'**
+  String get budgetAmountCategoryHint;
+
   /// No description provided for @budgetAmountHint.
   ///
   /// In en, this message translates to:

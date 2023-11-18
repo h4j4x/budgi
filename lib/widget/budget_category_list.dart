@@ -1,28 +1,17 @@
 import 'package:flutter/material.dart';
 
 import '../di.dart';
-import '../l10n/l10n.dart';
 import '../model/budget_category.dart';
 import '../model/crud_handler.dart';
 import '../model/item_action.dart';
-import 'common/date_input.dart';
 import 'common/responsive.dart';
 
 class BudgetCategoryList extends StatefulWidget {
-  final DateTime fromDate;
-  final DateTime toDate;
-  final Function(DateTime) onFromDateChange;
-  final Function(DateTime) onToDateChange;
-
-  final CrudHandler<BudgetCategoryAmount> crudHandler;
+  final CrudHandler<BudgetCategory> crudHandler;
 
   const BudgetCategoryList({
     super.key,
     required this.crudHandler,
-    required this.fromDate,
-    required this.toDate,
-    required this.onFromDateChange,
-    required this.onToDateChange,
   });
 
   @override
@@ -32,7 +21,7 @@ class BudgetCategoryList extends StatefulWidget {
 }
 
 class _BudgetCategoryListState extends State<BudgetCategoryList> {
-  final list = <BudgetCategoryAmount>[];
+  final list = <BudgetCategory>[];
 
   bool loading = false;
 
@@ -56,10 +45,7 @@ class _BudgetCategoryListState extends State<BudgetCategoryList> {
     setState(() {
       loading = true;
     });
-    final values = await DI().budgetCategoryService().listAmounts(
-          fromDate: widget.fromDate,
-          toDate: widget.toDate,
-        );
+    final values = await DI().budgetCategoryService().listCategories();
     list.clear();
     list.addAll(values);
     setState(() {
@@ -81,59 +67,21 @@ class _BudgetCategoryListState extends State<BudgetCategoryList> {
   }
 
   Widget mobile() {
-    return Column(
-      children: [
-        toolBar(),
-        const Divider(),
-        ListView.separated(
-          shrinkWrap: true,
-          itemBuilder: (_, index) {
-            return listItem(list[index]);
-          },
-          separatorBuilder: (_, __) {
-            return const Divider();
-          },
-          itemCount: list.length,
-        ),
-      ],
+    return ListView.separated(
+      shrinkWrap: true,
+      itemBuilder: (_, index) {
+        return listItem(list[index]);
+      },
+      separatorBuilder: (_, __) {
+        return const Divider();
+      },
+      itemCount: list.length,
     );
   }
 
-  Widget toolBar() {
-    final l10n = L10n.of(context);
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-      child: Wrap(
-        runSpacing: 8,
-        spacing: 8,
-        children: [
-          Container(
-            constraints: const BoxConstraints(maxWidth: 200),
-            child: DateInputWidget(
-              label: l10n.fromDate,
-              value: widget.fromDate,
-              maxValue: widget.toDate.add(const Duration(days: -1)),
-              onChange: widget.onFromDateChange,
-            ),
-          ),
-          Container(
-            constraints: const BoxConstraints(maxWidth: 200),
-            child: DateInputWidget(
-              label: l10n.toDate,
-              minValue: widget.fromDate.add(const Duration(days: 1)),
-              value: widget.toDate,
-              onChange: widget.onToDateChange,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget listItem(BudgetCategoryAmount item) {
+  Widget listItem(BudgetCategory item) {
     return ListTile(
-      title: Text(item.budgetCategory.name),
-      subtitle: Text('\$${item.amount.toStringAsFixed(2)}'),
+      title: Text(item.name),
       trailing: IconButton(
         icon: const Icon(Icons.delete),
         onPressed: () {

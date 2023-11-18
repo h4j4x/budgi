@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'di.dart';
 import 'l10n/l10n.dart';
-import 'page/budget_categories.dart';
+import 'page/budget_categories_amount.dart';
 
 void main() {
   DI().setup();
@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
       ),
       localizationsDelegates: L10n.localizationsDelegates,
       supportedLocales: L10n.supportedLocales,
-      home: const BudgetCategoriesPage(), // TODO
+      home: const BudgetCategoriesAmountPage(), // TODO
     );
   }
 }

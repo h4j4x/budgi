@@ -6,20 +6,21 @@ import '../model/budget_category.dart';
 import '../model/crud_handler.dart';
 import '../model/item_action.dart';
 import '../util/datetime.dart';
-import '../widget/budget_category_list.dart';
-import 'budget_category.dart';
+import '../widget/budget_category_amount_list.dart';
+import 'budget_category_amount.dart';
 
-class BudgetCategoriesPage extends StatefulWidget {
-  const BudgetCategoriesPage({super.key});
+class BudgetCategoriesAmountPage extends StatefulWidget {
+  const BudgetCategoriesAmountPage({super.key});
 
   @override
   State<StatefulWidget> createState() {
-    return _BudgetCategoriesPageState();
+    return _BudgetCategoriesAmountPageState();
   }
 }
 
-class _BudgetCategoriesPageState extends State<BudgetCategoriesPage> {
-  late CrudHandler<BudgetCategory> crudHandler;
+class _BudgetCategoriesAmountPageState
+    extends State<BudgetCategoriesAmountPage> {
+  late CrudHandler<BudgetCategoryAmount> crudHandler;
   late DateTime fromDate;
   late DateTime toDate;
 
@@ -53,30 +54,48 @@ class _BudgetCategoriesPageState extends State<BudgetCategoriesPage> {
   }
 
   Widget body() {
-    return BudgetCategoryList(
+    return BudgetCategoryAmountList(
       crudHandler: crudHandler,
+      fromDate: fromDate,
+      toDate: toDate,
+      onFromDateChange: (value) {
+        setState(() {
+          fromDate = value;
+          crudHandler.reload();
+        });
+      },
+      onToDateChange: (value) {
+        setState(() {
+          toDate = value;
+          crudHandler.reload();
+        });
+      },
     );
   }
 
   void onItemAction(
     BuildContext context,
-    BudgetCategory item,
+    BudgetCategoryAmount item,
     ItemAction action,
   ) async {
     switch (action) {
       case ItemAction.select:
         {
           await Navigator.of(context).push(MaterialPageRoute<void>(
-            builder: (BuildContext context) => BudgetCategoryPage(
+            builder: (BuildContext context) => BudgetCategoryAmountPage(
               value: item,
+              fromDate: fromDate,
+              toDate: toDate,
             ),
           ));
           break;
         }
       case ItemAction.delete:
         {
-          await DI().budgetCategoryService().deleteCategory(
-                code: item.code,
+          await DI().budgetCategoryService().deleteAmount(
+                categoryCode: item.category.code,
+                fromDate: fromDate,
+                toDate: toDate,
               );
           break;
         }
@@ -88,7 +107,10 @@ class _BudgetCategoriesPageState extends State<BudgetCategoriesPage> {
     return FloatingActionButton(
       onPressed: () async {
         await Navigator.of(context).push(MaterialPageRoute<void>(
-          builder: (BuildContext context) => BudgetCategoryPage(),
+          builder: (BuildContext context) => BudgetCategoryAmountPage(
+            fromDate: fromDate,
+            toDate: toDate,
+          ),
         ));
         crudHandler.reload();
       },

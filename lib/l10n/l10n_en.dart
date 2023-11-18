@@ -19,6 +19,9 @@ class L10nEn extends L10n {
   String get budgetAmount => 'Budget amount';
 
   @override
+  String get budgetAmountCategoryHint => 'Select budget category';
+
+  @override
   String get budgetAmountHint => 'Enter budget amount...';
 
   @override

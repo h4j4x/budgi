@@ -3,6 +3,7 @@
   "appTitle": "Budg1",
   "budget": "Budget",
   "budgetAmount": "Budget amount",
+  "budgetAmountCategoryHint": "Select budget category",
   "budgetAmountHint": "Enter budget amount...",
   "budgets": "Budgets",
   "cancelAction": "Cancel",

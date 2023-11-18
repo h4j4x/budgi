@@ -19,11 +19,11 @@ class BudgetCategoryMemoryService implements BudgetCategoryService {
 
   @override
   Future<BudgetCategory> saveCategory({
-    String? categoryCode,
-    required String categoryName,
+    String? code,
+    required String name,
   }) {
-    final budgetCategoryCode = categoryCode ?? randomString(6);
-    final category = _BudgetCategory(budgetCategoryCode, categoryName);
+    final budgetCategoryCode = code ?? randomString(6);
+    final category = _BudgetCategory(budgetCategoryCode, name);
     final errors = categoryValidator?.validate(category);
     if (errors?.isNotEmpty ?? false) {
       throw ValidationError(errors!);
@@ -34,8 +34,26 @@ class BudgetCategoryMemoryService implements BudgetCategoryService {
   }
 
   @override
-  Future<List<BudgetCategory>> listCategories() {
-    return Future.value(categories.values.toList());
+  Future<List<BudgetCategory>> listCategories({
+    bool withAmount = false,
+    DateTime? fromDate,
+    DateTime? toDate,
+  }) {
+    final list = categories.values.toList();
+    if (fromDate != null && toDate != null) {
+      final datesCode = _datesCode(fromDate, toDate);
+      final amountsCategories = (values[datesCode] ?? <BudgetCategoryAmount>{})
+          .map((amount) => amount.category.code)
+          .toList();
+      list.removeWhere((category) {
+        final match = amountsCategories.contains(category.code);
+        if (withAmount) {
+          return !match;
+        }
+        return match;
+      });
+    }
+    return Future.value(list);
   }
 
   @override
@@ -67,11 +85,11 @@ class BudgetCategoryMemoryService implements BudgetCategoryService {
       throw ValidationError(errors!);
     }
 
-    final amountCode = _datesCode(fromDate, toDate);
-    values[amountCode] ??= <BudgetCategoryAmount>{};
-    values[amountCode]!
-        .removeWhere((amount) => amount.budgetCategory.code == category.code);
-    values[amountCode]!.add(categoryAmount);
+    final datesCode = _datesCode(fromDate, toDate);
+    values[datesCode] ??= <BudgetCategoryAmount>{};
+    values[datesCode]!
+        .removeWhere((amount) => amount.category.code == category.code);
+    values[datesCode]!.add(categoryAmount);
     return Future.value(categoryAmount);
   }
 
@@ -81,8 +99,8 @@ class BudgetCategoryMemoryService implements BudgetCategoryService {
     required DateTime toDate,
     Sort? amountSort,
   }) {
-    final amountCode = _datesCode(fromDate, toDate);
-    final set = values[amountCode] ?? {};
+    final datesCode = _datesCode(fromDate, toDate);
+    final set = values[datesCode] ?? {};
     return Future.value(set.toList()
       ..sort(
         (value1, value2) {
@@ -99,13 +117,13 @@ class BudgetCategoryMemoryService implements BudgetCategoryService {
 
   @override
   Future<void> deleteAmount({
-    required String code,
+    required String categoryCode,
     required DateTime fromDate,
     required DateTime toDate,
   }) {
-    final amountCode = _datesCode(fromDate, toDate);
-    final set = values[amountCode] ?? {};
-    set.removeWhere((amount) => amount.budgetCategory.code == code);
+    final datesCode = _datesCode(fromDate, toDate);
+    final set = values[datesCode] ?? {};
+    set.removeWhere((amount) => amount.category.code == categoryCode);
     return Future.value();
   }
 
@@ -141,10 +159,10 @@ class _BudgetCategory implements BudgetCategory {
 
 class _BudgetCategoryAmount implements BudgetCategoryAmount {
   _BudgetCategoryAmount(
-      this.budgetCategory, this.fromDate, this.toDate, this.amount);
+      this.category, this.fromDate, this.toDate, this.amount);
 
   @override
-  BudgetCategory budgetCategory;
+  BudgetCategory category;
 
   @override
   DateTime fromDate;
@@ -162,11 +180,11 @@ class _BudgetCategoryAmount implements BudgetCategoryAmount {
     }
     return other is _BudgetCategoryAmount &&
         runtimeType == other.runtimeType &&
-        budgetCategory == other.budgetCategory;
+        category == other.category;
   }
 
   @override
   int get hashCode {
-    return budgetCategory.code.hashCode;
+    return category.code.hashCode;
   }
 }
