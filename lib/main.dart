@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'di.dart';
 import 'l10n/l10n.dart';
@@ -6,6 +8,12 @@ import 'page/budget_categories_amount.dart';
 import 'theme.dart';
 
 void main() {
+  LicenseRegistry.addLicense(() async* {
+    final license = await rootBundle.loadString('fonts/Open_Sans/OFL.txt');
+    yield LicenseEntryWithLineBreaks(['google_fonts'], license);
+  });
+
+  initTheme();
   DI().setup();
   runApp(const MyApp());
 }

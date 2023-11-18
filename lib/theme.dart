@@ -1,6 +1,10 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+void initTheme() {
+  GoogleFonts.config.allowRuntimeFetching = false;
+}
+
 // https://rydmike.com/flexcolorscheme/themesplayground-latest/
 const scheme = FlexScheme.materialBaseline;
 
