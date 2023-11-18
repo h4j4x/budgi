@@ -32,6 +32,43 @@ void main() {
     expect(list.length, equals(total - 1));
   });
 
+  test('.listCategories() with amounts filter', () async {
+    final service = BudgetCategoryMemoryService();
+
+    final category1 = await service.saveCategory(name: 'cat1');
+    final category2 = await service.saveCategory(name: 'cat2');
+
+    final fromDate = DateTime.now();
+    final toDate = DateTime.now()..add(const Duration(days: 2));
+
+    await service.saveAmount(
+      categoryCode: category1.code,
+      fromDate: fromDate,
+      toDate: toDate,
+      amount: 1,
+    );
+    var list = await service.listCategories();
+    expect(list.length, equals(2));
+
+    // WITH AMOUNTS
+    list = await service.listCategories(
+      withAmount: true,
+      fromDate: fromDate,
+      toDate: toDate,
+    );
+    expect(list.length, equals(1));
+    expect(list[0].code, equals(category1.code));
+
+    // WITHOUT AMOUNTS
+    list = await service.listCategories(
+      withAmount: false,
+      fromDate: fromDate,
+      toDate: toDate,
+    );
+    expect(list.length, equals(1));
+    expect(list[0].code, equals(category2.code));
+  });
+
   test('.saveAmount(), .listAmounts(), .removeAmount()', () async {
     final service = BudgetCategoryMemoryService();
 
