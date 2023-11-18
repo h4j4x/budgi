@@ -169,6 +169,12 @@ abstract class L10n {
   /// **'Invalid budget amount. Enter a non negative number for amount.'**
   String get invalidBudgetAmount;
 
+  /// No description provided for @invalidBudgetCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid category.'**
+  String get invalidBudgetCategory;
+
   /// No description provided for @invalidBudgetCategoryName.
   ///
   /// In en, this message translates to:

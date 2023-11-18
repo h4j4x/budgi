@@ -46,6 +46,9 @@ class L10nEn extends L10n {
   String get invalidBudgetAmount => 'Invalid budget amount. Enter a non negative number for amount.';
 
   @override
+  String get invalidBudgetCategory => 'Invalid category.';
+
+  @override
   String get invalidBudgetCategoryName => 'Invalid budget category name. Enter a non empty name with no more than 255 characters.';
 
   @override

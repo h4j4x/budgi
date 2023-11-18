@@ -3,9 +3,21 @@ import '../model/sort.dart';
 
 abstract class BudgetCategoryService {
   /// @throws ValidationError
-  Future<BudgetCategoryAmount> saveAmount({
+  Future<BudgetCategory> saveCategory({
     String? categoryCode,
     required String categoryName,
+  });
+
+  Future<List<BudgetCategory>> listCategories();
+
+  Future<void> deleteCategory({
+    required String code,
+  });
+
+  /// @throws ValidationError
+  Future<BudgetCategoryAmount> saveAmount({
+    required String categoryCode,
+    String? amountCode,
     required DateTime fromDate,
     required DateTime toDate,
     required double amount,

@@ -7,34 +7,70 @@ import '../budget_category.dart';
 import '../validator.dart';
 
 class BudgetCategoryMemoryService implements BudgetCategoryService {
-  final Validator<BudgetCategoryAmount, BudgetCategoryError>? validator;
+  final Validator<BudgetCategory, BudgetCategoryError>? categoryValidator;
+  final Validator<BudgetCategoryAmount, BudgetCategoryError>? amountValidator;
   final categories = <String, BudgetCategory>{};
   final values = <String, Set<BudgetCategoryAmount>>{};
 
-  BudgetCategoryMemoryService({this.validator});
+  BudgetCategoryMemoryService({
+    this.categoryValidator,
+    this.amountValidator,
+  });
+
+  @override
+  Future<BudgetCategory> saveCategory({
+    String? categoryCode,
+    required String categoryName,
+  }) {
+    final budgetCategoryCode = categoryCode ?? randomString(6);
+    final category = _BudgetCategory(budgetCategoryCode, categoryName);
+    final errors = categoryValidator?.validate(category);
+    if (errors?.isNotEmpty ?? false) {
+      throw ValidationError(errors!);
+    }
+
+    categories[budgetCategoryCode] = category;
+    return Future.value(category);
+  }
+
+  @override
+  Future<List<BudgetCategory>> listCategories() {
+    return Future.value(categories.values.toList());
+  }
+
+  @override
+  Future<void> deleteCategory({
+    required String code,
+  }) {
+    categories.remove(code);
+    return Future.value();
+  }
 
   @override
   Future<BudgetCategoryAmount> saveAmount({
-    String? categoryCode,
-    required String categoryName,
+    required String categoryCode,
+    String? amountCode,
     required DateTime fromDate,
     required DateTime toDate,
     required double amount,
   }) {
-    final budgetCategoryCode = categoryCode ?? randomString(6);
-    final category = _BudgetCategory(budgetCategoryCode, categoryName);
-    categories[budgetCategoryCode] = category;
+    final category = categories[categoryCode];
+    if (category == null) {
+      throw ValidationError({
+        'category': BudgetCategoryError.invalidCategory,
+      });
+    }
     final categoryAmount =
         _BudgetCategoryAmount(category, fromDate, toDate, amount);
-    final errors = validator?.validate(categoryAmount);
+    final errors = amountValidator?.validate(categoryAmount);
     if (errors?.isNotEmpty ?? false) {
       throw ValidationError(errors!);
     }
 
     final amountCode = _datesCode(fromDate, toDate);
     values[amountCode] ??= <BudgetCategoryAmount>{};
-    values[amountCode]!.removeWhere(
-        (amount) => amount.budgetCategory.code == budgetCategoryCode);
+    values[amountCode]!
+        .removeWhere((amount) => amount.budgetCategory.code == category.code);
     values[amountCode]!.add(categoryAmount);
     return Future.value(categoryAmount);
   }
