@@ -83,16 +83,15 @@ class _BudgetCategoryAmountEditState extends State<BudgetCategoryAmountEdit> {
   }
 
   Widget categoryField() {
-    final hintColor = errors.containsKey(BudgetCategoryAmountValidator.category)
-        ? Theme.of(context).colorScheme.error
-        : null;
-    return DropdownButton<BudgetCategory>(
+    return DropdownButtonFormField<BudgetCategory>(
       items: (categories ?? []).map(categoryOption).toList(),
       value: category,
-      hint: Text(
-        L10n.of(context).budgetAmountCategoryHint,
-        style: TextStyle(color: hintColor),
+      decoration: InputDecoration(
+        hintText: L10n.of(context).budgetAmountCategoryHint,
+        errorText:
+            errors[BudgetCategoryAmountValidator.category]?.l10n(context),
       ),
+      isExpanded: true,
       onChanged: widget.value == null
           ? (selectedCategory) {
               if (selectedCategory != null) {

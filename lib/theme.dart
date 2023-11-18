@@ -1,7 +1,11 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 // https://rydmike.com/flexcolorscheme/themesplayground-latest/
 const scheme = FlexScheme.materialBaseline;
+
+// https://pub.dev/packages/google_fonts
+final fontFamily = GoogleFonts.openSans().fontFamily;
 
 final lightTheme = FlexThemeData.light(
   scheme: scheme,
@@ -18,7 +22,7 @@ final lightTheme = FlexThemeData.light(
   visualDensity: FlexColorScheme.comfortablePlatformDensity,
   useMaterial3: true,
   swapLegacyOnMaterial3: true,
-  // fontFamily: GoogleFonts.notoSans().fontFamily,
+  fontFamily: fontFamily,
 );
 
 final darkTheme = FlexThemeData.dark(
@@ -35,5 +39,5 @@ final darkTheme = FlexThemeData.dark(
   visualDensity: FlexColorScheme.comfortablePlatformDensity,
   useMaterial3: true,
   swapLegacyOnMaterial3: true,
-  // fontFamily: GoogleFonts.notoSans().fontFamily,
+  fontFamily: fontFamily,
 );
