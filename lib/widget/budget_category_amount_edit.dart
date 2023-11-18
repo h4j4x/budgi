@@ -5,6 +5,7 @@ import '../error/validation.dart';
 import '../l10n/l10n.dart';
 import '../model/budget_category.dart';
 import '../model/budget_category_error.dart';
+import '../router.dart';
 import '../service/impl/budget_category_validator.dart';
 
 class BudgetCategoryAmountEdit extends StatefulWidget {
@@ -141,7 +142,7 @@ class _BudgetCategoryAmountEditState extends State<BudgetCategoryAmountEdit> {
           onPressed: saving
               ? null
               : () {
-                  Navigator.of(context).pop();
+                  context.pop();
                 },
           child: Text(L10n.of(context).cancelAction),
         ),
@@ -187,7 +188,7 @@ class _BudgetCategoryAmountEditState extends State<BudgetCategoryAmountEdit> {
             amount: amount,
           );
       if (mounted) {
-        Navigator.of(context).pop();
+        context.pop();
       }
     } on ValidationError<BudgetCategoryError> catch (e) {
       errors.addAll(e.errors);

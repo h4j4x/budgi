@@ -103,12 +103,6 @@ abstract class L10n {
   /// **'Budg1'**
   String get appTitle;
 
-  /// No description provided for @budget.
-  ///
-  /// In en, this message translates to:
-  /// **'Budget'**
-  String get budget;
-
   /// No description provided for @budgetAmount.
   ///
   /// In en, this message translates to:
@@ -127,11 +121,29 @@ abstract class L10n {
   /// **'Enter budget amount...'**
   String get budgetAmountHint;
 
-  /// No description provided for @budgets.
+  /// No description provided for @budgetsCategories.
   ///
   /// In en, this message translates to:
-  /// **'Budgets'**
-  String get budgets;
+  /// **'Budgets categories'**
+  String get budgetsCategories;
+
+  /// No description provided for @budgetCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget category'**
+  String get budgetCategory;
+
+  /// No description provided for @budgetsCategoriesAmounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Budgets categories amounts'**
+  String get budgetsCategoriesAmounts;
+
+  /// No description provided for @budgetsCategoryAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget category amount'**
+  String get budgetsCategoryAmount;
 
   /// No description provided for @cancelAction.
   ///

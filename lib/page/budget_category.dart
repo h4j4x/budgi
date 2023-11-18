@@ -5,6 +5,8 @@ import '../model/budget_category.dart';
 import '../widget/budget_category_edit.dart';
 
 class BudgetCategoryPage extends StatelessWidget {
+  static const route = '/category';
+
   final BudgetCategory? value;
 
   const BudgetCategoryPage({
@@ -18,7 +20,7 @@ class BudgetCategoryPage extends StatelessWidget {
     final action = value != null ? l10n.editAction : l10n.createAction;
     return Scaffold(
       appBar: AppBar(
-        title: Text('$action ${l10n.budget.toLowerCase()}'),
+        title: Text('$action ${l10n.budgetCategory.toLowerCase()}'),
       ),
       body: Padding(
         padding: const EdgeInsets.only(left: 8.0, top: 8.0, right: 8.0),

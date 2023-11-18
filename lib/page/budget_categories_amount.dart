@@ -5,11 +5,14 @@ import '../l10n/l10n.dart';
 import '../model/budget_category.dart';
 import '../model/crud_handler.dart';
 import '../model/item_action.dart';
+import '../router.dart';
 import '../util/datetime.dart';
 import '../widget/budget_category_amount_list.dart';
 import 'budget_category_amount.dart';
 
 class BudgetCategoriesAmountPage extends StatefulWidget {
+  static const route = '/categories-amounts';
+
   const BudgetCategoriesAmountPage({super.key});
 
   @override
@@ -43,7 +46,7 @@ class _BudgetCategoriesAmountPageState
 
   PreferredSizeWidget appBar() {
     return AppBar(
-      title: Text(L10n.of(context).budgets),
+      title: Text(L10n.of(context).budgetsCategoriesAmounts),
       actions: [
         IconButton(
           onPressed: crudHandler.reload,
@@ -81,13 +84,14 @@ class _BudgetCategoriesAmountPageState
     switch (action) {
       case ItemAction.select:
         {
-          await Navigator.of(context).push(MaterialPageRoute<void>(
-            builder: (BuildContext context) => BudgetCategoryAmountPage(
-              value: item,
+          await context.push(
+            BudgetCategoryAmountPage.route,
+            extra: BudgetCategoryAmountData(
+              amount: item,
               fromDate: fromDate,
               toDate: toDate,
             ),
-          ));
+          );
           break;
         }
       case ItemAction.delete:
@@ -106,12 +110,13 @@ class _BudgetCategoriesAmountPageState
   Widget addButton() {
     return FloatingActionButton(
       onPressed: () async {
-        await Navigator.of(context).push(MaterialPageRoute<void>(
-          builder: (BuildContext context) => BudgetCategoryAmountPage(
+        await context.push(
+          BudgetCategoryAmountPage.route,
+          extra: BudgetCategoryAmountData(
             fromDate: fromDate,
             toDate: toDate,
           ),
-        ));
+        );
         crudHandler.reload();
       },
       tooltip: L10n.of(context).addAction,

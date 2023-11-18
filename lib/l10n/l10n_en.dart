@@ -13,9 +13,6 @@ class L10nEn extends L10n {
   String get appTitle => 'Budg1';
 
   @override
-  String get budget => 'Budget';
-
-  @override
   String get budgetAmount => 'Budget amount';
 
   @override
@@ -25,7 +22,16 @@ class L10nEn extends L10n {
   String get budgetAmountHint => 'Enter budget amount...';
 
   @override
-  String get budgets => 'Budgets';
+  String get budgetsCategories => 'Budgets categories';
+
+  @override
+  String get budgetCategory => 'Budget category';
+
+  @override
+  String get budgetsCategoriesAmounts => 'Budgets categories amounts';
+
+  @override
+  String get budgetsCategoryAmount => 'Budget category amount';
 
   @override
   String get cancelAction => 'Cancel';

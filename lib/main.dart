@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 
 import 'di.dart';
 import 'l10n/l10n.dart';
-import 'page/budget_categories_amount.dart';
+import 'router.dart';
 import 'theme.dart';
 
 void main() {
@@ -23,13 +23,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       onGenerateTitle: (context) => L10n.of(context).appTitle,
       theme: lightTheme,
       darkTheme: darkTheme,
       localizationsDelegates: L10n.localizationsDelegates,
       supportedLocales: L10n.supportedLocales,
-      home: const BudgetCategoriesAmountPage(), // TODO
+      routerConfig: router,
     );
   }
 }

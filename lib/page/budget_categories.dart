@@ -5,11 +5,14 @@ import '../l10n/l10n.dart';
 import '../model/budget_category.dart';
 import '../model/crud_handler.dart';
 import '../model/item_action.dart';
+import '../router.dart';
 import '../util/datetime.dart';
 import '../widget/budget_category_list.dart';
 import 'budget_category.dart';
 
 class BudgetCategoriesPage extends StatefulWidget {
+  static const route = '/categories';
+
   const BudgetCategoriesPage({super.key});
 
   @override
@@ -42,7 +45,7 @@ class _BudgetCategoriesPageState extends State<BudgetCategoriesPage> {
 
   PreferredSizeWidget appBar() {
     return AppBar(
-      title: Text(L10n.of(context).budgets),
+      title: Text(L10n.of(context).budgetsCategories),
       actions: [
         IconButton(
           onPressed: crudHandler.reload,
@@ -66,11 +69,7 @@ class _BudgetCategoriesPageState extends State<BudgetCategoriesPage> {
     switch (action) {
       case ItemAction.select:
         {
-          await Navigator.of(context).push(MaterialPageRoute<void>(
-            builder: (BuildContext context) => BudgetCategoryPage(
-              value: item,
-            ),
-          ));
+          await context.push(BudgetCategoryPage.route, extra: item);
           break;
         }
       case ItemAction.delete:
@@ -87,9 +86,7 @@ class _BudgetCategoriesPageState extends State<BudgetCategoriesPage> {
   Widget addButton() {
     return FloatingActionButton(
       onPressed: () async {
-        await Navigator.of(context).push(MaterialPageRoute<void>(
-          builder: (BuildContext context) => const BudgetCategoryPage(),
-        ));
+        await context.push(BudgetCategoryPage.route);
         crudHandler.reload();
       },
       tooltip: L10n.of(context).addAction,

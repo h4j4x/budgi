@@ -25,3 +25,15 @@ abstract class BudgetCategoryAmount {
 
   set amount(double value);
 }
+
+class BudgetCategoryAmountData {
+  final BudgetCategoryAmount? amount;
+  final DateTime fromDate;
+  final DateTime toDate;
+
+  BudgetCategoryAmountData({
+    this.amount,
+    required this.fromDate,
+    required this.toDate,
+  });
+}
