@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../app/router.dart';
 import '../di.dart';
 import '../l10n/l10n.dart';
 import '../model/budget_category.dart';
 import '../model/crud_handler.dart';
 import '../model/item_action.dart';
-import '../app/router.dart';
 import '../util/datetime.dart';
 import '../widget/budget_category_list.dart';
 import 'budget_category.dart';
@@ -45,7 +45,6 @@ class _BudgetCategoriesPageState extends State<BudgetCategoriesPage> {
 
   PreferredSizeWidget appBar() {
     return AppBar(
-      title: Text(L10n.of(context).budgetsCategories),
       actions: [
         IconButton(
           onPressed: crudHandler.reload,

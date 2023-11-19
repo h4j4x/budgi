@@ -6,7 +6,6 @@ import '../model/budget_category.dart';
 import '../model/crud_handler.dart';
 import '../model/item_action.dart';
 import 'common/date_input.dart';
-import 'common/responsive.dart';
 
 class BudgetCategoryAmountList extends StatefulWidget {
   final DateTime fromDate;
@@ -74,27 +73,28 @@ class _BudgetCategoryAmountListState extends State<BudgetCategoryAmountList> {
         child: CircularProgressIndicator.adaptive(),
       );
     }
-    return ResponsiveWidget(
-      mobile: mobile(),
-      desktop: mobile(),
-    );
+    return body();
   }
 
-  Widget mobile() {
+  Widget body() {
     return Column(
       children: [
         toolBar(),
         const Divider(),
-        ListView.separated(
-          shrinkWrap: true,
-          itemBuilder: (_, index) {
-            return listItem(list[index]);
-          },
-          separatorBuilder: (_, __) {
-            return const Divider();
-          },
-          itemCount: list.length,
-        ),
+        if (list.isEmpty) const Spacer(),
+        if (list.isEmpty) Text(L10n.of(context).nothingHere),
+        if (list.isEmpty) const Spacer(),
+        if (list.isNotEmpty)
+          ListView.separated(
+            shrinkWrap: true,
+            itemBuilder: (_, index) {
+              return listItem(list[index]);
+            },
+            separatorBuilder: (_, __) {
+              return const Divider();
+            },
+            itemCount: list.length,
+          ),
       ],
     );
   }

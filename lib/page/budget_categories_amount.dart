@@ -46,7 +46,6 @@ class _BudgetCategoriesAmountPageState
 
   PreferredSizeWidget appBar() {
     return AppBar(
-      title: Text(L10n.of(context).budgetsCategoriesAmounts),
       actions: [
         IconButton(
           onPressed: crudHandler.reload,

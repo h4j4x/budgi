@@ -8,20 +8,12 @@ import '../page/budget_categories_amount.dart';
 import '../page/budget_category.dart';
 import '../page/budget_category_amount.dart';
 import '../page/home.dart';
-
-extension RouterContext on BuildContext {
-  Future<T?> push<T extends Object?>(String location, {Object? extra}) {
-    return GoRouter.of(this).push<T>(location, extra: extra);
-  }
-
-  void pop<T extends Object?>([T? result]) {
-    return GoRouter.of(this).pop(result);
-  }
-}
+import 'icon.dart';
 
 final _routes = <AppRoute>[
   AppRoute(
     path: HomePage.route,
+    icon: AppIcon.home,
     menuText: (context) {
       return L10n.of(context).home;
     },
@@ -31,6 +23,7 @@ final _routes = <AppRoute>[
   ),
   AppRoute(
     path: BudgetCategoriesPage.route,
+    icon: AppIcon.budgetCategory,
     menuText: (context) {
       return L10n.of(context).budgetsCategories;
     },
@@ -46,6 +39,7 @@ final _routes = <AppRoute>[
   ),
   AppRoute(
     path: BudgetCategoriesAmountPage.route,
+    icon: AppIcon.budgetCategoryAmount,
     menuText: (context) {
       return L10n.of(context).budgetsCategoriesAmounts;
     },
@@ -79,7 +73,7 @@ final router = GoRouter(
       navigatorKey: _shellNavigatorKey,
       pageBuilder: (context, state, child) {
         return NoTransitionPage(
-          child: AppScaffold(
+          child: _AppScaffold(
             path: state.fullPath ?? '',
             child: child,
           ),
@@ -99,23 +93,22 @@ final router = GoRouter(
   ],
 );
 
-class AppScaffold extends StatelessWidget {
+class _AppScaffold extends StatelessWidget {
   final String path;
   final Widget child;
+  final routes = _routes.where((route) {
+    return route.menuText != null;
+  }).toList();
 
-  const AppScaffold({
-    super.key,
+  _AppScaffold({
     required this.child,
     required this.path,
   });
 
   @override
   Widget build(BuildContext context) {
-    final routes = _routes.where((route) {
-      return route.menuText != null;
-    }).toList();
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(title: title(context)),
       body: SafeArea(child: child),
       drawer: Drawer(
         child: ListView.separated(
@@ -142,6 +135,24 @@ class AppScaffold extends StatelessWidget {
       ),
     );
   }
+
+  Widget? title(BuildContext context) {
+    final currentRouteIndex = routes.indexWhere((route) {
+      return route.path == path && route.menuText != null;
+    });
+    if (currentRouteIndex >= 0) {
+      final route = routes[currentRouteIndex];
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (route.icon != null) route.icon!,
+          if (route.icon != null) const SizedBox(width: 8),
+          Text(route.menuText!(context)),
+        ],
+      );
+    }
+    return null;
+  }
 }
 
 typedef TextBuilder = String Function(BuildContext);
@@ -160,4 +171,14 @@ class AppRoute {
     this.menuText,
     this.icon,
   });
+}
+
+extension RouterContext on BuildContext {
+  Future<T?> push<T extends Object?>(String location, {Object? extra}) {
+    return GoRouter.of(this).push<T>(location, extra: extra);
+  }
+
+  void pop<T extends Object?>([T? result]) {
+    return GoRouter.of(this).pop(result);
+  }
 }

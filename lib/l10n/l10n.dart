@@ -205,6 +205,12 @@ abstract class L10n {
   /// **'Invalid budget category name. Enter a non empty name with no more than 255 characters.'**
   String get invalidBudgetCategoryName;
 
+  /// No description provided for @nothingHere.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing here :('**
+  String get nothingHere;
+
   /// No description provided for @prefixWithDate.
   ///
   /// In en, this message translates to:

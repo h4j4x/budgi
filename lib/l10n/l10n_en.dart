@@ -64,6 +64,9 @@ class L10nEn extends L10n {
   String get invalidBudgetCategoryName => 'Invalid budget category name. Enter a non empty name with no more than 255 characters.';
 
   @override
+  String get nothingHere => 'Nothing here :(';
+
+  @override
   String prefixWithDate(String prefix, DateTime date) {
     final intl.DateFormat dateDateFormat = intl.DateFormat.yMMMd(localeName);
     final String dateString = dateDateFormat.format(date);

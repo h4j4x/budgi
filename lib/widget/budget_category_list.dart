@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../di.dart';
+import '../l10n/l10n.dart';
 import '../model/budget_category.dart';
 import '../model/crud_handler.dart';
 import '../model/item_action.dart';
-import 'common/responsive.dart';
 
 class BudgetCategoryList extends StatefulWidget {
   final CrudHandler<BudgetCategory> crudHandler;
@@ -60,13 +60,15 @@ class _BudgetCategoryListState extends State<BudgetCategoryList> {
         child: CircularProgressIndicator.adaptive(),
       );
     }
-    return ResponsiveWidget(
-      mobile: mobile(),
-      desktop: mobile(),
-    );
+    return body();
   }
 
-  Widget mobile() {
+  Widget body() {
+    if (list.isEmpty) {
+      return Center(
+        child: Text(L10n.of(context).nothingHere),
+      );
+    }
     return ListView.separated(
       shrinkWrap: true,
       itemBuilder: (_, index) {
