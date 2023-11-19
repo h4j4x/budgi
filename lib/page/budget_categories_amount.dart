@@ -5,7 +5,7 @@ import '../l10n/l10n.dart';
 import '../model/budget_category.dart';
 import '../model/crud_handler.dart';
 import '../model/item_action.dart';
-import '../router.dart';
+import '../app/router.dart';
 import '../util/datetime.dart';
 import '../widget/budget_category_amount_list.dart';
 import 'budget_category_amount.dart';

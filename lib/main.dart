@@ -4,8 +4,8 @@ import 'package:flutter/services.dart';
 
 import 'di.dart';
 import 'l10n/l10n.dart';
-import 'router.dart';
-import 'theme.dart';
+import 'app/router.dart';
+import 'app/theme.dart';
 
 void main() {
   LicenseRegistry.addLicense(() async* {
@@ -25,6 +25,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       onGenerateTitle: (context) => L10n.of(context).appTitle,
+      debugShowCheckedModeBanner: false,
       theme: lightTheme,
       darkTheme: darkTheme,
       localizationsDelegates: L10n.localizationsDelegates,

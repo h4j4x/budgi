@@ -5,7 +5,7 @@ import '../error/validation.dart';
 import '../l10n/l10n.dart';
 import '../model/budget_category.dart';
 import '../model/budget_category_error.dart';
-import '../router.dart';
+import '../app/router.dart';
 import '../service/impl/budget_category_validator.dart';
 
 class BudgetCategoryAmountEdit extends StatefulWidget {

@@ -52,6 +52,9 @@ class L10nEn extends L10n {
   String get fromDate => 'From date';
 
   @override
+  String get home => 'Home';
+
+  @override
   String get invalidBudgetAmount => 'Invalid budget amount. Enter a non negative number for amount.';
 
   @override

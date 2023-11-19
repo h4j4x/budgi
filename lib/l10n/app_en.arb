@@ -14,6 +14,7 @@
   "createAction": "Create",
   "editAction": "Edit",
   "fromDate": "From date",
+  "home": "Home",
   "invalidBudgetAmount": "Invalid budget amount. Enter a non negative number for amount.",
   "invalidBudgetCategory": "Invalid category.",
   "invalidBudgetCategoryName": "Invalid budget category name. Enter a non empty name with no more than 255 characters.",

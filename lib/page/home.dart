@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-import '../router.dart';
+import '../app/router.dart';
 import 'budget_categories.dart';
 import 'budget_categories_amount.dart';
 
 class HomePage extends StatelessWidget {
-  static const route = '/';
+  static const route = '/home';
 
   const HomePage({super.key});
 
