@@ -1,4 +1,5 @@
 import '../model/budget_category.dart';
+import '../model/period.dart';
 import '../model/sort.dart';
 
 abstract class BudgetCategoryService {
@@ -8,16 +9,15 @@ abstract class BudgetCategoryService {
     required String name,
   });
 
-  /// If fromDate or toDate are not given, withAmount if ignored.
-  /// If fromDate and toDate are both given, response categories are filtered by
+  /// If period is not given, withAmount if ignored.
+  /// If period is given, response categories are filtered by
   /// withAmounts (true will get categories with registered amounts between the
   /// given interval).
   ///
   /// fromDate and toDate are inclusive.
   Future<List<BudgetCategory>> listCategories({
     bool withAmount = false,
-    DateTime? fromDate,
-    DateTime? toDate,
+    Period? period,
   });
 
   Future<void> deleteCategory({
@@ -29,22 +29,19 @@ abstract class BudgetCategoryService {
   Future<BudgetCategoryAmount> saveAmount({
     required String categoryCode,
     String? amountCode,
-    required DateTime fromDate,
-    required DateTime toDate,
+    required Period period,
     required double amount,
   });
 
   /// fromDate and toDate are inclusive.
   Future<List<BudgetCategoryAmount>> listAmounts({
-    required DateTime fromDate,
-    required DateTime toDate,
+    required Period period,
     Sort? amountSort,
   });
 
   /// fromDate and toDate are inclusive.
   Future<void> deleteAmount({
     required String categoryCode,
-    required DateTime fromDate,
-    required DateTime toDate,
+    required Period period,
   });
 }

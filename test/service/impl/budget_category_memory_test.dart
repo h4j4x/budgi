@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:budgi/model/period.dart';
 import 'package:budgi/model/sort.dart';
 import 'package:budgi/service/impl/budget_category_memory.dart';
 import 'package:test/test.dart';
@@ -40,11 +41,11 @@ void main() {
 
     final fromDate = DateTime.now();
     final toDate = DateTime.now()..add(const Duration(days: 2));
+    final period = Period(from: fromDate, to: toDate);
 
     await service.saveAmount(
       categoryCode: category1.code,
-      fromDate: fromDate,
-      toDate: toDate,
+      period: period,
       amount: 1,
     );
     var list = await service.listCategories();
@@ -53,8 +54,7 @@ void main() {
     // WITH AMOUNTS
     list = await service.listCategories(
       withAmount: true,
-      fromDate: fromDate,
-      toDate: toDate,
+      period: period,
     );
     expect(list.length, equals(1));
     expect(list[0].code, equals(category1.code));
@@ -62,8 +62,7 @@ void main() {
     // WITHOUT AMOUNTS
     list = await service.listCategories(
       withAmount: false,
-      fromDate: fromDate,
-      toDate: toDate,
+      period: period,
     );
     expect(list.length, equals(1));
     expect(list[0].code, equals(category2.code));
@@ -83,32 +82,30 @@ void main() {
 
       final fromDate = startDate.add(Duration(days: i));
       final toDate = fromDate.add(const Duration(days: daysDiff));
+      final period = Period(from: fromDate, to: toDate);
+
       final amount = i.toDouble();
       final categoryAmount = await service.saveAmount(
         categoryCode: category.code,
-        fromDate: fromDate,
-        toDate: toDate,
+        period: period,
         amount: amount,
       );
       expect(categoryAmount.category, equals(category));
-      expect(categoryAmount.fromDate, equals(fromDate));
-      expect(categoryAmount.toDate, equals(toDate));
+      expect(categoryAmount.period.from, equals(fromDate));
+      expect(categoryAmount.period.to, equals(toDate));
       expect(categoryAmount.amount, equals(amount));
 
       var list = await service.listAmounts(
-        fromDate: fromDate,
-        toDate: toDate,
+        period: period,
       );
       expect(list.length, equals(1));
 
       await service.deleteAmount(
         categoryCode: category.code,
-        fromDate: fromDate,
-        toDate: toDate,
+        period: period,
       );
       list = await service.listAmounts(
-        fromDate: fromDate,
-        toDate: toDate,
+        period: period,
       );
       expect(list.length, equals(0));
     }
@@ -119,6 +116,8 @@ void main() {
 
     final fromDate = DateTime.now();
     final toDate = DateTime.now()..add(const Duration(days: 2));
+    final period = Period(from: fromDate, to: toDate);
+
     final random = Random();
     for (var i = 0; i < 20; i++) {
       final name = 'category-$i';
@@ -128,8 +127,7 @@ void main() {
 
       final categoryAmount = await service.saveAmount(
         categoryCode: category.code,
-        fromDate: fromDate,
-        toDate: toDate,
+        period: period,
         amount: random.nextDouble(),
       );
       expect(categoryAmount.category, equals(category));
@@ -137,8 +135,7 @@ void main() {
 
     // ASC
     var list = await service.listAmounts(
-      fromDate: fromDate,
-      toDate: toDate,
+      period: period,
       amountSort: Sort.asc,
     );
     var lastAmount = -1.0;
@@ -149,8 +146,7 @@ void main() {
 
     // DESC
     list = await service.listAmounts(
-      fromDate: fromDate,
-      toDate: toDate,
+      period: period,
       amountSort: Sort.desc,
     );
     lastAmount = double.infinity;
@@ -169,33 +165,31 @@ void main() {
 
     final fromDate = DateTime.now();
     final toDate = DateTime.now()..add(const Duration(days: 2));
+    final period = Period(from: fromDate, to: toDate);
+
     final categoryAmount = await service.saveAmount(
       categoryCode: category.code,
-      fromDate: fromDate,
-      toDate: toDate,
+      period: period,
       amount: 10.0,
     );
     expect(categoryAmount.category, equals(category));
 
     var list = await service.listAmounts(
-      fromDate: fromDate,
-      toDate: toDate,
+      period: period,
     );
     expect(list.length, equals(1));
 
     const updatedAmount = 20.0;
     final updated = await service.saveAmount(
       categoryCode: category.code,
-      fromDate: fromDate,
-      toDate: toDate,
+      period: period,
       amount: updatedAmount,
     );
     expect(updated.category, equals(category));
     expect(updated.amount, equals(updatedAmount));
 
     list = await service.listAmounts(
-      fromDate: fromDate,
-      toDate: toDate,
+      period: period,
     );
     expect(list.length, equals(1));
     expect(list[0].amount, equals(updatedAmount));

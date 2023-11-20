@@ -1,23 +1,22 @@
 import 'package:flutter/material.dart';
 
+import '../app/router.dart';
 import '../di.dart';
 import '../error/validation.dart';
 import '../l10n/l10n.dart';
 import '../model/budget_category.dart';
 import '../model/budget_category_error.dart';
-import '../app/router.dart';
+import '../model/period.dart';
 import '../service/impl/budget_category_validator.dart';
 
 class BudgetCategoryAmountEdit extends StatefulWidget {
   final BudgetCategoryAmount? value;
-  final DateTime fromDate;
-  final DateTime toDate;
+  final Period period;
 
   const BudgetCategoryAmountEdit({
     super.key,
     this.value,
-    required this.fromDate,
-    required this.toDate,
+    required this.period,
   });
 
   @override
@@ -50,8 +49,7 @@ class _BudgetCategoryAmountEditState extends State<BudgetCategoryAmountEdit> {
 
   void loadCategories() async {
     final list = await DI().budgetCategoryService().listCategories(
-          fromDate: widget.fromDate,
-          toDate: widget.toDate,
+          period: widget.period,
         );
     setState(() {
       categories = list;
@@ -183,8 +181,7 @@ class _BudgetCategoryAmountEditState extends State<BudgetCategoryAmountEdit> {
       final amount = double.tryParse(amountController.text) ?? -1;
       await DI().budgetCategoryService().saveAmount(
             categoryCode: category!.code,
-            fromDate: widget.fromDate,
-            toDate: widget.toDate,
+            period: widget.period,
             amount: amount,
           );
       if (mounted) {

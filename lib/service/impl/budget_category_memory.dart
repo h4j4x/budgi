@@ -1,6 +1,7 @@
 import '../../error/validation.dart';
 import '../../model/budget_category.dart';
 import '../../model/budget_category_error.dart';
+import '../../model/period.dart';
 import '../../model/sort.dart';
 import '../../util/string.dart';
 import '../budget_category.dart';
@@ -36,12 +37,11 @@ class BudgetCategoryMemoryService implements BudgetCategoryService {
   @override
   Future<List<BudgetCategory>> listCategories({
     bool withAmount = false,
-    DateTime? fromDate,
-    DateTime? toDate,
+    Period? period,
   }) {
     final list = categories.values.toList();
-    if (fromDate != null && toDate != null) {
-      final datesCode = _datesCode(fromDate, toDate);
+    if (period != null) {
+      final datesCode = _datesCode(period);
       final amountsCategories = (values[datesCode] ?? <BudgetCategoryAmount>{})
           .map((amount) => amount.category.code)
           .toList();
@@ -68,8 +68,7 @@ class BudgetCategoryMemoryService implements BudgetCategoryService {
   Future<BudgetCategoryAmount> saveAmount({
     required String categoryCode,
     String? amountCode,
-    required DateTime fromDate,
-    required DateTime toDate,
+    required Period period,
     required double amount,
   }) {
     final category = categories[categoryCode];
@@ -78,14 +77,13 @@ class BudgetCategoryMemoryService implements BudgetCategoryService {
         'category': BudgetCategoryError.invalidCategory,
       });
     }
-    final categoryAmount =
-        _BudgetCategoryAmount(category, fromDate, toDate, amount);
+    final categoryAmount = _BudgetCategoryAmount(category, period, amount);
     final errors = amountValidator?.validate(categoryAmount);
     if (errors?.isNotEmpty ?? false) {
       throw ValidationError(errors!);
     }
 
-    final datesCode = _datesCode(fromDate, toDate);
+    final datesCode = _datesCode(period);
     values[datesCode] ??= <BudgetCategoryAmount>{};
     values[datesCode]!
         .removeWhere((amount) => amount.category.code == category.code);
@@ -95,11 +93,10 @@ class BudgetCategoryMemoryService implements BudgetCategoryService {
 
   @override
   Future<List<BudgetCategoryAmount>> listAmounts({
-    required DateTime fromDate,
-    required DateTime toDate,
+    required Period period,
     Sort? amountSort,
   }) {
-    final datesCode = _datesCode(fromDate, toDate);
+    final datesCode = _datesCode(period);
     final set = values[datesCode] ?? {};
     return Future.value(set.toList()
       ..sort(
@@ -118,17 +115,18 @@ class BudgetCategoryMemoryService implements BudgetCategoryService {
   @override
   Future<void> deleteAmount({
     required String categoryCode,
-    required DateTime fromDate,
-    required DateTime toDate,
+    required Period period,
   }) {
-    final datesCode = _datesCode(fromDate, toDate);
+    final datesCode = _datesCode(period);
     final set = values[datesCode] ?? {};
     set.removeWhere((amount) => amount.category.code == categoryCode);
     return Future.value();
   }
 
-  String _datesCode(DateTime fromDate, DateTime toDate) {
-    return '${fromDate.year}${fromDate.month}${fromDate.day}-${toDate.year}${toDate.month}${toDate.day}';
+  String _datesCode(Period period) {
+    final from = '${period.from.year}${period.from.month}${period.from.day}';
+    final to = '${period.to.year}${period.to.month}${period.to.day}';
+    return '$from-$to';
   }
 }
 
@@ -158,17 +156,13 @@ class _BudgetCategory implements BudgetCategory {
 }
 
 class _BudgetCategoryAmount implements BudgetCategoryAmount {
-  _BudgetCategoryAmount(
-      this.category, this.fromDate, this.toDate, this.amount);
+  _BudgetCategoryAmount(this.category, this.period, this.amount);
 
   @override
   BudgetCategory category;
 
   @override
-  DateTime fromDate;
-
-  @override
-  DateTime toDate;
+  Period period;
 
   @override
   double amount;

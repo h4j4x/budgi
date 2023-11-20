@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../l10n/l10n.dart';
+import '../model/period.dart';
 
 extension DateTimeExtension on DateTime {
   DateTime atStartOfDay() {
@@ -16,12 +17,12 @@ extension DateTimeExtension on DateTime {
 
 String formatDateTimePeriod(
   BuildContext context, {
-  required DateTime from,
-  required DateTime to,
+  required Period period,
 }) {
   final l10n = L10n.of(context);
-  if (from.month == to.month && from.year == to.year) {
-    return l10n.dateMonthYear(from);
+  if (period.from.month == period.to.month &&
+      period.from.year == period.to.year) {
+    return l10n.dateMonthYear(period.from);
   }
   return 'TODO';
 }

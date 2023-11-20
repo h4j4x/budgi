@@ -1,3 +1,5 @@
+import 'period.dart';
+
 abstract class BudgetCategory {
   String get code;
 
@@ -13,27 +15,32 @@ abstract class BudgetCategoryAmount {
 
   set category(BudgetCategory value);
 
-  DateTime get fromDate;
+  Period get period;
 
-  set fromDate(DateTime value);
-
-  DateTime get toDate;
-
-  set toDate(DateTime value);
+  set period(Period period);
 
   double get amount;
 
   set amount(double value);
 }
 
-class BudgetCategoryAmountData {
+class BudgetCategoryAmountData extends Period {
   final BudgetCategoryAmount? amount;
-  final DateTime fromDate;
-  final DateTime toDate;
 
   BudgetCategoryAmountData({
     this.amount,
-    required this.fromDate,
-    required this.toDate,
+    required super.from,
+    required super.to,
   });
+
+  factory BudgetCategoryAmountData.fromPeriod({
+    BudgetCategoryAmount? amount,
+    required Period period,
+  }) {
+    return BudgetCategoryAmountData(
+      amount: amount,
+      from: period.from,
+      to: period.to,
+    );
+  }
 }

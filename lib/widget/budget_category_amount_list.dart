@@ -5,19 +5,18 @@ import '../l10n/l10n.dart';
 import '../model/budget_category.dart';
 import '../model/crud_handler.dart';
 import '../model/item_action.dart';
+import '../model/period.dart';
 import '../util/datetime.dart';
 
 class BudgetCategoryAmountList extends StatefulWidget {
-  final DateTime fromDate;
-  final DateTime toDate;
+  final Period period;
 
   final CrudHandler<BudgetCategoryAmount> crudHandler;
 
   const BudgetCategoryAmountList({
     super.key,
     required this.crudHandler,
-    required this.fromDate,
-    required this.toDate,
+    required this.period,
   });
 
   @override
@@ -38,8 +37,7 @@ class _BudgetCategoryAmountListState extends State<BudgetCategoryAmountList> {
     Future.delayed(Duration.zero, () {
       periodController.text = formatDateTimePeriod(
         context,
-        from: widget.fromDate,
-        to: widget.toDate,
+        period: widget.period,
       );
     });
     widget.crudHandler.reload = () {
@@ -58,8 +56,7 @@ class _BudgetCategoryAmountListState extends State<BudgetCategoryAmountList> {
       loading = true;
     });
     final values = await DI().budgetCategoryService().listAmounts(
-          fromDate: widget.fromDate,
-          toDate: widget.toDate,
+          period: widget.period,
         );
     list.clear();
     list.addAll(values);

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
+import '../app/router.dart';
 import '../di.dart';
 import '../l10n/l10n.dart';
 import '../model/budget_category.dart';
 import '../model/crud_handler.dart';
 import '../model/item_action.dart';
-import '../app/router.dart';
-import '../util/datetime.dart';
+import '../model/period.dart';
 import '../widget/budget_category_amount_list.dart';
 import 'budget_category_amount.dart';
 
@@ -24,15 +24,13 @@ class BudgetCategoriesAmountPage extends StatefulWidget {
 class _BudgetCategoriesAmountPageState
     extends State<BudgetCategoriesAmountPage> {
   late CrudHandler<BudgetCategoryAmount> crudHandler;
-  late DateTime fromDate;
-  late DateTime toDate;
+  late Period period;
 
   @override
   void initState() {
     super.initState();
     crudHandler = CrudHandler(onItemAction: onItemAction);
-    fromDate = DateTime.now().atStartOfDay(); // TODO
-    toDate = fromDate.add(const Duration(days: 1)); // TODO
+    period = Period.currentMonth;
   }
 
   @override
@@ -46,8 +44,7 @@ class _BudgetCategoriesAmountPageState
   Widget body() {
     return BudgetCategoryAmountList(
       crudHandler: crudHandler,
-      fromDate: fromDate,
-      toDate: toDate,
+      period: period,
     );
   }
 
@@ -61,10 +58,9 @@ class _BudgetCategoriesAmountPageState
         {
           await context.push(
             BudgetCategoryAmountPage.route,
-            extra: BudgetCategoryAmountData(
+            extra: BudgetCategoryAmountData.fromPeriod(
               amount: item,
-              fromDate: fromDate,
-              toDate: toDate,
+              period: period,
             ),
           );
           break;
@@ -73,8 +69,7 @@ class _BudgetCategoriesAmountPageState
         {
           await DI().budgetCategoryService().deleteAmount(
                 categoryCode: item.category.code,
-                fromDate: fromDate,
-                toDate: toDate,
+                period: period,
               );
           break;
         }
@@ -87,9 +82,8 @@ class _BudgetCategoriesAmountPageState
       onPressed: () async {
         await context.push(
           BudgetCategoryAmountPage.route,
-          extra: BudgetCategoryAmountData(
-            fromDate: fromDate,
-            toDate: toDate,
+          extra: BudgetCategoryAmountData.fromPeriod(
+            period: period,
           ),
         );
         crudHandler.reload();

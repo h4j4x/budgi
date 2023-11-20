@@ -2,26 +2,24 @@ import 'package:flutter/material.dart';
 
 import '../l10n/l10n.dart';
 import '../model/budget_category.dart';
+import '../model/period.dart';
 import '../widget/budget_category_amount_edit.dart';
 
 class BudgetCategoryAmountPage extends StatelessWidget {
   static const route = '/category-amount';
 
   final BudgetCategoryAmount? value;
-  final DateTime fromDate;
-  final DateTime toDate;
+  final Period period;
 
   const BudgetCategoryAmountPage({
     super.key,
     this.value,
-    required this.fromDate,
-    required this.toDate,
+    required this.period,
   });
 
   BudgetCategoryAmountPage.data(BudgetCategoryAmountData data, {super.key})
       : value = data.amount,
-        fromDate = data.fromDate,
-        toDate = data.toDate;
+        period = data;
 
   @override
   Widget build(BuildContext context) {
@@ -35,8 +33,7 @@ class BudgetCategoryAmountPage extends StatelessWidget {
         padding: const EdgeInsets.only(left: 8.0, top: 8.0, right: 8.0),
         child: BudgetCategoryAmountEdit(
           value: value,
-          fromDate: fromDate,
-          toDate: toDate,
+          period: period,
         ),
       ),
     );
