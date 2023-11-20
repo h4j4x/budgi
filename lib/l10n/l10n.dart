@@ -169,6 +169,12 @@ abstract class L10n {
   /// **'Create'**
   String get createAction;
 
+  /// No description provided for @dateMonthYear.
+  ///
+  /// In en, this message translates to:
+  /// **'{date}'**
+  String dateMonthYear(DateTime date);
+
   /// No description provided for @editAction.
   ///
   /// In en, this message translates to:

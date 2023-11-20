@@ -46,6 +46,14 @@ class L10nEn extends L10n {
   String get createAction => 'Create';
 
   @override
+  String dateMonthYear(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.yMMMM(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return '$dateString';
+  }
+
+  @override
   String get editAction => 'Edit';
 
   @override

@@ -38,20 +38,8 @@ class _BudgetCategoriesAmountPageState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBar(),
       body: body(),
       floatingActionButton: addButton(),
-    );
-  }
-
-  PreferredSizeWidget appBar() {
-    return AppBar(
-      actions: [
-        IconButton(
-          onPressed: crudHandler.reload,
-          icon: const Icon(Icons.refresh),
-        ),
-      ],
     );
   }
 
@@ -60,18 +48,6 @@ class _BudgetCategoriesAmountPageState
       crudHandler: crudHandler,
       fromDate: fromDate,
       toDate: toDate,
-      onFromDateChange: (value) {
-        setState(() {
-          fromDate = value;
-          crudHandler.reload();
-        });
-      },
-      onToDateChange: (value) {
-        setState(() {
-          toDate = value;
-          crudHandler.reload();
-        });
-      },
     );
   }
 

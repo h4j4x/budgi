@@ -12,6 +12,15 @@
   "categoryName": "Category name",
   "categoryNameHint": "Enter category name...",
   "createAction": "Create",
+  "dateMonthYear": "{date}",
+  "@dateMonthYear": {
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMM"
+      }
+    }
+  },
   "editAction": "Edit",
   "fromDate": "From date",
   "home": "Home",

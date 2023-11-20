@@ -5,13 +5,11 @@ import '../l10n/l10n.dart';
 import '../model/budget_category.dart';
 import '../model/crud_handler.dart';
 import '../model/item_action.dart';
-import 'common/date_input.dart';
+import '../util/datetime.dart';
 
 class BudgetCategoryAmountList extends StatefulWidget {
   final DateTime fromDate;
   final DateTime toDate;
-  final Function(DateTime) onFromDateChange;
-  final Function(DateTime) onToDateChange;
 
   final CrudHandler<BudgetCategoryAmount> crudHandler;
 
@@ -20,8 +18,6 @@ class BudgetCategoryAmountList extends StatefulWidget {
     required this.crudHandler,
     required this.fromDate,
     required this.toDate,
-    required this.onFromDateChange,
-    required this.onToDateChange,
   });
 
   @override
@@ -31,6 +27,7 @@ class BudgetCategoryAmountList extends StatefulWidget {
 }
 
 class _BudgetCategoryAmountListState extends State<BudgetCategoryAmountList> {
+  final periodController = TextEditingController();
   final list = <BudgetCategoryAmount>[];
 
   bool loading = false;
@@ -38,11 +35,16 @@ class _BudgetCategoryAmountListState extends State<BudgetCategoryAmountList> {
   @override
   void initState() {
     super.initState();
+    Future.delayed(Duration.zero, () {
+      periodController.text = formatDateTimePeriod(
+        context,
+        from: widget.fromDate,
+        to: widget.toDate,
+      );
+    });
     widget.crudHandler.reload = () {
-      Future.delayed(Duration.zero, () {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          loadList();
-        });
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        loadList();
       });
     };
     Future.delayed(Duration.zero, loadList);
@@ -100,7 +102,6 @@ class _BudgetCategoryAmountListState extends State<BudgetCategoryAmountList> {
   }
 
   Widget toolBar() {
-    final l10n = L10n.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       child: Wrap(
@@ -109,21 +110,15 @@ class _BudgetCategoryAmountListState extends State<BudgetCategoryAmountList> {
         children: [
           Container(
             constraints: const BoxConstraints(maxWidth: 200),
-            child: DateInputWidget(
-              label: l10n.fromDate,
-              value: widget.fromDate,
-              maxValue: widget.toDate.add(const Duration(days: -1)),
-              onChange: widget.onFromDateChange,
+            child: TextField(
+              controller: periodController,
+              readOnly: true,
+              enabled: false,
             ),
           ),
-          Container(
-            constraints: const BoxConstraints(maxWidth: 200),
-            child: DateInputWidget(
-              label: l10n.toDate,
-              minValue: widget.fromDate.add(const Duration(days: 1)),
-              value: widget.toDate,
-              onChange: widget.onToDateChange,
-            ),
+          IconButton(
+            onPressed: loadList,
+            icon: const Icon(Icons.refresh),
           ),
         ],
       ),
