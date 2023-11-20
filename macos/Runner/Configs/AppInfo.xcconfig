@@ -8,7 +8,7 @@
 PRODUCT_NAME = budgi
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.example.budgi
+PRODUCT_BUNDLE_IDENTIFIER = com.sp1ke.budgi.flutter
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2023 com.example. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2023 Sp1k_e. All rights reserved.
