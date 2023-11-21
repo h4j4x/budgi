@@ -35,4 +35,8 @@ class AppIcon {
   static Icon get reload {
     return const Icon(FluentIcons.arrow_sync_24_regular);
   }
+
+  static Icon get wallet {
+    return const Icon(FluentIcons.wallet_24_regular);
+  }
 }

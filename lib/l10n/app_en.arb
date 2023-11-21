@@ -39,8 +39,22 @@
   "home": "Home",
   "invalidBudgetAmount": "Invalid budget amount. Enter a non negative number for amount.",
   "invalidBudgetCategory": "Invalid category.",
-  "invalidBudgetCategoryName": "Invalid budget category name. Enter a non empty name with no more than 255 characters.",
-  "invalidWalletName": "Invalid wallet name. Enter a non empty name with no more than 255 characters.",
+  "invalidBudgetCategoryName": "Invalid budget category name. Enter a non empty name with no more than {maxLength} characters.",
+  "@invalidBudgetCategoryName": {
+    "placeholders": {
+      "maxLength": {
+        "type": "int"
+      }
+    }
+  },
+  "invalidWalletName": "Invalid wallet name. Enter a non empty name with no more than {maxLength} characters.",
+  "@invalidWalletName": {
+    "placeholders": {
+      "maxLength": {
+        "type": "int"
+      }
+    }
+  },
   "invalidWalletType": "Invalid wallet type.",
   "nothingHere": "Nothing here :(",
   "prefixWithDate": "{prefix}{date}",
@@ -56,5 +70,13 @@
     }
   },
   "saveAction": "Save",
-  "toDate": "To date"
+  "toDate": "To date",
+  "wallet": "Wallet",
+  "walletName": "Wallet name",
+  "walletNameHint": "Enter wallet name...",
+  "wallets": "Wallets",
+  "walletTypeCash": "Cash",
+  "walletTypeCreditCard": "Credit card",
+  "walletTypeDebitCard": "Debit card",
+  "walletTypeHint": "Select wallet type"
 }

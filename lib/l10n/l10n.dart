@@ -226,14 +226,14 @@ abstract class L10n {
   /// No description provided for @invalidBudgetCategoryName.
   ///
   /// In en, this message translates to:
-  /// **'Invalid budget category name. Enter a non empty name with no more than 255 characters.'**
-  String get invalidBudgetCategoryName;
+  /// **'Invalid budget category name. Enter a non empty name with no more than {maxLength} characters.'**
+  String invalidBudgetCategoryName(int maxLength);
 
   /// No description provided for @invalidWalletName.
   ///
   /// In en, this message translates to:
-  /// **'Invalid wallet name. Enter a non empty name with no more than 255 characters.'**
-  String get invalidWalletName;
+  /// **'Invalid wallet name. Enter a non empty name with no more than {maxLength} characters.'**
+  String invalidWalletName(int maxLength);
 
   /// No description provided for @invalidWalletType.
   ///
@@ -264,6 +264,54 @@ abstract class L10n {
   /// In en, this message translates to:
   /// **'To date'**
   String get toDate;
+
+  /// No description provided for @wallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet'**
+  String get wallet;
+
+  /// No description provided for @walletName.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet name'**
+  String get walletName;
+
+  /// No description provided for @walletNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter wallet name...'**
+  String get walletNameHint;
+
+  /// No description provided for @wallets.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallets'**
+  String get wallets;
+
+  /// No description provided for @walletTypeCash.
+  ///
+  /// In en, this message translates to:
+  /// **'Cash'**
+  String get walletTypeCash;
+
+  /// No description provided for @walletTypeCreditCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Credit card'**
+  String get walletTypeCreditCard;
+
+  /// No description provided for @walletTypeDebitCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Debit card'**
+  String get walletTypeDebitCard;
+
+  /// No description provided for @walletTypeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select wallet type'**
+  String get walletTypeHint;
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {

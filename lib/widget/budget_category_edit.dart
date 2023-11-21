@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../app/info.dart';
 import '../app/router.dart';
 import '../di.dart';
 import '../error/validation.dart';
@@ -65,9 +66,9 @@ class _BudgetCategoryEditState extends State<BudgetCategoryEdit> {
     final l10n = L10n.of(context);
     return TextField(
       controller: nameController,
-      textInputAction: TextInputAction.next,
+      textInputAction: TextInputAction.go,
       autofocus: true,
-      maxLength: 200,
+      maxLength: AppInfo.textFieldMaxLength,
       enabled: !saving,
       decoration: InputDecoration(
         labelText: l10n.categoryName,
@@ -78,6 +79,9 @@ class _BudgetCategoryEditState extends State<BudgetCategoryEdit> {
         setState(() {
           errors.remove(BudgetCategoryValidator.name);
         });
+      },
+      onSubmitted: (_) {
+        onSave();
       },
     );
   }

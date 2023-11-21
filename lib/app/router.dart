@@ -3,15 +3,19 @@ import 'package:go_router/go_router.dart';
 
 import '../l10n/l10n.dart';
 import '../model/budget_category.dart';
+import '../model/wallet.dart';
 import '../page/budget_categories.dart';
 import '../page/budget_categories_amounts.dart';
 import '../page/budget_category.dart';
 import '../page/budget_category_amount.dart';
 import '../page/home.dart';
+import '../page/wallet.dart';
+import '../page/wallets.dart';
 import '../widget/app/layout.dart';
 import 'icon.dart';
 
 final _routes = <AppRoute>[
+  // home
   AppRoute(
     path: HomePage.route,
     icon: AppIcon.home,
@@ -22,6 +26,7 @@ final _routes = <AppRoute>[
       return const HomePage();
     },
   ),
+  // budget categories
   AppRoute(
     path: BudgetCategoriesPage.route,
     icon: AppIcon.budgetCategory,
@@ -32,12 +37,14 @@ final _routes = <AppRoute>[
       return const BudgetCategoriesPage();
     },
   ),
+  // budget category
   AppRoute(
     path: BudgetCategoryPage.route,
     pageBuilder: (_, state) {
       return BudgetCategoryPage(value: state.extra as BudgetCategory?);
     },
   ),
+  // budget categories amounts
   AppRoute(
     path: BudgetCategoriesAmountsPage.route,
     icon: AppIcon.budgetCategoryAmount,
@@ -48,6 +55,7 @@ final _routes = <AppRoute>[
       return const BudgetCategoriesAmountsPage();
     },
   ),
+  // budget category amount
   AppRoute(
     path: BudgetCategoryAmountPage.route,
     pageBuilder: (_, state) {
@@ -57,6 +65,24 @@ final _routes = <AppRoute>[
         );
       }
       return const HomePage();
+    },
+  ),
+  // wallets
+  AppRoute(
+    path: WalletsPage.route,
+    icon: AppIcon.wallet,
+    menuText: (context) {
+      return L10n.of(context).wallets;
+    },
+    pageBuilder: (_, __) {
+      return const WalletsPage();
+    },
+  ),
+  // budget category amount
+  AppRoute(
+    path: WalletPage.route,
+    pageBuilder: (_, state) {
+      return WalletPage(value: state.extra as Wallet?);
     },
   ),
 ];

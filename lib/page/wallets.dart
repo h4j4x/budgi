@@ -4,26 +4,26 @@ import '../app/icon.dart';
 import '../app/router.dart';
 import '../di.dart';
 import '../l10n/l10n.dart';
-import '../model/budget_category.dart';
 import '../model/crud_handler.dart';
 import '../model/item_action.dart';
-import '../service/budget_category.dart';
-import '../widget/budget_category_list.dart';
-import 'budget_category.dart';
+import '../model/wallet.dart';
+import '../service/wallet.dart';
+import '../widget/wallet_list.dart';
+import 'wallet.dart';
 
-class BudgetCategoriesPage extends StatefulWidget {
-  static const route = '/categories';
+class WalletsPage extends StatefulWidget {
+  static const route = '/wallets';
 
-  const BudgetCategoriesPage({super.key});
+  const WalletsPage({super.key});
 
   @override
   State<StatefulWidget> createState() {
-    return _BudgetCategoriesPageState();
+    return _WalletsPageState();
   }
 }
 
-class _BudgetCategoriesPageState extends State<BudgetCategoriesPage> {
-  late CrudHandler<BudgetCategory> crudHandler;
+class _WalletsPageState extends State<WalletsPage> {
+  late CrudHandler<Wallet> crudHandler;
 
   @override
   void initState() {
@@ -55,7 +55,7 @@ class _BudgetCategoriesPageState extends State<BudgetCategoriesPage> {
     return CustomScrollView(
       slivers: [
         toolbar(),
-        BudgetCategoryList(
+        WalletList(
           crudHandler: crudHandler,
         ),
       ],
@@ -75,18 +75,18 @@ class _BudgetCategoriesPageState extends State<BudgetCategoriesPage> {
 
   void onItemAction(
     BuildContext context,
-    BudgetCategory item,
+    Wallet item,
     ItemAction action,
   ) async {
     switch (action) {
       case ItemAction.select:
         {
-          await context.push(BudgetCategoryPage.route, extra: item);
+          await context.push(WalletPage.route, extra: item);
           break;
         }
       case ItemAction.delete:
         {
-          await DI().get<BudgetCategoryService>().deleteCategory(
+          await DI().get<WalletService>().deleteWallet(
                 code: item.code,
               );
           break;
@@ -98,7 +98,7 @@ class _BudgetCategoriesPageState extends State<BudgetCategoriesPage> {
   Widget addButton() {
     return FloatingActionButton(
       onPressed: () async {
-        await context.push(BudgetCategoryPage.route);
+        await context.push(WalletPage.route);
         crudHandler.reload();
       },
       tooltip: L10n.of(context).addAction,

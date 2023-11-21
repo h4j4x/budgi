@@ -96,8 +96,10 @@ class _BudgetCategoryAmountEditState extends State<BudgetCategoryAmountEdit> {
           ? (selectedCategory) {
               if (selectedCategory != null) {
                 setState(() {
+                  errors.remove(BudgetCategoryAmountValidator.category);
                   category = selectedCategory;
                 });
+                amountFocus.requestFocus();
               }
             }
           : null,
@@ -129,6 +131,9 @@ class _BudgetCategoryAmountEditState extends State<BudgetCategoryAmountEdit> {
         setState(() {
           errors.remove(BudgetCategoryAmountValidator.amount);
         });
+      },
+      onSubmitted: (_) {
+        onSave();
       },
     );
   }
