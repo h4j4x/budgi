@@ -85,6 +85,20 @@ class L10nEn extends L10n {
   }
 
   @override
+  String get invalidTransactionAmount => 'Invalid transaction amount. Enter a non negative number for amount.';
+
+  @override
+  String invalidTransactionDescription(int maxLength) {
+    return 'Invalid transaction description. Enter an optional description with no more than $maxLength characters.';
+  }
+
+  @override
+  String get invalidTransactionType => 'Invalid transaction type';
+
+  @override
+  String get invalidTransactionWallet => 'Invalid wallet';
+
+  @override
   String invalidWalletName(int maxLength) {
     return 'Invalid wallet name. Enter a non empty name with no more than $maxLength characters.';
   }
@@ -108,6 +122,18 @@ class L10nEn extends L10n {
 
   @override
   String get toDate => 'To date';
+
+  @override
+  String get transactionTypeIncome => 'Income';
+
+  @override
+  String get transactionTypeIncomeTransfer => 'Income transfer';
+
+  @override
+  String get transactionTypeExpense => 'Expense';
+
+  @override
+  String get transactionTypeExpenseTransfer => 'Expense transfer';
 
   @override
   String get wallet => 'Wallet';

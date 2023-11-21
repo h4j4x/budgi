@@ -3,25 +3,15 @@ import 'period.dart';
 abstract class BudgetCategory {
   String get code;
 
-  set code(String value);
-
   String get name;
-
-  set name(String value);
 }
 
 abstract class BudgetCategoryAmount {
   BudgetCategory get category;
 
-  set category(BudgetCategory value);
-
   Period get period;
 
-  set period(Period period);
-
   double get amount;
-
-  set amount(double value);
 
   BudgetCategoryAmount copyWith({required Period period});
 }

@@ -47,6 +47,17 @@
       }
     }
   },
+  "invalidTransactionAmount": "Invalid transaction amount. Enter a non negative number for amount.",
+  "invalidTransactionDescription": "Invalid transaction description. Enter an optional description with no more than {maxLength} characters.",
+  "@invalidTransactionDescription": {
+    "placeholders": {
+      "maxLength": {
+        "type": "int"
+      }
+    }
+  },
+  "invalidTransactionType": "Invalid transaction type",
+  "invalidTransactionWallet": "Invalid wallet",
   "invalidWalletName": "Invalid wallet name. Enter a non empty name with no more than {maxLength} characters.",
   "@invalidWalletName": {
     "placeholders": {
@@ -71,6 +82,10 @@
   },
   "saveAction": "Save",
   "toDate": "To date",
+  "transactionTypeIncome": "Income",
+  "transactionTypeIncomeTransfer": "Income transfer",
+  "transactionTypeExpense": "Expense",
+  "transactionTypeExpenseTransfer": "Expense transfer",
   "wallet": "Wallet",
   "walletName": "Wallet name",
   "walletNameHint": "Enter wallet name...",

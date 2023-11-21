@@ -229,6 +229,30 @@ abstract class L10n {
   /// **'Invalid budget category name. Enter a non empty name with no more than {maxLength} characters.'**
   String invalidBudgetCategoryName(int maxLength);
 
+  /// No description provided for @invalidTransactionAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid transaction amount. Enter a non negative number for amount.'**
+  String get invalidTransactionAmount;
+
+  /// No description provided for @invalidTransactionDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid transaction description. Enter an optional description with no more than {maxLength} characters.'**
+  String invalidTransactionDescription(int maxLength);
+
+  /// No description provided for @invalidTransactionType.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid transaction type'**
+  String get invalidTransactionType;
+
+  /// No description provided for @invalidTransactionWallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid wallet'**
+  String get invalidTransactionWallet;
+
   /// No description provided for @invalidWalletName.
   ///
   /// In en, this message translates to:
@@ -264,6 +288,30 @@ abstract class L10n {
   /// In en, this message translates to:
   /// **'To date'**
   String get toDate;
+
+  /// No description provided for @transactionTypeIncome.
+  ///
+  /// In en, this message translates to:
+  /// **'Income'**
+  String get transactionTypeIncome;
+
+  /// No description provided for @transactionTypeIncomeTransfer.
+  ///
+  /// In en, this message translates to:
+  /// **'Income transfer'**
+  String get transactionTypeIncomeTransfer;
+
+  /// No description provided for @transactionTypeExpense.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense'**
+  String get transactionTypeExpense;
+
+  /// No description provided for @transactionTypeExpenseTransfer.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense transfer'**
+  String get transactionTypeExpenseTransfer;
 
   /// No description provided for @wallet.
   ///
