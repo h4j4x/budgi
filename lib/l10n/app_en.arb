@@ -4,6 +4,7 @@
   "budgetAmount": "Budget amount",
   "budgetAmountCategoryHint": "Select budget category",
   "budgetAmountHint": "Enter budget amount...",
+  "budgetsAmounts": "Budgets amounts",
   "budgetsCategories": "Budgets categories",
   "budgetCategory": "Budget category",
   "budgetsCategoriesAmounts": "Budgets categories amounts",
@@ -11,6 +12,7 @@
   "cancelAction": "Cancel",
   "categoryName": "Category name",
   "categoryNameHint": "Enter category name...",
+  "copyingPreviousPeriod": "Copying previous period amounts. Please wait...",
   "createAction": "Create",
   "dateMonthYear": "{date}",
   "@dateMonthYear": {

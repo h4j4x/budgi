@@ -23,14 +23,33 @@ class BudgetCategoriesAmountPage extends StatefulWidget {
 
 class _BudgetCategoriesAmountPageState
     extends State<BudgetCategoriesAmountPage> {
+  final period = Period.currentMonth;
+
   late CrudHandler<BudgetCategoryAmount> crudHandler;
-  late Period period;
+
+  bool loading = true;
+  String? loadingMessage;
 
   @override
   void initState() {
     super.initState();
     crudHandler = CrudHandler(onItemAction: onItemAction);
-    period = Period.currentMonth;
+    Future.delayed(Duration.zero, checkPreviousPeriod);
+  }
+
+  void checkPreviousPeriod() async {
+    final periodChanged =
+        await DI().budgetCategoryService().periodHasChanged(period);
+    if (periodChanged) {
+      setState(() {
+        loadingMessage = L10n.of(context).copyingPreviousPeriod;
+      });
+      await DI().budgetCategoryService().copyPreviousPeriodAmountsInto(period);
+    }
+    setState(() {
+      loading = false;
+      loadingMessage = null;
+    });
   }
 
   @override
@@ -42,9 +61,28 @@ class _BudgetCategoriesAmountPageState
   }
 
   Widget body() {
+    if (loading) {
+      return loadingBody();
+    }
     return BudgetCategoryAmountList(
       crudHandler: crudHandler,
       period: period,
+    );
+  }
+
+  Widget loadingBody() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const CircularProgressIndicator.adaptive(),
+          if (loadingMessage != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Text(loadingMessage!),
+            ),
+        ],
+      ),
     );
   }
 

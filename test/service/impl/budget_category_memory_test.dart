@@ -40,7 +40,7 @@ void main() {
     final category2 = await service.saveCategory(name: 'cat2');
 
     final fromDate = DateTime.now();
-    final toDate = DateTime.now()..add(const Duration(days: 2));
+    final toDate = fromDate.add(const Duration(days: 2));
     final period = Period(from: fromDate, to: toDate);
 
     await service.saveAmount(
@@ -115,7 +115,7 @@ void main() {
     final service = BudgetCategoryMemoryService();
 
     final fromDate = DateTime.now();
-    final toDate = DateTime.now()..add(const Duration(days: 2));
+    final toDate = fromDate.add(const Duration(days: 2));
     final period = Period(from: fromDate, to: toDate);
 
     final random = Random();
@@ -164,7 +164,7 @@ void main() {
     );
 
     final fromDate = DateTime.now();
-    final toDate = DateTime.now()..add(const Duration(days: 2));
+    final toDate = fromDate.add(const Duration(days: 2));
     final period = Period(from: fromDate, to: toDate);
 
     final categoryAmount = await service.saveAmount(
@@ -193,5 +193,43 @@ void main() {
     );
     expect(list.length, equals(1));
     expect(list[0].amount, equals(updatedAmount));
+  });
+
+  test('Copies previous period amounts and save current', () async {
+    final service = BudgetCategoryMemoryService();
+
+    final category = await service.saveCategory(
+      name: 'test',
+    );
+
+    final fromDate = DateTime.now();
+    final toDate = fromDate.add(const Duration(days: 2));
+    final period = Period(from: fromDate, to: toDate);
+
+    var periodHasChanged = await service.periodHasChanged(period);
+    expect(periodHasChanged, isFalse);
+
+    final categoryAmount = await service.saveAmount(
+      categoryCode: category.code,
+      period: period,
+      amount: 10.0,
+    );
+
+    periodHasChanged = await service.periodHasChanged(period);
+    expect(periodHasChanged, isFalse);
+
+    final newToDate = toDate.add(const Duration(days: 2));
+    final newPeriod = Period(from: toDate, to: newToDate);
+    periodHasChanged = await service.periodHasChanged(newPeriod);
+    expect(periodHasChanged, isTrue);
+
+    await service.copyPreviousPeriodAmountsInto(newPeriod);
+    final list = await service.listAmounts(
+      period: newPeriod,
+    );
+    expect(list.length, equals(1));
+    expect(list[0].category, equals(categoryAmount.category));
+    expect(list[0].period, equals(newPeriod));
+    expect(list[0].amount, equals(categoryAmount.amount));
   });
 }

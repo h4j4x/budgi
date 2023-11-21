@@ -13,4 +13,11 @@ class Period {
     final to = DateTime(now.year, now.month + 1).add(const Duration(days: -1));
     return Period(from: from, to: to);
   }
+
+  @override
+  String toString() {
+    final fromStr = '${from.year}${from.month}${from.day}';
+    final toStr = '${to.year}${to.month}${to.day}';
+    return '$fromStr-$toStr';
+  }
 }

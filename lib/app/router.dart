@@ -8,6 +8,7 @@ import '../page/budget_categories_amount.dart';
 import '../page/budget_category.dart';
 import '../page/budget_category_amount.dart';
 import '../page/home.dart';
+import '../widget/app/layout.dart';
 import 'icon.dart';
 
 final _routes = <AppRoute>[
@@ -41,7 +42,7 @@ final _routes = <AppRoute>[
     path: BudgetCategoriesAmountPage.route,
     icon: AppIcon.budgetCategoryAmount,
     menuText: (context) {
-      return L10n.of(context).budgetsCategoriesAmounts;
+      return L10n.of(context).budgetsAmounts;
     },
     pageBuilder: (_, __) {
       return const BudgetCategoriesAmountPage();
@@ -62,6 +63,9 @@ final _routes = <AppRoute>[
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
+final _menuRoutes = _routes.where((route) {
+  return route.menuText != null;
+}).toList();
 
 // https://pub.dev/documentation/go_router/latest/topics/Get%20started-topic.html
 final router = GoRouter(
@@ -73,8 +77,9 @@ final router = GoRouter(
       navigatorKey: _shellNavigatorKey,
       pageBuilder: (context, state, child) {
         return NoTransitionPage(
-          child: _AppScaffold(
+          child: AppScaffold(
             path: state.fullPath ?? '',
+            routes: _menuRoutes,
             child: child,
           ),
         );
@@ -92,68 +97,6 @@ final router = GoRouter(
     ),
   ],
 );
-
-class _AppScaffold extends StatelessWidget {
-  final String path;
-  final Widget child;
-  final routes = _routes.where((route) {
-    return route.menuText != null;
-  }).toList();
-
-  _AppScaffold({
-    required this.child,
-    required this.path,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: title(context)),
-      body: SafeArea(child: child),
-      drawer: Drawer(
-        child: ListView.separated(
-          itemCount: routes.length,
-          itemBuilder: (context, index) {
-            final route = routes[index];
-            final selected = route.path == path;
-            return ListTile(
-              title: Text(route.menuText!(context)),
-              leading: route.icon,
-              selected: selected,
-              onTap: !selected
-                  ? () {
-                      GoRouter.of(context).go(route.path);
-                      Navigator.pop(context);
-                    }
-                  : null,
-            );
-          },
-          separatorBuilder: (_, __) {
-            return const Divider();
-          },
-        ),
-      ),
-    );
-  }
-
-  Widget? title(BuildContext context) {
-    final currentRouteIndex = routes.indexWhere((route) {
-      return route.path == path && route.menuText != null;
-    });
-    if (currentRouteIndex >= 0) {
-      final route = routes[currentRouteIndex];
-      return Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (route.icon != null) route.icon!,
-          if (route.icon != null) const SizedBox(width: 8),
-          Text(route.menuText!(context)),
-        ],
-      );
-    }
-    return null;
-  }
-}
 
 typedef TextBuilder = String Function(BuildContext);
 
@@ -176,6 +119,10 @@ class AppRoute {
 extension RouterContext on BuildContext {
   Future<T?> push<T extends Object?>(String location, {Object? extra}) {
     return GoRouter.of(this).push<T>(location, extra: extra);
+  }
+
+  void go(String location, {Object? extra}) {
+    GoRouter.of(this).go(location, extra: extra);
   }
 
   void pop<T extends Object?>([T? result]) {

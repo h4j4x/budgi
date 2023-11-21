@@ -14,7 +14,7 @@ abstract class BudgetCategoryService {
   /// withAmounts (true will get categories with registered amounts between the
   /// given interval).
   ///
-  /// fromDate and toDate are inclusive.
+  /// period dates are inclusive.
   Future<List<BudgetCategory>> listCategories({
     bool withAmount = false,
     Period? period,
@@ -24,7 +24,9 @@ abstract class BudgetCategoryService {
     required String code,
   });
 
-  /// fromDate and toDate are inclusive.
+  /// period dates are inclusive.
+  ///
+  /// Should save given period as last used.
   /// @throws ValidationError
   Future<BudgetCategoryAmount> saveAmount({
     required String categoryCode,
@@ -33,15 +35,29 @@ abstract class BudgetCategoryService {
     required double amount,
   });
 
-  /// fromDate and toDate are inclusive.
+  /// period dates are inclusive.
+  ///
+  /// Should save given period as last used.
   Future<List<BudgetCategoryAmount>> listAmounts({
     required Period period,
     Sort? amountSort,
   });
 
-  /// fromDate and toDate are inclusive.
+  /// period dates are inclusive.
+  ///
+  /// Should save given period as last used.
   Future<void> deleteAmount({
     required String categoryCode,
     required Period period,
   });
+
+  /// returns true if previous used period is different from given one.
+  ///
+  /// Should NOT save given period as last used.
+  Future<bool> periodHasChanged(Period period);
+
+  /// Duplicates previous used period amounts into given one.
+  ///
+  /// Should save given period as last used.
+  Future copyPreviousPeriodAmountsInto(Period period);
 }

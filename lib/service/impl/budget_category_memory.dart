@@ -10,8 +10,10 @@ import '../validator.dart';
 class BudgetCategoryMemoryService implements BudgetCategoryService {
   final Validator<BudgetCategory, BudgetCategoryError>? categoryValidator;
   final Validator<BudgetCategoryAmount, BudgetCategoryError>? amountValidator;
-  final categories = <String, BudgetCategory>{};
-  final values = <String, Set<BudgetCategoryAmount>>{};
+
+  final _categories = <String, BudgetCategory>{};
+  final _values = <String, Set<BudgetCategoryAmount>>{};
+  final _periods = <String>[];
 
   BudgetCategoryMemoryService({
     this.categoryValidator,
@@ -30,7 +32,7 @@ class BudgetCategoryMemoryService implements BudgetCategoryService {
       throw ValidationError(errors!);
     }
 
-    categories[budgetCategoryCode] = category;
+    _categories[budgetCategoryCode] = category;
     return Future.value(category);
   }
 
@@ -39,12 +41,12 @@ class BudgetCategoryMemoryService implements BudgetCategoryService {
     bool withAmount = false,
     Period? period,
   }) {
-    final list = categories.values.toList();
+    final list = _categories.values.toList();
     if (period != null) {
-      final datesCode = _datesCode(period);
-      final amountsCategories = (values[datesCode] ?? <BudgetCategoryAmount>{})
-          .map((amount) => amount.category.code)
-          .toList();
+      final amountsCategories =
+          (_values[period.toString()] ?? <BudgetCategoryAmount>{})
+              .map((amount) => amount.category.code)
+              .toList();
       list.removeWhere((category) {
         final match = amountsCategories.contains(category.code);
         if (withAmount) {
@@ -60,7 +62,7 @@ class BudgetCategoryMemoryService implements BudgetCategoryService {
   Future<void> deleteCategory({
     required String code,
   }) {
-    categories.remove(code);
+    _categories.remove(code);
     return Future.value();
   }
 
@@ -71,7 +73,9 @@ class BudgetCategoryMemoryService implements BudgetCategoryService {
     required Period period,
     required double amount,
   }) {
-    final category = categories[categoryCode];
+    _saveLastUsed(period);
+
+    final category = _categories[categoryCode];
     if (category == null) {
       throw ValidationError({
         'category': BudgetCategoryError.invalidCategory,
@@ -83,11 +87,11 @@ class BudgetCategoryMemoryService implements BudgetCategoryService {
       throw ValidationError(errors!);
     }
 
-    final datesCode = _datesCode(period);
-    values[datesCode] ??= <BudgetCategoryAmount>{};
-    values[datesCode]!
+    final periodKey = period.toString();
+    _values[periodKey] ??= <BudgetCategoryAmount>{};
+    _values[periodKey]!
         .removeWhere((amount) => amount.category.code == category.code);
-    values[datesCode]!.add(categoryAmount);
+    _values[periodKey]!.add(categoryAmount);
     return Future.value(categoryAmount);
   }
 
@@ -96,8 +100,9 @@ class BudgetCategoryMemoryService implements BudgetCategoryService {
     required Period period,
     Sort? amountSort,
   }) {
-    final datesCode = _datesCode(period);
-    final set = values[datesCode] ?? {};
+    _saveLastUsed(period);
+
+    final set = _values[period.toString()] ?? {};
     return Future.value(set.toList()
       ..sort(
         (value1, value2) {
@@ -117,16 +122,40 @@ class BudgetCategoryMemoryService implements BudgetCategoryService {
     required String categoryCode,
     required Period period,
   }) {
-    final datesCode = _datesCode(period);
-    final set = values[datesCode] ?? {};
+    _saveLastUsed(period);
+
+    final set = _values[period.toString()] ?? {};
     set.removeWhere((amount) => amount.category.code == categoryCode);
     return Future.value();
   }
 
-  String _datesCode(Period period) {
-    final from = '${period.from.year}${period.from.month}${period.from.day}';
-    final to = '${period.to.year}${period.to.month}${period.to.day}';
-    return '$from-$to';
+  void _saveLastUsed(Period period) {
+    final periodKey = period.toString();
+    if (!_periods.contains(periodKey)) {
+      _periods.add(periodKey);
+    }
+  }
+
+  @override
+  Future<bool> periodHasChanged(Period period) {
+    if (_periods.isNotEmpty) {
+      final periodKey = period.toString();
+      return Future.value(!_periods.contains(periodKey));
+    }
+    return Future.value(false);
+  }
+
+  @override
+  Future copyPreviousPeriodAmountsInto(Period period) {
+    if (_periods.isNotEmpty) {
+      final previousPeriodKey = _periods.last;
+      final periodKey = period.toString();
+      _values[periodKey] = <BudgetCategoryAmount>{};
+      for (var categoryAmount in _values[previousPeriodKey]!) {
+        _values[periodKey]!.add(categoryAmount.copyWith(period: period));
+      }
+    }
+    return Future.value();
   }
 }
 
@@ -180,5 +209,10 @@ class _BudgetCategoryAmount implements BudgetCategoryAmount {
   @override
   int get hashCode {
     return category.code.hashCode;
+  }
+
+  @override
+  BudgetCategoryAmount copyWith({required Period period}) {
+    return _BudgetCategoryAmount(category, period, amount);
   }
 }

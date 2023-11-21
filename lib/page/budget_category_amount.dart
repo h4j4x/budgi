@@ -27,7 +27,7 @@ class BudgetCategoryAmountPage extends StatelessWidget {
     final action = value != null ? l10n.editAction : l10n.createAction;
     return Scaffold(
       appBar: AppBar(
-        title: Text('$action ${l10n.budgetsCategoryAmount.toLowerCase()}'),
+        title: Text('$action ${l10n.budgetAmount.toLowerCase()}'),
       ),
       body: Padding(
         padding: const EdgeInsets.only(left: 8.0, top: 8.0, right: 8.0),

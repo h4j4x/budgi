@@ -49,14 +49,19 @@ class _BudgetCategoryEditState extends State<BudgetCategoryEdit> {
         ],
       ),
     ];
-    return ListView.separated(
-      itemBuilder: (_, index) {
-        return items[index];
-      },
-      separatorBuilder: (_, __) {
-        return const Divider(color: Colors.transparent);
-      },
-      itemCount: items.length,
+    return Center(
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 800),
+        child: ListView.separated(
+          itemBuilder: (_, index) {
+            return items[index];
+          },
+          separatorBuilder: (_, __) {
+            return const Divider(color: Colors.transparent);
+          },
+          itemCount: items.length,
+        ),
+      ),
     );
   }
 

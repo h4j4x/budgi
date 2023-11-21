@@ -101,9 +101,8 @@ class _BudgetCategoryAmountListState extends State<BudgetCategoryAmountList> {
   Widget toolBar() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-      child: Wrap(
-        runSpacing: 8,
-        spacing: 8,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Container(
             constraints: const BoxConstraints(maxWidth: 200),

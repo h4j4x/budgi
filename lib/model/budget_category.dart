@@ -22,6 +22,8 @@ abstract class BudgetCategoryAmount {
   double get amount;
 
   set amount(double value);
+
+  BudgetCategoryAmount copyWith({required Period period});
 }
 
 class BudgetCategoryAmountData extends Period {

@@ -121,6 +121,12 @@ abstract class L10n {
   /// **'Enter budget amount...'**
   String get budgetAmountHint;
 
+  /// No description provided for @budgetsAmounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Budgets amounts'**
+  String get budgetsAmounts;
+
   /// No description provided for @budgetsCategories.
   ///
   /// In en, this message translates to:
@@ -162,6 +168,12 @@ abstract class L10n {
   /// In en, this message translates to:
   /// **'Enter category name...'**
   String get categoryNameHint;
+
+  /// No description provided for @copyingPreviousPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'Copying previous period amounts. Please wait...'**
+  String get copyingPreviousPeriod;
 
   /// No description provided for @createAction.
   ///

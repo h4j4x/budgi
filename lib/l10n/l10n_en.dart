@@ -22,6 +22,9 @@ class L10nEn extends L10n {
   String get budgetAmountHint => 'Enter budget amount...';
 
   @override
+  String get budgetsAmounts => 'Budgets amounts';
+
+  @override
   String get budgetsCategories => 'Budgets categories';
 
   @override
@@ -41,6 +44,9 @@ class L10nEn extends L10n {
 
   @override
   String get categoryNameHint => 'Enter category name...';
+
+  @override
+  String get copyingPreviousPeriod => 'Copying previous period amounts. Please wait...';
 
   @override
   String get createAction => 'Create';
