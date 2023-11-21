@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
+import '../app/router.dart';
 import '../di.dart';
 import '../error/validation.dart';
 import '../l10n/l10n.dart';
 import '../model/budget_category.dart';
 import '../model/budget_category_error.dart';
-import '../app/router.dart';
 import '../service/impl/budget_category_validator.dart';
+import 'common/form_toolbar.dart';
 
 class BudgetCategoryEdit extends StatefulWidget {
   final BudgetCategory? value;
@@ -41,13 +42,7 @@ class _BudgetCategoryEditState extends State<BudgetCategoryEdit> {
     final items = <Widget>[
       categoryNameField(),
       const SizedBox(height: 24),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          cancelButton(),
-          saveButton(),
-        ],
-      ),
+      FormToolbar(enabled: !saving, onSave: onSave),
     ];
     return Center(
       child: Container(
@@ -83,34 +78,6 @@ class _BudgetCategoryEditState extends State<BudgetCategoryEdit> {
           errors.remove(BudgetCategoryValidator.name);
         });
       },
-    );
-  }
-
-  Widget cancelButton() {
-    return Center(
-      child: Container(
-        constraints: const BoxConstraints(maxWidth: 150, minWidth: 80),
-        child: ElevatedButton(
-          onPressed: saving
-              ? null
-              : () {
-                  context.pop();
-                },
-          child: Text(L10n.of(context).cancelAction),
-        ),
-      ),
-    );
-  }
-
-  Widget saveButton() {
-    return Center(
-      child: Container(
-        constraints: const BoxConstraints(maxWidth: 150, minWidth: 80),
-        child: ElevatedButton(
-          onPressed: saving ? null : onSave,
-          child: Text(L10n.of(context).saveAction),
-        ),
-      ),
     );
   }
 

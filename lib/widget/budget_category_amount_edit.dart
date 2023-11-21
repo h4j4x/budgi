@@ -8,6 +8,7 @@ import '../model/budget_category.dart';
 import '../model/budget_category_error.dart';
 import '../model/period.dart';
 import '../service/impl/budget_category_validator.dart';
+import 'common/form_toolbar.dart';
 
 class BudgetCategoryAmountEdit extends StatefulWidget {
   final BudgetCategoryAmount? value;
@@ -62,13 +63,7 @@ class _BudgetCategoryAmountEditState extends State<BudgetCategoryAmountEdit> {
       categoryField(),
       amountField(),
       const SizedBox(height: 24),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          cancelButton(),
-          saveButton(),
-        ],
-      ),
+      FormToolbar(enabled: !saving, onSave: onSave),
     ];
     return Center(
       child: Container(
@@ -134,34 +129,6 @@ class _BudgetCategoryAmountEditState extends State<BudgetCategoryAmountEdit> {
           errors.remove(BudgetCategoryAmountValidator.amount);
         });
       },
-    );
-  }
-
-  Widget cancelButton() {
-    return Center(
-      child: Container(
-        constraints: const BoxConstraints(maxWidth: 150, minWidth: 80),
-        child: ElevatedButton(
-          onPressed: saving
-              ? null
-              : () {
-                  context.pop();
-                },
-          child: Text(L10n.of(context).cancelAction),
-        ),
-      ),
-    );
-  }
-
-  Widget saveButton() {
-    return Center(
-      child: Container(
-        constraints: const BoxConstraints(maxWidth: 150, minWidth: 80),
-        child: ElevatedButton(
-          onPressed: saving ? null : onSave,
-          child: Text(L10n.of(context).saveAction),
-        ),
-      ),
     );
   }
 
