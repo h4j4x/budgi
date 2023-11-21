@@ -5,6 +5,7 @@ abstract class AppInfo {
   Future<String> version();
 }
 
+// https://pub.dev/packages/package_info_plus
 class PackageAppInfo implements AppInfo {
   PackageInfo? packageInfo;
 

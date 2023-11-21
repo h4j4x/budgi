@@ -38,7 +38,7 @@ class _BudgetCategoriesPageState extends State<BudgetCategoriesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBar(),
+      // appBar: appBar(),
       body: body(),
       floatingActionButton: addButton(),
     );
@@ -56,8 +56,20 @@ class _BudgetCategoriesPageState extends State<BudgetCategoriesPage> {
   }
 
   Widget body() {
-    return BudgetCategoryList(
-      crudHandler: crudHandler,
+    return CustomScrollView(
+      slivers: [
+        SliverAppBar(
+          actions: [
+            IconButton(
+              onPressed: crudHandler.reload,
+              icon: AppIcon.reload,
+            ),
+          ],
+        ),
+        BudgetCategoryList(
+          crudHandler: crudHandler,
+        ),
+      ],
     );
   }
 

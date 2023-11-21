@@ -6,6 +6,7 @@ import '../l10n/l10n.dart';
 import '../model/budget_category.dart';
 import '../model/crud_handler.dart';
 import '../model/item_action.dart';
+import 'common/sliver_center.dart';
 
 class BudgetCategoryList extends StatefulWidget {
   final CrudHandler<BudgetCategory> crudHandler;
@@ -57,7 +58,7 @@ class _BudgetCategoryListState extends State<BudgetCategoryList> {
   @override
   Widget build(BuildContext context) {
     if (loading) {
-      return const Center(
+      return const SliverCenter(
         child: CircularProgressIndicator.adaptive(),
       );
     }
@@ -66,12 +67,11 @@ class _BudgetCategoryListState extends State<BudgetCategoryList> {
 
   Widget body() {
     if (list.isEmpty) {
-      return Center(
+      return SliverCenter(
         child: Text(L10n.of(context).nothingHere),
       );
     }
-    return ListView.separated(
-      shrinkWrap: true,
+    return SliverList.separated(
       itemBuilder: (_, index) {
         return listItem(list[index]);
       },
