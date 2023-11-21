@@ -8,22 +8,24 @@ import '../model/budget_category.dart';
 import '../model/crud_handler.dart';
 import '../model/item_action.dart';
 import '../model/period.dart';
+import '../util/datetime.dart';
 import '../widget/budget_category_amount_list.dart';
 import 'budget_category_amount.dart';
 
-class BudgetCategoriesAmountPage extends StatefulWidget {
+class BudgetCategoriesAmountsPage extends StatefulWidget {
   static const route = '/categories-amounts';
 
-  const BudgetCategoriesAmountPage({super.key});
+  const BudgetCategoriesAmountsPage({super.key});
 
   @override
   State<StatefulWidget> createState() {
-    return _BudgetCategoriesAmountPageState();
+    return _BudgetCategoriesAmountsPageState();
   }
 }
 
-class _BudgetCategoriesAmountPageState
-    extends State<BudgetCategoriesAmountPage> {
+class _BudgetCategoriesAmountsPageState
+    extends State<BudgetCategoriesAmountsPage> {
+  final periodController = TextEditingController();
   final period = Period.currentMonth;
 
   late CrudHandler<BudgetCategoryAmount> crudHandler;
@@ -35,7 +37,13 @@ class _BudgetCategoriesAmountPageState
   void initState() {
     super.initState();
     crudHandler = CrudHandler(onItemAction: onItemAction);
-    Future.delayed(Duration.zero, checkPreviousPeriod);
+    Future.delayed(Duration.zero, () {
+      periodController.text = formatDateTimePeriod(
+        context,
+        period: period,
+      );
+      checkPreviousPeriod();
+    });
   }
 
   void checkPreviousPeriod() async {
@@ -65,9 +73,34 @@ class _BudgetCategoriesAmountPageState
     if (loading) {
       return loadingBody();
     }
-    return BudgetCategoryAmountList(
-      crudHandler: crudHandler,
-      period: period,
+    return CustomScrollView(
+      slivers: [
+        toolbar(),
+        BudgetCategoryAmountList(
+          crudHandler: crudHandler,
+          period: period,
+        ),
+      ],
+    );
+  }
+
+  Widget toolbar() {
+    return SliverAppBar(
+      toolbarHeight: kToolbarHeight + 16,
+      title: Container(
+        constraints: const BoxConstraints(maxWidth: 200),
+        child: TextField(
+          controller: periodController,
+          readOnly: true,
+          enabled: false,
+        ),
+      ),
+      actions: [
+        IconButton(
+          onPressed: crudHandler.reload,
+          icon: AppIcon.reload,
+        ),
+      ],
     );
   }
 

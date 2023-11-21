@@ -58,16 +58,20 @@ class _BudgetCategoriesPageState extends State<BudgetCategoriesPage> {
   Widget body() {
     return CustomScrollView(
       slivers: [
-        SliverAppBar(
-          actions: [
-            IconButton(
-              onPressed: crudHandler.reload,
-              icon: AppIcon.reload,
-            ),
-          ],
-        ),
+        toolbar(),
         BudgetCategoryList(
           crudHandler: crudHandler,
+        ),
+      ],
+    );
+  }
+
+  Widget toolbar() {
+    return SliverAppBar(
+      actions: [
+        IconButton(
+          onPressed: crudHandler.reload,
+          icon: AppIcon.reload,
         ),
       ],
     );

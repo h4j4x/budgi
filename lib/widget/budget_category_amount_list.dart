@@ -7,7 +7,7 @@ import '../model/budget_category.dart';
 import '../model/crud_handler.dart';
 import '../model/item_action.dart';
 import '../model/period.dart';
-import '../util/datetime.dart';
+import 'common/sliver_center.dart';
 
 class BudgetCategoryAmountList extends StatefulWidget {
   final Period period;
@@ -27,7 +27,6 @@ class BudgetCategoryAmountList extends StatefulWidget {
 }
 
 class _BudgetCategoryAmountListState extends State<BudgetCategoryAmountList> {
-  final periodController = TextEditingController();
   final list = <BudgetCategoryAmount>[];
 
   bool loading = false;
@@ -35,12 +34,6 @@ class _BudgetCategoryAmountListState extends State<BudgetCategoryAmountList> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration.zero, () {
-      periodController.text = formatDateTimePeriod(
-        context,
-        period: widget.period,
-      );
-    });
     widget.crudHandler.reload = () {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         loadList();
@@ -69,7 +62,7 @@ class _BudgetCategoryAmountListState extends State<BudgetCategoryAmountList> {
   @override
   Widget build(BuildContext context) {
     if (loading) {
-      return const Center(
+      return const SliverCenter(
         child: CircularProgressIndicator.adaptive(),
       );
     }
@@ -77,48 +70,19 @@ class _BudgetCategoryAmountListState extends State<BudgetCategoryAmountList> {
   }
 
   Widget body() {
-    return Column(
-      children: [
-        toolBar(),
-        const Divider(),
-        if (list.isEmpty) const Spacer(),
-        if (list.isEmpty) Text(L10n.of(context).nothingHere),
-        if (list.isEmpty) const Spacer(),
-        if (list.isNotEmpty)
-          ListView.separated(
-            shrinkWrap: true,
-            itemBuilder: (_, index) {
-              return listItem(list[index]);
-            },
-            separatorBuilder: (_, __) {
-              return const Divider();
-            },
-            itemCount: list.length,
-          ),
-      ],
-    );
-  }
-
-  Widget toolBar() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Container(
-            constraints: const BoxConstraints(maxWidth: 200),
-            child: TextField(
-              controller: periodController,
-              readOnly: true,
-              enabled: false,
-            ),
-          ),
-          IconButton(
-            onPressed: loadList,
-            icon: AppIcon.reload,
-          ),
-        ],
-      ),
+    if (list.isEmpty) {
+      return SliverCenter(
+        child: Text(L10n.of(context).nothingHere),
+      );
+    }
+    return SliverList.separated(
+      itemBuilder: (_, index) {
+        return listItem(list[index]);
+      },
+      separatorBuilder: (_, __) {
+        return const Divider();
+      },
+      itemCount: list.length,
     );
   }
 

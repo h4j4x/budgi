@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../l10n/l10n.dart';
 import '../model/budget_category.dart';
 import '../page/budget_categories.dart';
-import '../page/budget_categories_amount.dart';
+import '../page/budget_categories_amounts.dart';
 import '../page/budget_category.dart';
 import '../page/budget_category_amount.dart';
 import '../page/home.dart';
@@ -39,13 +39,13 @@ final _routes = <AppRoute>[
     },
   ),
   AppRoute(
-    path: BudgetCategoriesAmountPage.route,
+    path: BudgetCategoriesAmountsPage.route,
     icon: AppIcon.budgetCategoryAmount,
     menuText: (context) {
       return L10n.of(context).budgetsAmounts;
     },
     pageBuilder: (_, __) {
-      return const BudgetCategoriesAmountPage();
+      return const BudgetCategoriesAmountsPage();
     },
   ),
   AppRoute(
