@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../app/icon.dart';
 import '../app/router.dart';
 import '../di.dart';
 import '../l10n/l10n.dart';
@@ -48,7 +49,7 @@ class _BudgetCategoriesPageState extends State<BudgetCategoriesPage> {
       actions: [
         IconButton(
           onPressed: crudHandler.reload,
-          icon: const Icon(Icons.refresh),
+          icon: AppIcon.reload,
         ),
       ],
     );
@@ -89,7 +90,7 @@ class _BudgetCategoriesPageState extends State<BudgetCategoriesPage> {
         crudHandler.reload();
       },
       tooltip: L10n.of(context).addAction,
-      child: const Icon(Icons.add),
+      child: AppIcon.add,
     );
   }
 }

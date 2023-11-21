@@ -8,13 +8,14 @@ import 'app/router.dart';
 import 'app/theme.dart';
 
 void main() {
+  DI().setup();
+
   LicenseRegistry.addLicense(() async* {
     final license = await rootBundle.loadString('fonts/Open_Sans/OFL.txt');
     yield LicenseEntryWithLineBreaks(['google_fonts'], license);
   });
 
   initTheme();
-  DI().setup();
   runApp(const MyApp());
 }
 

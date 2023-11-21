@@ -10,6 +10,11 @@ class L10nEn extends L10n {
   String get addAction => 'Add';
 
   @override
+  String appAbout(String version, int year) {
+    return 'v$version - Sp1k_e $year';
+  }
+
+  @override
   String get appTitle => 'Budg1';
 
   @override

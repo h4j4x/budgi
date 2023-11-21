@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../app/icon.dart';
 import '../../l10n/l10n.dart';
 import '../../util/datetime.dart';
 
@@ -46,9 +47,9 @@ class DateInputWidget extends StatelessWidget {
       },
       child: Row(
         children: [
-          const Padding(
-            padding: EdgeInsets.only(right: 4),
-            child: Icon(Icons.calendar_today),
+          Padding(
+            padding: const EdgeInsets.only(right: 4),
+            child: AppIcon.calendar,
           ),
           Expanded(
             child: Center(

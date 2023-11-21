@@ -1,5 +1,16 @@
 {
   "addAction": "Add",
+  "appAbout": "v{version} - Sp1k_e {year}",
+  "@appAbout": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "year": {
+        "type": "int"
+      }
+    }
+  },
   "appTitle": "Budg1",
   "budgetAmount": "Budget amount",
   "budgetAmountCategoryHint": "Select budget category",

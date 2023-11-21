@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../app/icon.dart';
 import '../di.dart';
 import '../l10n/l10n.dart';
 import '../model/budget_category.dart';
@@ -114,7 +115,7 @@ class _BudgetCategoryAmountListState extends State<BudgetCategoryAmountList> {
           ),
           IconButton(
             onPressed: loadList,
-            icon: const Icon(Icons.refresh),
+            icon: AppIcon.reload,
           ),
         ],
       ),
@@ -126,7 +127,7 @@ class _BudgetCategoryAmountListState extends State<BudgetCategoryAmountList> {
       title: Text(item.category.name),
       subtitle: Text('\$${item.amount.toStringAsFixed(2)}'),
       trailing: IconButton(
-        icon: const Icon(Icons.delete),
+        icon: AppIcon.delete,
         onPressed: () {
           widget.crudHandler.onItemAction(context, item, ItemAction.delete);
         },

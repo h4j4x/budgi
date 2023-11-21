@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../app/icon.dart';
 import '../di.dart';
 import '../l10n/l10n.dart';
 import '../model/budget_category.dart';
@@ -85,7 +86,7 @@ class _BudgetCategoryListState extends State<BudgetCategoryList> {
     return ListTile(
       title: Text(item.name),
       trailing: IconButton(
-        icon: const Icon(Icons.delete),
+        icon: AppIcon.delete,
         onPressed: () {
           widget.crudHandler.onItemAction(context, item, ItemAction.delete);
         },

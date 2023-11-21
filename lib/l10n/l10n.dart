@@ -97,6 +97,12 @@ abstract class L10n {
   /// **'Add'**
   String get addAction;
 
+  /// No description provided for @appAbout.
+  ///
+  /// In en, this message translates to:
+  /// **'v{version} - Sp1k_e {year}'**
+  String appAbout(String version, int year);
+
   /// No description provided for @appTitle.
   ///
   /// In en, this message translates to:
