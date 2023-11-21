@@ -8,6 +8,7 @@ import '../model/budget_category.dart';
 import '../model/crud_handler.dart';
 import '../model/item_action.dart';
 import '../model/period.dart';
+import '../service/budget_category.dart';
 import '../util/datetime.dart';
 import '../widget/budget_category_amount_list.dart';
 import 'budget_category_amount.dart';
@@ -47,13 +48,13 @@ class _BudgetCategoriesAmountsPageState
   }
 
   void checkPreviousPeriod() async {
-    final periodChanged =
-        await DI().budgetCategoryService().periodHasChanged(period);
+    final budgetCategoryService = DI().get<BudgetCategoryService>();
+    final periodChanged = await budgetCategoryService.periodHasChanged(period);
     if (periodChanged) {
       setState(() {
         loadingMessage = L10n.of(context).copyingPreviousPeriod;
       });
-      await DI().budgetCategoryService().copyPreviousPeriodAmountsInto(period);
+      await budgetCategoryService.copyPreviousPeriodAmountsInto(period);
     }
     setState(() {
       loading = false;
@@ -139,7 +140,7 @@ class _BudgetCategoriesAmountsPageState
         }
       case ItemAction.delete:
         {
-          await DI().budgetCategoryService().deleteAmount(
+          await DI().get<BudgetCategoryService>().deleteAmount(
                 categoryCode: item.category.code,
                 period: period,
               );

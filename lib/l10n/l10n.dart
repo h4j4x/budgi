@@ -229,6 +229,18 @@ abstract class L10n {
   /// **'Invalid budget category name. Enter a non empty name with no more than 255 characters.'**
   String get invalidBudgetCategoryName;
 
+  /// No description provided for @invalidWalletName.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid wallet name. Enter a non empty name with no more than 255 characters.'**
+  String get invalidWalletName;
+
+  /// No description provided for @invalidWalletType.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid wallet type.'**
+  String get invalidWalletType;
+
   /// No description provided for @nothingHere.
   ///
   /// In en, this message translates to:

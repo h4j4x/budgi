@@ -7,6 +7,7 @@ import '../l10n/l10n.dart';
 import '../model/budget_category.dart';
 import '../model/budget_category_error.dart';
 import '../model/period.dart';
+import '../service/budget_category.dart';
 import '../service/impl/budget_category_validator.dart';
 import 'common/form_toolbar.dart';
 
@@ -49,7 +50,7 @@ class _BudgetCategoryAmountEditState extends State<BudgetCategoryAmountEdit> {
   }
 
   void loadCategories() async {
-    final list = await DI().budgetCategoryService().listCategories(
+    final list = await DI().get<BudgetCategoryService>().listCategories(
           period: widget.period,
         );
     setState(() {
@@ -151,7 +152,7 @@ class _BudgetCategoryAmountEditState extends State<BudgetCategoryAmountEdit> {
     });
     try {
       final amount = double.tryParse(amountController.text) ?? -1;
-      await DI().budgetCategoryService().saveAmount(
+      await DI().get<BudgetCategoryService>().saveAmount(
             categoryCode: category!.code,
             period: widget.period,
             amount: amount,

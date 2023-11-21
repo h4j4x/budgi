@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../app/icon.dart';
+import '../../app/info.dart';
 import '../../app/router.dart';
 import '../../di.dart';
 import '../../l10n/l10n.dart';
@@ -28,7 +29,7 @@ class _AppScaffoldState extends State<AppScaffold> {
   void initState() {
     super.initState();
     Future.delayed(Duration.zero, () async {
-      version = await DI().appInfo().version();
+      version = await DI().get<AppInfo>().version();
       setState(() {});
     });
   }

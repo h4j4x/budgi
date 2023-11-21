@@ -6,6 +6,7 @@ import '../error/validation.dart';
 import '../l10n/l10n.dart';
 import '../model/budget_category.dart';
 import '../model/budget_category_error.dart';
+import '../service/budget_category.dart';
 import '../service/impl/budget_category_validator.dart';
 import 'common/form_toolbar.dart';
 
@@ -90,7 +91,7 @@ class _BudgetCategoryEditState extends State<BudgetCategoryEdit> {
       saving = true;
     });
     try {
-      await DI().budgetCategoryService().saveCategory(
+      await DI().get<BudgetCategoryService>().saveCategory(
             code: widget.value?.code,
             name: nameController.text,
           );

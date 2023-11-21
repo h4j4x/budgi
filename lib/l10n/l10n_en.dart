@@ -83,6 +83,12 @@ class L10nEn extends L10n {
   String get invalidBudgetCategoryName => 'Invalid budget category name. Enter a non empty name with no more than 255 characters.';
 
   @override
+  String get invalidWalletName => 'Invalid wallet name. Enter a non empty name with no more than 255 characters.';
+
+  @override
+  String get invalidWalletType => 'Invalid wallet type.';
+
+  @override
   String get nothingHere => 'Nothing here :(';
 
   @override

@@ -7,6 +7,7 @@ import '../model/budget_category.dart';
 import '../model/crud_handler.dart';
 import '../model/item_action.dart';
 import '../model/period.dart';
+import '../service/budget_category.dart';
 import 'common/sliver_center.dart';
 
 class BudgetCategoryAmountList extends StatefulWidget {
@@ -49,7 +50,7 @@ class _BudgetCategoryAmountListState extends State<BudgetCategoryAmountList> {
     setState(() {
       loading = true;
     });
-    final values = await DI().budgetCategoryService().listAmounts(
+    final values = await DI().get<BudgetCategoryService>().listAmounts(
           period: widget.period,
         );
     list.clear();

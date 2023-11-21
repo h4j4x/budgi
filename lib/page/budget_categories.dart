@@ -7,6 +7,7 @@ import '../l10n/l10n.dart';
 import '../model/budget_category.dart';
 import '../model/crud_handler.dart';
 import '../model/item_action.dart';
+import '../service/budget_category.dart';
 import '../util/datetime.dart';
 import '../widget/budget_category_list.dart';
 import 'budget_category.dart';
@@ -90,7 +91,7 @@ class _BudgetCategoriesPageState extends State<BudgetCategoriesPage> {
         }
       case ItemAction.delete:
         {
-          await DI().budgetCategoryService().deleteCategory(
+          await DI().get<BudgetCategoryService>().deleteCategory(
                 code: item.code,
               );
           break;

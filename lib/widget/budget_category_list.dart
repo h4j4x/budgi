@@ -6,6 +6,7 @@ import '../l10n/l10n.dart';
 import '../model/budget_category.dart';
 import '../model/crud_handler.dart';
 import '../model/item_action.dart';
+import '../service/budget_category.dart';
 import 'common/sliver_center.dart';
 
 class BudgetCategoryList extends StatefulWidget {
@@ -47,7 +48,7 @@ class _BudgetCategoryListState extends State<BudgetCategoryList> {
     setState(() {
       loading = true;
     });
-    final values = await DI().budgetCategoryService().listCategories();
+    final values = await DI().get<BudgetCategoryService>().listCategories();
     list.clear();
     list.addAll(values);
     setState(() {
