@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 
-import '../app/info.dart';
-import '../app/router.dart';
-import '../di.dart';
-import '../error/validation.dart';
-import '../l10n/l10n.dart';
-import '../model/wallet.dart';
-import '../model/wallet_error.dart';
-import '../service/impl/wallet_validator.dart';
-import '../service/wallet.dart';
-import 'common/form_toolbar.dart';
+import '../../app/icon.dart';
+import '../../app/info.dart';
+import '../../app/router.dart';
+import '../../di.dart';
+import '../../error/validation.dart';
+import '../../l10n/l10n.dart';
+import '../../model/wallet.dart';
+import '../../model/wallet_error.dart';
+import '../../service/impl/wallet_validator.dart';
+import '../../service/wallet.dart';
+import '../common/form_toolbar.dart';
 
 class WalletEdit extends StatefulWidget {
   final Wallet? value;
@@ -71,6 +72,7 @@ class _WalletEditState extends State<WalletEdit> {
       items: WalletType.values.map(walletTypeOption).toList(),
       value: walletType,
       decoration: InputDecoration(
+        icon: AppIcon.wallet,
         hintText: L10n.of(context).walletTypeHint,
         errorText: errors[WalletValidator.walletType]?.l10n(context),
       ),

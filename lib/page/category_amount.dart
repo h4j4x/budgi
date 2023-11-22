@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../l10n/l10n.dart';
 import '../model/category.dart';
 import '../model/period.dart';
-import '../widget/category_amount_edit.dart';
+import '../widget/entity/category_amount_edit.dart';
 
 class CategoryAmountPage extends StatelessWidget {
   static const route = '/category-amount';

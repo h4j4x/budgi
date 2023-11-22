@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
-import '../app/info.dart';
-import '../app/router.dart';
-import '../di.dart';
-import '../error/validation.dart';
-import '../l10n/l10n.dart';
-import '../model/category.dart';
-import '../model/category_error.dart';
-import '../service/category.dart';
-import '../service/impl/category_validator.dart';
-import 'common/form_toolbar.dart';
+import '../../app/info.dart';
+import '../../app/router.dart';
+import '../../di.dart';
+import '../../error/validation.dart';
+import '../../l10n/l10n.dart';
+import '../../model/category.dart';
+import '../../model/category_error.dart';
+import '../../service/category.dart';
+import '../../service/impl/category_validator.dart';
+import '../common/form_toolbar.dart';
 
 class CategoryEdit extends StatefulWidget {
   final Category? value;

@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 
-import '../app/router.dart';
-import '../di.dart';
-import '../error/validation.dart';
-import '../l10n/l10n.dart';
-import '../model/category.dart';
-import '../model/category_error.dart';
-import '../model/period.dart';
-import '../service/category.dart';
-import '../service/impl/category_validator.dart';
-import 'common/form_toolbar.dart';
+import '../../app/icon.dart';
+import '../../app/router.dart';
+import '../../di.dart';
+import '../../error/validation.dart';
+import '../../l10n/l10n.dart';
+import '../../model/category.dart';
+import '../../model/category_error.dart';
+import '../../model/period.dart';
+import '../../service/category.dart';
+import '../../service/impl/category_validator.dart';
+import '../common/form_toolbar.dart';
 
 class CategoryAmountEdit extends StatefulWidget {
   final CategoryAmount? value;
@@ -87,6 +88,7 @@ class _CategoryAmountEditState extends State<CategoryAmountEdit> {
       items: (categories ?? []).map(categoryOption).toList(),
       value: category,
       decoration: InputDecoration(
+        icon: categories != null ? AppIcon.loading : AppIcon.category,
         hintText: L10n.of(context).budgetAmountCategoryHint,
         errorText: errors[CategoryAmountValidator.category]?.l10n(context),
       ),

@@ -10,7 +10,7 @@ import '../model/item_action.dart';
 import '../model/period.dart';
 import '../service/category.dart';
 import '../util/datetime.dart';
-import '../widget/category_amount_list.dart';
+import '../widget/entity/category_amount_list.dart';
 import 'category_amount.dart';
 
 class CategoriesAmountsPage extends StatefulWidget {

@@ -8,7 +8,7 @@ import '../model/crud_handler.dart';
 import '../model/item_action.dart';
 import '../model/wallet.dart';
 import '../service/wallet.dart';
-import '../widget/wallet_list.dart';
+import '../widget/entity/wallet_list.dart';
 import 'wallet.dart';
 
 class WalletsPage extends StatefulWidget {
@@ -34,7 +34,6 @@ class _WalletsPageState extends State<WalletsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: appBar(),
       body: body(),
       floatingActionButton: addButton(),
     );

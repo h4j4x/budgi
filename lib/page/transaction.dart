@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
 import '../l10n/l10n.dart';
-import '../model/category.dart';
-import '../widget/entity/category_edit.dart';
+import '../model/transaction.dart';
+import '../widget/entity/transaction_edit.dart';
 
-class CategoryPage extends StatelessWidget {
-  static const route = '/category';
+class TransactionPage extends StatelessWidget {
+  static const route = '/transaction';
 
-  final Category? value;
+  final Transaction? value;
 
-  const CategoryPage({
+  const TransactionPage({
     super.key,
     this.value,
   });
@@ -20,11 +20,11 @@ class CategoryPage extends StatelessWidget {
     final action = value != null ? l10n.editAction : l10n.createAction;
     return Scaffold(
       appBar: AppBar(
-        title: Text('$action ${l10n.budgetCategory.toLowerCase()}'),
+        title: Text('$action ${l10n.transaction.toLowerCase()}'),
       ),
       body: Padding(
         padding: const EdgeInsets.only(left: 8.0, top: 8.0, right: 8.0),
-        child: CategoryEdit(
+        child: TransactionEdit(
           value: value,
         ),
       ),

@@ -59,8 +59,7 @@ import 'l10n_en.dart';
 /// be consistent with the languages listed in the L10n.supportedLocales
 /// property.
 abstract class L10n {
-  L10n(String locale)
-      : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  L10n(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -80,8 +79,7 @@ abstract class L10n {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
-      <LocalizationsDelegate<dynamic>>[
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
     delegate,
     GlobalMaterialLocalizations.delegate,
     GlobalCupertinoLocalizations.delegate,
@@ -89,7 +87,9 @@ abstract class L10n {
   ];
 
   /// A list of this localizations delegate's supported locales.
-  static const List<Locale> supportedLocales = <Locale>[Locale('en')];
+  static const List<Locale> supportedLocales = <Locale>[
+    Locale('en')
+  ];
 
   /// No description provided for @addAction.
   ///
@@ -289,6 +289,48 @@ abstract class L10n {
   /// **'To date'**
   String get toDate;
 
+  /// No description provided for @transaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction'**
+  String get transaction;
+
+  /// No description provided for @transactionAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction amount'**
+  String get transactionAmount;
+
+  /// No description provided for @transactionAmountHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter transaction amount...'**
+  String get transactionAmountHint;
+
+  /// No description provided for @transactionCategoryHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select transaction category'**
+  String get transactionCategoryHint;
+
+  /// No description provided for @transactionDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction description'**
+  String get transactionDescription;
+
+  /// No description provided for @transactionDescriptionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter transaction description...'**
+  String get transactionDescriptionHint;
+
+  /// No description provided for @transactions.
+  ///
+  /// In en, this message translates to:
+  /// **'Transactions'**
+  String get transactions;
+
   /// No description provided for @transactionTypeIncome.
   ///
   /// In en, this message translates to:
@@ -312,6 +354,18 @@ abstract class L10n {
   /// In en, this message translates to:
   /// **'Expense transfer'**
   String get transactionTypeExpenseTransfer;
+
+  /// No description provided for @transactionTypeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select transaction type'**
+  String get transactionTypeHint;
+
+  /// No description provided for @transactionWalletHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select transaction wallet'**
+  String get transactionWalletHint;
 
   /// No description provided for @wallet.
   ///
@@ -371,23 +425,24 @@ class _L10nDelegate extends LocalizationsDelegate<L10n> {
   }
 
   @override
-  bool isSupported(Locale locale) =>
-      <String>['en'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>['en'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_L10nDelegate old) => false;
 }
 
 L10n lookupL10n(Locale locale) {
+
+
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
-    case 'en':
-      return L10nEn();
+    case 'en': return L10nEn();
   }
 
   throw FlutterError(
-      'L10n.delegate failed to load unsupported locale "$locale". This is likely '
-      'an issue with the localizations generation tool. Please file an issue '
-      'on GitHub with a reproducible sample app and the gen-l10n configuration '
-      'that was used.');
+    'L10n.delegate failed to load unsupported locale "$locale". This is likely '
+    'an issue with the localizations generation tool. Please file an issue '
+    'on GitHub with a reproducible sample app and the gen-l10n configuration '
+    'that was used.'
+  );
 }

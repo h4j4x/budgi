@@ -1,30 +1,30 @@
 import 'package:flutter/material.dart';
 
-import '../app/icon.dart';
-import '../di.dart';
-import '../l10n/l10n.dart';
-import '../model/crud_handler.dart';
-import '../model/item_action.dart';
-import '../model/wallet.dart';
-import '../service/wallet.dart';
-import 'common/sliver_center.dart';
+import '../../app/icon.dart';
+import '../../di.dart';
+import '../../l10n/l10n.dart';
+import '../../model/crud_handler.dart';
+import '../../model/item_action.dart';
+import '../../model/transaction.dart';
+import '../../service/transaction.dart';
+import '../common/sliver_center.dart';
 
-class WalletList extends StatefulWidget {
-  final CrudHandler<Wallet> crudHandler;
+class TransactionList extends StatefulWidget {
+  final CrudHandler<Transaction> crudHandler;
 
-  const WalletList({
+  const TransactionList({
     super.key,
     required this.crudHandler,
   });
 
   @override
   State<StatefulWidget> createState() {
-    return _WalletListState();
+    return _TransactionListState();
   }
 }
 
-class _WalletListState extends State<WalletList> {
-  final list = <Wallet>[];
+class _TransactionListState extends State<TransactionList> {
+  final list = <Transaction>[];
 
   bool loading = false;
 
@@ -48,7 +48,7 @@ class _WalletListState extends State<WalletList> {
     setState(() {
       loading = true;
     });
-    final values = await DI().get<WalletService>().listWallets();
+    final values = await DI().get<TransactionService>().listTransactions();
     list.clear();
     list.addAll(values);
     setState(() {
@@ -83,10 +83,13 @@ class _WalletListState extends State<WalletList> {
     );
   }
 
-  Widget listItem(Wallet item) {
+  Widget listItem(Transaction item) {
+    final transactionType = item.transactionType.l10n(context);
+    final amount = item.amount.toStringAsFixed(2);
     return ListTile(
-      title: Text(item.name),
-      subtitle: Text(item.walletType.l10n(context)),
+      leading: item.transactionType.icon(),
+      title: Text('${item.category.name}. $transactionType \$$amount'),
+      subtitle: Text('${item.wallet.name}. ${item.description}'),
       trailing: IconButton(
         icon: AppIcon.delete,
         onPressed: () {

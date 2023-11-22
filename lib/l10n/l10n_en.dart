@@ -51,8 +51,7 @@ class L10nEn extends L10n {
   String get categoryNameHint => 'Enter category name...';
 
   @override
-  String get copyingPreviousPeriod =>
-      'Copying previous period amounts. Please wait...';
+  String get copyingPreviousPeriod => 'Copying previous period amounts. Please wait...';
 
   @override
   String get createAction => 'Create';
@@ -75,8 +74,7 @@ class L10nEn extends L10n {
   String get home => 'Home';
 
   @override
-  String get invalidBudgetAmount =>
-      'Invalid budget amount. Enter a non negative number for amount.';
+  String get invalidBudgetAmount => 'Invalid budget amount. Enter a non negative number for amount.';
 
   @override
   String get invalidBudgetCategory => 'Invalid category.';
@@ -87,8 +85,7 @@ class L10nEn extends L10n {
   }
 
   @override
-  String get invalidTransactionAmount =>
-      'Invalid transaction amount. Enter a non negative number for amount.';
+  String get invalidTransactionAmount => 'Invalid transaction amount. Enter a non negative number for amount.';
 
   @override
   String invalidTransactionDescription(int maxLength) {
@@ -127,6 +124,27 @@ class L10nEn extends L10n {
   String get toDate => 'To date';
 
   @override
+  String get transaction => 'Transaction';
+
+  @override
+  String get transactionAmount => 'Transaction amount';
+
+  @override
+  String get transactionAmountHint => 'Enter transaction amount...';
+
+  @override
+  String get transactionCategoryHint => 'Select transaction category';
+
+  @override
+  String get transactionDescription => 'Transaction description';
+
+  @override
+  String get transactionDescriptionHint => 'Enter transaction description...';
+
+  @override
+  String get transactions => 'Transactions';
+
+  @override
   String get transactionTypeIncome => 'Income';
 
   @override
@@ -137,6 +155,12 @@ class L10nEn extends L10n {
 
   @override
   String get transactionTypeExpenseTransfer => 'Expense transfer';
+
+  @override
+  String get transactionTypeHint => 'Select transaction type';
+
+  @override
+  String get transactionWalletHint => 'Select transaction wallet';
 
   @override
   String get wallet => 'Wallet';

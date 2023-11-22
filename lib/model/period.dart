@@ -20,4 +20,8 @@ class Period {
     final toStr = '${to.year}${to.month}${to.day}';
     return '$fromStr-$toStr';
   }
+
+  bool contains(DateTime dateTime) {
+    return !from.isAfter(dateTime) && !to.isBefore(dateTime);
+  }
 }

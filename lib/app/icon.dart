@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 // https://github.com/microsoft/fluentui-system-icons/blob/main/icons_regular.md
 // https://fluenticons.co/
 class AppIcon {
+  AppIcon._();
+
   static Icon get about {
     return const Icon(FluentIcons.info_24_regular);
   }
@@ -28,12 +30,36 @@ class AppIcon {
     return const Icon(FluentIcons.delete_24_regular);
   }
 
+  static Icon get expenseTransaction {
+    return const Icon(FluentIcons.washer_24_regular);
+  }
+
+  static Icon get expenseTransfer {
+    return const Icon(FluentIcons.building_bank_toolbox_24_regular);
+  }
+
   static Icon get home {
     return const Icon(FluentIcons.board_24_regular);
   }
 
+  static Icon get incomeTransaction {
+    return const Icon(FluentIcons.money_24_regular);
+  }
+
+  static Icon get incomeTransfer {
+    return const Icon(FluentIcons.building_bank_24_regular);
+  }
+
+  static Icon get loading {
+    return const Icon(FluentIcons.timer_24_regular);
+  }
+
   static Icon get reload {
     return const Icon(FluentIcons.arrow_sync_24_regular);
+  }
+
+  static Icon get transaction {
+    return const Icon(FluentIcons.payment_24_regular);
   }
 
   static Icon get wallet {

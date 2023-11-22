@@ -1,34 +1,30 @@
 import 'package:flutter/material.dart';
 
-import '../app/icon.dart';
-import '../di.dart';
-import '../l10n/l10n.dart';
-import '../model/category.dart';
-import '../model/crud_handler.dart';
-import '../model/item_action.dart';
-import '../model/period.dart';
-import '../service/category.dart';
-import 'common/sliver_center.dart';
+import '../../app/icon.dart';
+import '../../di.dart';
+import '../../l10n/l10n.dart';
+import '../../model/crud_handler.dart';
+import '../../model/item_action.dart';
+import '../../model/wallet.dart';
+import '../../service/wallet.dart';
+import '../common/sliver_center.dart';
 
-class CategoryAmountList extends StatefulWidget {
-  final Period period;
+class WalletList extends StatefulWidget {
+  final CrudHandler<Wallet> crudHandler;
 
-  final CrudHandler<CategoryAmount> crudHandler;
-
-  const CategoryAmountList({
+  const WalletList({
     super.key,
     required this.crudHandler,
-    required this.period,
   });
 
   @override
   State<StatefulWidget> createState() {
-    return _CategoryAmountListState();
+    return _WalletListState();
   }
 }
 
-class _CategoryAmountListState extends State<CategoryAmountList> {
-  final list = <CategoryAmount>[];
+class _WalletListState extends State<WalletList> {
+  final list = <Wallet>[];
 
   bool loading = false;
 
@@ -36,8 +32,10 @@ class _CategoryAmountListState extends State<CategoryAmountList> {
   void initState() {
     super.initState();
     widget.crudHandler.reload = () {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        loadList();
+      Future.delayed(Duration.zero, () {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          loadList();
+        });
       });
     };
     Future.delayed(Duration.zero, loadList);
@@ -50,9 +48,7 @@ class _CategoryAmountListState extends State<CategoryAmountList> {
     setState(() {
       loading = true;
     });
-    final values = await DI().get<CategoryService>().listAmounts(
-          period: widget.period,
-        );
+    final values = await DI().get<WalletService>().listWallets();
     list.clear();
     list.addAll(values);
     setState(() {
@@ -87,10 +83,10 @@ class _CategoryAmountListState extends State<CategoryAmountList> {
     );
   }
 
-  Widget listItem(CategoryAmount item) {
+  Widget listItem(Wallet item) {
     return ListTile(
-      title: Text(item.category.name),
-      subtitle: Text('\$${item.amount.toStringAsFixed(2)}'),
+      title: Text(item.name),
+      subtitle: Text(item.walletType.l10n(context)),
       trailing: IconButton(
         icon: AppIcon.delete,
         onPressed: () {

@@ -8,16 +8,16 @@ abstract class TransactionService {
   Future<Transaction> saveTransaction({
     String? code,
     required TransactionType transactionType,
-    required Wallet wallet,
     required Category category,
+    required Wallet wallet,
     required double amount,
     String? description,
   });
 
   Future<List<Transaction>> listTransactions({
     TransactionType? transactionType,
-    Wallet? wallet,
     Category? category,
+    Wallet? wallet,
     Period? period,
   });
 

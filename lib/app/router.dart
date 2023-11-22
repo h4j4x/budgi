@@ -3,12 +3,15 @@ import 'package:go_router/go_router.dart';
 
 import '../l10n/l10n.dart';
 import '../model/category.dart';
+import '../model/transaction.dart';
 import '../model/wallet.dart';
 import '../page/categories.dart';
 import '../page/categories_amounts.dart';
 import '../page/category.dart';
 import '../page/category_amount.dart';
 import '../page/home.dart';
+import '../page/transaction.dart';
+import '../page/transactions.dart';
 import '../page/wallet.dart';
 import '../page/wallets.dart';
 import '../widget/app/layout.dart';
@@ -78,11 +81,29 @@ final _routes = <AppRoute>[
       return const WalletsPage();
     },
   ),
-  // budget category amount
+  // wallet
   AppRoute(
     path: WalletPage.route,
     pageBuilder: (_, state) {
       return WalletPage(value: state.extra as Wallet?);
+    },
+  ),
+  // transactions
+  AppRoute(
+    path: TransactionsPage.route,
+    icon: AppIcon.transaction,
+    menuText: (context) {
+      return L10n.of(context).transactions;
+    },
+    pageBuilder: (_, __) {
+      return const TransactionsPage();
+    },
+  ),
+  // wallet
+  AppRoute(
+    path: TransactionPage.route,
+    pageBuilder: (_, state) {
+      return TransactionPage(value: state.extra as Transaction?);
     },
   ),
 ];
