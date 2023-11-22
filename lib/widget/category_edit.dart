@@ -5,29 +5,29 @@ import '../app/router.dart';
 import '../di.dart';
 import '../error/validation.dart';
 import '../l10n/l10n.dart';
-import '../model/budget_category.dart';
-import '../model/budget_category_error.dart';
-import '../service/budget_category.dart';
-import '../service/impl/budget_category_validator.dart';
+import '../model/category.dart';
+import '../model/category_error.dart';
+import '../service/category.dart';
+import '../service/impl/category_validator.dart';
 import 'common/form_toolbar.dart';
 
-class BudgetCategoryEdit extends StatefulWidget {
-  final BudgetCategory? value;
+class CategoryEdit extends StatefulWidget {
+  final Category? value;
 
-  const BudgetCategoryEdit({
+  const CategoryEdit({
     super.key,
     this.value,
   });
 
   @override
   State<StatefulWidget> createState() {
-    return _BudgetCategoryEditState();
+    return _CategoryEditState();
   }
 }
 
-class _BudgetCategoryEditState extends State<BudgetCategoryEdit> {
+class _CategoryEditState extends State<CategoryEdit> {
   final nameController = TextEditingController();
-  final errors = <String, BudgetCategoryError>{};
+  final errors = <String, CategoryError>{};
 
   bool saving = false;
 
@@ -73,11 +73,11 @@ class _BudgetCategoryEditState extends State<BudgetCategoryEdit> {
       decoration: InputDecoration(
         labelText: l10n.categoryName,
         hintText: l10n.categoryNameHint,
-        errorText: errors[BudgetCategoryValidator.name]?.l10n(context),
+        errorText: errors[CategoryValidator.name]?.l10n(context),
       ),
       onChanged: (_) {
         setState(() {
-          errors.remove(BudgetCategoryValidator.name);
+          errors.remove(CategoryValidator.name);
         });
       },
       onSubmitted: (_) {
@@ -95,14 +95,14 @@ class _BudgetCategoryEditState extends State<BudgetCategoryEdit> {
       saving = true;
     });
     try {
-      await DI().get<BudgetCategoryService>().saveCategory(
+      await DI().get<CategoryService>().saveCategory(
             code: widget.value?.code,
             name: nameController.text,
           );
       if (mounted) {
         context.pop();
       }
-    } on ValidationError<BudgetCategoryError> catch (e) {
+    } on ValidationError<CategoryError> catch (e) {
       errors.addAll(e.errors);
     } finally {
       setState(() {

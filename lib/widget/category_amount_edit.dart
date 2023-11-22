@@ -4,18 +4,18 @@ import '../app/router.dart';
 import '../di.dart';
 import '../error/validation.dart';
 import '../l10n/l10n.dart';
-import '../model/budget_category.dart';
-import '../model/budget_category_error.dart';
+import '../model/category.dart';
+import '../model/category_error.dart';
 import '../model/period.dart';
-import '../service/budget_category.dart';
-import '../service/impl/budget_category_validator.dart';
+import '../service/category.dart';
+import '../service/impl/category_validator.dart';
 import 'common/form_toolbar.dart';
 
-class BudgetCategoryAmountEdit extends StatefulWidget {
-  final BudgetCategoryAmount? value;
+class CategoryAmountEdit extends StatefulWidget {
+  final CategoryAmount? value;
   final Period period;
 
-  const BudgetCategoryAmountEdit({
+  const CategoryAmountEdit({
     super.key,
     this.value,
     required this.period,
@@ -23,18 +23,18 @@ class BudgetCategoryAmountEdit extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return _BudgetCategoryAmountEditState();
+    return _CategoryAmountEditState();
   }
 }
 
-class _BudgetCategoryAmountEditState extends State<BudgetCategoryAmountEdit> {
+class _CategoryAmountEditState extends State<CategoryAmountEdit> {
   final amountController = TextEditingController();
   final amountFocus = FocusNode();
-  final errors = <String, BudgetCategoryError>{};
+  final errors = <String, CategoryError>{};
 
   bool saving = false;
-  List<BudgetCategory>? categories;
-  BudgetCategory? category;
+  List<Category>? categories;
+  Category? category;
 
   @override
   void initState() {
@@ -42,7 +42,7 @@ class _BudgetCategoryAmountEditState extends State<BudgetCategoryAmountEdit> {
     if (widget.value != null) {
       amountController.text =
           widget.value!.amount.toStringAsFixed(2).toString();
-      categories = <BudgetCategory>[widget.value!.category];
+      categories = <Category>[widget.value!.category];
       category = widget.value!.category;
     } else {
       Future.delayed(Duration.zero, loadCategories);
@@ -50,7 +50,7 @@ class _BudgetCategoryAmountEditState extends State<BudgetCategoryAmountEdit> {
   }
 
   void loadCategories() async {
-    final list = await DI().get<BudgetCategoryService>().listCategories(
+    final list = await DI().get<CategoryService>().listCategories(
           period: widget.period,
         );
     setState(() {
@@ -83,20 +83,19 @@ class _BudgetCategoryAmountEditState extends State<BudgetCategoryAmountEdit> {
   }
 
   Widget categoryField() {
-    return DropdownButtonFormField<BudgetCategory>(
+    return DropdownButtonFormField<Category>(
       items: (categories ?? []).map(categoryOption).toList(),
       value: category,
       decoration: InputDecoration(
         hintText: L10n.of(context).budgetAmountCategoryHint,
-        errorText:
-            errors[BudgetCategoryAmountValidator.category]?.l10n(context),
+        errorText: errors[CategoryAmountValidator.category]?.l10n(context),
       ),
       isExpanded: true,
       onChanged: widget.value == null
           ? (selectedCategory) {
               if (selectedCategory != null) {
                 setState(() {
-                  errors.remove(BudgetCategoryAmountValidator.category);
+                  errors.remove(CategoryAmountValidator.category);
                   category = selectedCategory;
                 });
                 amountFocus.requestFocus();
@@ -106,8 +105,8 @@ class _BudgetCategoryAmountEditState extends State<BudgetCategoryAmountEdit> {
     );
   }
 
-  DropdownMenuItem<BudgetCategory> categoryOption(BudgetCategory value) {
-    return DropdownMenuItem<BudgetCategory>(
+  DropdownMenuItem<Category> categoryOption(Category value) {
+    return DropdownMenuItem<Category>(
       value: value,
       enabled: value != category,
       child: Text(value.name),
@@ -125,11 +124,11 @@ class _BudgetCategoryAmountEditState extends State<BudgetCategoryAmountEdit> {
       decoration: InputDecoration(
         labelText: l10n.budgetAmount,
         hintText: l10n.budgetAmountHint,
-        errorText: errors[BudgetCategoryAmountValidator.amount]?.l10n(context),
+        errorText: errors[CategoryAmountValidator.amount]?.l10n(context),
       ),
       onChanged: (_) {
         setState(() {
-          errors.remove(BudgetCategoryAmountValidator.amount);
+          errors.remove(CategoryAmountValidator.amount);
         });
       },
       onSubmitted: (_) {
@@ -145,8 +144,8 @@ class _BudgetCategoryAmountEditState extends State<BudgetCategoryAmountEdit> {
 
     if (category == null) {
       setState(() {
-        errors[BudgetCategoryAmountValidator.category] =
-            BudgetCategoryError.invalidCategory;
+        errors[CategoryAmountValidator.category] =
+            CategoryError.invalidCategory;
       });
       return;
     }
@@ -157,7 +156,7 @@ class _BudgetCategoryAmountEditState extends State<BudgetCategoryAmountEdit> {
     });
     try {
       final amount = double.tryParse(amountController.text) ?? -1;
-      await DI().get<BudgetCategoryService>().saveAmount(
+      await DI().get<CategoryService>().saveAmount(
             categoryCode: category!.code,
             period: widget.period,
             amount: amount,
@@ -165,7 +164,7 @@ class _BudgetCategoryAmountEditState extends State<BudgetCategoryAmountEdit> {
       if (mounted) {
         context.pop();
       }
-    } on ValidationError<BudgetCategoryError> catch (e) {
+    } on ValidationError<CategoryError> catch (e) {
       errors.addAll(e.errors);
     } finally {
       setState(() {

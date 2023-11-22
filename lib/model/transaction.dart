@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../l10n/l10n.dart';
-import 'budget_category.dart';
+import 'category.dart';
 import 'wallet.dart';
 
 enum TransactionType {
@@ -30,7 +30,7 @@ abstract class Transaction {
 
   Wallet get wallet;
 
-  BudgetCategory get budgetCategory;
+  Category get category;
 
   double get amount;
 

@@ -1,4 +1,4 @@
-import '../model/budget_category.dart';
+import '../model/category.dart';
 import '../model/period.dart';
 import '../model/transaction.dart';
 import '../model/wallet.dart';
@@ -9,7 +9,7 @@ abstract class TransactionService {
     String? code,
     required TransactionType transactionType,
     required Wallet wallet,
-    required BudgetCategory budgetCategory,
+    required Category category,
     required double amount,
     String? description,
   });
@@ -17,7 +17,7 @@ abstract class TransactionService {
   Future<List<Transaction>> listTransactions({
     TransactionType? transactionType,
     Wallet? wallet,
-    BudgetCategory? budgetCategory,
+    Category? category,
     Period? period,
   });
 

@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 
 import '../l10n/l10n.dart';
-import '../model/budget_category.dart';
+import '../model/category.dart';
 import '../model/period.dart';
-import '../widget/budget_category_amount_edit.dart';
+import '../widget/category_amount_edit.dart';
 
-class BudgetCategoryAmountPage extends StatelessWidget {
+class CategoryAmountPage extends StatelessWidget {
   static const route = '/category-amount';
 
-  final BudgetCategoryAmount? value;
+  final CategoryAmount? value;
   final Period period;
 
-  const BudgetCategoryAmountPage({
+  const CategoryAmountPage({
     super.key,
     this.value,
     required this.period,
   });
 
-  BudgetCategoryAmountPage.data(BudgetCategoryAmountData data, {super.key})
+  CategoryAmountPage.data(CategoryAmountData data, {super.key})
       : value = data.amount,
         period = data;
 
@@ -31,7 +31,7 @@ class BudgetCategoryAmountPage extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.only(left: 8.0, top: 8.0, right: 8.0),
-        child: BudgetCategoryAmountEdit(
+        child: CategoryAmountEdit(
           value: value,
           period: period,
         ),

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../app/info.dart';
 import '../l10n/l10n.dart';
 
-enum BudgetCategoryError {
+enum CategoryError {
   invalidCategoryName,
   invalidCategory,
   invalidAmount;

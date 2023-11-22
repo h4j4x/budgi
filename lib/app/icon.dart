@@ -12,11 +12,11 @@ class AppIcon {
     return const Icon(FluentIcons.add_24_regular);
   }
 
-  static Icon get budgetCategory {
+  static Icon get category {
     return const Icon(FluentIcons.apps_24_regular);
   }
 
-  static Icon get budgetCategoryAmount {
+  static Icon get categoryAmount {
     return const Icon(FluentIcons.apps_add_in_24_regular);
   }
 

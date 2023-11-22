@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
 import '../l10n/l10n.dart';
-import '../model/budget_category.dart';
-import '../widget/budget_category_edit.dart';
+import '../model/category.dart';
+import '../widget/category_edit.dart';
 
-class BudgetCategoryPage extends StatelessWidget {
+class CategoryPage extends StatelessWidget {
   static const route = '/category';
 
-  final BudgetCategory? value;
+  final Category? value;
 
-  const BudgetCategoryPage({
+  const CategoryPage({
     super.key,
     this.value,
   });
@@ -24,7 +24,7 @@ class BudgetCategoryPage extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.only(left: 8.0, top: 8.0, right: 8.0),
-        child: BudgetCategoryEdit(
+        child: CategoryEdit(
           value: value,
         ),
       ),

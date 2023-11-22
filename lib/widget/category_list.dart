@@ -3,32 +3,28 @@ import 'package:flutter/material.dart';
 import '../app/icon.dart';
 import '../di.dart';
 import '../l10n/l10n.dart';
-import '../model/budget_category.dart';
+import '../model/category.dart';
 import '../model/crud_handler.dart';
 import '../model/item_action.dart';
-import '../model/period.dart';
-import '../service/budget_category.dart';
+import '../service/category.dart';
 import 'common/sliver_center.dart';
 
-class BudgetCategoryAmountList extends StatefulWidget {
-  final Period period;
+class CategoryList extends StatefulWidget {
+  final CrudHandler<Category> crudHandler;
 
-  final CrudHandler<BudgetCategoryAmount> crudHandler;
-
-  const BudgetCategoryAmountList({
+  const CategoryList({
     super.key,
     required this.crudHandler,
-    required this.period,
   });
 
   @override
   State<StatefulWidget> createState() {
-    return _BudgetCategoryAmountListState();
+    return _CategoryListState();
   }
 }
 
-class _BudgetCategoryAmountListState extends State<BudgetCategoryAmountList> {
-  final list = <BudgetCategoryAmount>[];
+class _CategoryListState extends State<CategoryList> {
+  final list = <Category>[];
 
   bool loading = false;
 
@@ -36,8 +32,10 @@ class _BudgetCategoryAmountListState extends State<BudgetCategoryAmountList> {
   void initState() {
     super.initState();
     widget.crudHandler.reload = () {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        loadList();
+      Future.delayed(Duration.zero, () {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          loadList();
+        });
       });
     };
     Future.delayed(Duration.zero, loadList);
@@ -50,9 +48,7 @@ class _BudgetCategoryAmountListState extends State<BudgetCategoryAmountList> {
     setState(() {
       loading = true;
     });
-    final values = await DI().get<BudgetCategoryService>().listAmounts(
-          period: widget.period,
-        );
+    final values = await DI().get<CategoryService>().listCategories();
     list.clear();
     list.addAll(values);
     setState(() {
@@ -87,10 +83,9 @@ class _BudgetCategoryAmountListState extends State<BudgetCategoryAmountList> {
     );
   }
 
-  Widget listItem(BudgetCategoryAmount item) {
+  Widget listItem(Category item) {
     return ListTile(
-      title: Text(item.category.name),
-      subtitle: Text('\$${item.amount.toStringAsFixed(2)}'),
+      title: Text(item.name),
       trailing: IconButton(
         icon: AppIcon.delete,
         onPressed: () {

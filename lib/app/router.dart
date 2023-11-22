@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../l10n/l10n.dart';
-import '../model/budget_category.dart';
+import '../model/category.dart';
 import '../model/wallet.dart';
-import '../page/budget_categories.dart';
-import '../page/budget_categories_amounts.dart';
-import '../page/budget_category.dart';
-import '../page/budget_category_amount.dart';
+import '../page/categories.dart';
+import '../page/categories_amounts.dart';
+import '../page/category.dart';
+import '../page/category_amount.dart';
 import '../page/home.dart';
 import '../page/wallet.dart';
 import '../page/wallets.dart';
@@ -28,40 +28,40 @@ final _routes = <AppRoute>[
   ),
   // budget categories
   AppRoute(
-    path: BudgetCategoriesPage.route,
-    icon: AppIcon.budgetCategory,
+    path: CategoriesPage.route,
+    icon: AppIcon.category,
     menuText: (context) {
       return L10n.of(context).budgetsCategories;
     },
     pageBuilder: (_, __) {
-      return const BudgetCategoriesPage();
+      return const CategoriesPage();
     },
   ),
   // budget category
   AppRoute(
-    path: BudgetCategoryPage.route,
+    path: CategoryPage.route,
     pageBuilder: (_, state) {
-      return BudgetCategoryPage(value: state.extra as BudgetCategory?);
+      return CategoryPage(value: state.extra as Category?);
     },
   ),
   // budget categories amounts
   AppRoute(
-    path: BudgetCategoriesAmountsPage.route,
-    icon: AppIcon.budgetCategoryAmount,
+    path: CategoriesAmountsPage.route,
+    icon: AppIcon.categoryAmount,
     menuText: (context) {
       return L10n.of(context).budgetsAmounts;
     },
     pageBuilder: (_, __) {
-      return const BudgetCategoriesAmountsPage();
+      return const CategoriesAmountsPage();
     },
   ),
   // budget category amount
   AppRoute(
-    path: BudgetCategoryAmountPage.route,
+    path: CategoryAmountPage.route,
     pageBuilder: (_, state) {
-      if (state.extra is BudgetCategoryAmountData) {
-        return BudgetCategoryAmountPage.data(
-          state.extra as BudgetCategoryAmountData,
+      if (state.extra is CategoryAmountData) {
+        return CategoryAmountPage.data(
+          state.extra as CategoryAmountData,
         );
       }
       return const HomePage();

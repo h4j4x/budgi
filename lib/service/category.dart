@@ -1,10 +1,10 @@
-import '../model/budget_category.dart';
+import '../model/category.dart';
 import '../model/period.dart';
 import '../model/sort.dart';
 
-abstract class BudgetCategoryService {
+abstract class CategoryService {
   /// @throws ValidationError
-  Future<BudgetCategory> saveCategory({
+  Future<Category> saveCategory({
     String? code,
     required String name,
   });
@@ -15,7 +15,7 @@ abstract class BudgetCategoryService {
   /// given interval).
   ///
   /// period dates are inclusive.
-  Future<List<BudgetCategory>> listCategories({
+  Future<List<Category>> listCategories({
     bool withAmount = false,
     Period? period,
   });
@@ -28,7 +28,7 @@ abstract class BudgetCategoryService {
   ///
   /// Should save given period as last used.
   /// @throws ValidationError
-  Future<BudgetCategoryAmount> saveAmount({
+  Future<CategoryAmount> saveAmount({
     required String categoryCode,
     String? amountCode,
     required Period period,
@@ -38,7 +38,7 @@ abstract class BudgetCategoryService {
   /// period dates are inclusive.
   ///
   /// Should save given period as last used.
-  Future<List<BudgetCategoryAmount>> listAmounts({
+  Future<List<CategoryAmount>> listAmounts({
     required Period period,
     Sort? amountSort,
   });

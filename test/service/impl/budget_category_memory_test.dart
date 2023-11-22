@@ -2,12 +2,12 @@ import 'dart:math';
 
 import 'package:budgi/model/period.dart';
 import 'package:budgi/model/sort.dart';
-import 'package:budgi/service/impl/budget_category_memory.dart';
+import 'package:budgi/service/impl/category_memory.dart';
 import 'package:test/test.dart';
 
 void main() {
   test('.saveCategory(), .listCategories(), .removeCategory()', () async {
-    final service = BudgetCategoryMemoryService();
+    final service = CategoryMemoryService();
 
     const total = 10;
     var lastCode = '';
@@ -34,7 +34,7 @@ void main() {
   });
 
   test('.listCategories() with amounts filter', () async {
-    final service = BudgetCategoryMemoryService();
+    final service = CategoryMemoryService();
 
     final category1 = await service.saveCategory(name: 'cat1');
     final category2 = await service.saveCategory(name: 'cat2');
@@ -69,7 +69,7 @@ void main() {
   });
 
   test('.saveAmount(), .listAmounts(), .removeAmount()', () async {
-    final service = BudgetCategoryMemoryService();
+    final service = CategoryMemoryService();
 
     final startDate = DateTime.now();
     const daysDiff = 2;
@@ -112,7 +112,7 @@ void main() {
   });
 
   test('.listAmounts() with sort', () async {
-    final service = BudgetCategoryMemoryService();
+    final service = CategoryMemoryService();
 
     final fromDate = DateTime.now();
     final toDate = fromDate.add(const Duration(days: 2));
@@ -157,7 +157,7 @@ void main() {
   });
 
   test('.saveAmount() with update', () async {
-    final service = BudgetCategoryMemoryService();
+    final service = CategoryMemoryService();
 
     final category = await service.saveCategory(
       name: 'test',
@@ -196,7 +196,7 @@ void main() {
   });
 
   test('Copies previous period amounts and save current', () async {
-    final service = BudgetCategoryMemoryService();
+    final service = CategoryMemoryService();
 
     final category = await service.saveCategory(
       name: 'test',

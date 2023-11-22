@@ -1,9 +1,9 @@
 import 'package:get_it/get_it.dart';
 
 import 'app/info.dart';
-import 'service/budget_category.dart';
-import 'service/impl/budget_category_memory.dart';
-import 'service/impl/budget_category_validator.dart';
+import 'service/category.dart';
+import 'service/impl/category_memory.dart';
+import 'service/impl/category_validator.dart';
 import 'service/impl/wallet_memory.dart';
 import 'service/impl/wallet_validator.dart';
 import 'service/wallet.dart';
@@ -24,12 +24,12 @@ class DI {
       PackageAppInfo(),
     );
 
-    final budgetCategoryValidator = BudgetCategoryValidator();
-    final budgetCategoryAmountValidator = BudgetCategoryAmountValidator();
-    _getIt.registerSingleton<BudgetCategoryService>(
-      BudgetCategoryMemoryService(
-        categoryValidator: budgetCategoryValidator,
-        amountValidator: budgetCategoryAmountValidator,
+    final categoryValidator = CategoryValidator();
+    final categoryAmountValidator = CategoryAmountValidator();
+    _getIt.registerSingleton<CategoryService>(
+      CategoryMemoryService(
+        categoryValidator: categoryValidator,
+        amountValidator: categoryAmountValidator,
       ),
     );
 

@@ -1,50 +1,50 @@
 import '../../error/validation.dart';
-import '../../model/budget_category.dart';
-import '../../model/budget_category_error.dart';
+import '../../model/category.dart';
+import '../../model/category_error.dart';
 import '../../model/period.dart';
 import '../../model/sort.dart';
 import '../../util/string.dart';
-import '../budget_category.dart';
+import '../category.dart';
 import '../validator.dart';
 
-class BudgetCategoryMemoryService implements BudgetCategoryService {
-  final Validator<BudgetCategory, BudgetCategoryError>? categoryValidator;
-  final Validator<BudgetCategoryAmount, BudgetCategoryError>? amountValidator;
+class CategoryMemoryService implements CategoryService {
+  final Validator<Category, CategoryError>? categoryValidator;
+  final Validator<CategoryAmount, CategoryError>? amountValidator;
 
-  final _categories = <String, BudgetCategory>{};
-  final _values = <String, Set<BudgetCategoryAmount>>{};
+  final _categories = <String, Category>{};
+  final _values = <String, Set<CategoryAmount>>{};
   final _periods = <String>[];
 
-  BudgetCategoryMemoryService({
+  CategoryMemoryService({
     this.categoryValidator,
     this.amountValidator,
   });
 
   @override
-  Future<BudgetCategory> saveCategory({
+  Future<Category> saveCategory({
     String? code,
     required String name,
   }) {
-    final budgetCategoryCode = code ?? randomString(6);
-    final category = _BudgetCategory(budgetCategoryCode, name);
+    final categoryCode = code ?? randomString(6);
+    final category = _Category(categoryCode, name);
     final errors = categoryValidator?.validate(category);
     if (errors?.isNotEmpty ?? false) {
       throw ValidationError(errors!);
     }
 
-    _categories[budgetCategoryCode] = category;
+    _categories[categoryCode] = category;
     return Future.value(category);
   }
 
   @override
-  Future<List<BudgetCategory>> listCategories({
+  Future<List<Category>> listCategories({
     bool withAmount = false,
     Period? period,
   }) {
     final list = _categories.values.toList();
     if (period != null) {
       final amountsCategories =
-          (_values[period.toString()] ?? <BudgetCategoryAmount>{})
+          (_values[period.toString()] ?? <CategoryAmount>{})
               .map((amount) => amount.category.code)
               .toList();
       list.removeWhere((category) {
@@ -67,7 +67,7 @@ class BudgetCategoryMemoryService implements BudgetCategoryService {
   }
 
   @override
-  Future<BudgetCategoryAmount> saveAmount({
+  Future<CategoryAmount> saveAmount({
     required String categoryCode,
     String? amountCode,
     required Period period,
@@ -78,17 +78,17 @@ class BudgetCategoryMemoryService implements BudgetCategoryService {
     final category = _categories[categoryCode];
     if (category == null) {
       throw ValidationError({
-        'category': BudgetCategoryError.invalidCategory,
+        'category': CategoryError.invalidCategory,
       });
     }
-    final categoryAmount = _BudgetCategoryAmount(category, period, amount);
+    final categoryAmount = _CategoryAmount(category, period, amount);
     final errors = amountValidator?.validate(categoryAmount);
     if (errors?.isNotEmpty ?? false) {
       throw ValidationError(errors!);
     }
 
     final periodKey = period.toString();
-    _values[periodKey] ??= <BudgetCategoryAmount>{};
+    _values[periodKey] ??= <CategoryAmount>{};
     _values[periodKey]!
         .removeWhere((amount) => amount.category.code == category.code);
     _values[periodKey]!.add(categoryAmount);
@@ -96,7 +96,7 @@ class BudgetCategoryMemoryService implements BudgetCategoryService {
   }
 
   @override
-  Future<List<BudgetCategoryAmount>> listAmounts({
+  Future<List<CategoryAmount>> listAmounts({
     required Period period,
     Sort? amountSort,
   }) {
@@ -150,7 +150,7 @@ class BudgetCategoryMemoryService implements BudgetCategoryService {
     if (_periods.isNotEmpty) {
       final previousPeriodKey = _periods.last;
       final periodKey = period.toString();
-      _values[periodKey] = <BudgetCategoryAmount>{};
+      _values[periodKey] = <CategoryAmount>{};
       for (var categoryAmount in _values[previousPeriodKey]!) {
         _values[periodKey]!.add(categoryAmount.copyWith(period: period));
       }
@@ -159,8 +159,8 @@ class BudgetCategoryMemoryService implements BudgetCategoryService {
   }
 }
 
-class _BudgetCategory implements BudgetCategory {
-  _BudgetCategory(this.code, this.name);
+class _Category implements Category {
+  _Category(this.code, this.name);
 
   @override
   String code;
@@ -173,7 +173,7 @@ class _BudgetCategory implements BudgetCategory {
     if (identical(this, other)) {
       return true;
     }
-    return other is _BudgetCategory &&
+    return other is _Category &&
         runtimeType == other.runtimeType &&
         code == other.code;
   }
@@ -184,11 +184,11 @@ class _BudgetCategory implements BudgetCategory {
   }
 }
 
-class _BudgetCategoryAmount implements BudgetCategoryAmount {
-  _BudgetCategoryAmount(this.category, this.period, this.amount);
+class _CategoryAmount implements CategoryAmount {
+  _CategoryAmount(this.category, this.period, this.amount);
 
   @override
-  BudgetCategory category;
+  Category category;
 
   @override
   Period period;
@@ -201,7 +201,7 @@ class _BudgetCategoryAmount implements BudgetCategoryAmount {
     if (identical(this, other)) {
       return true;
     }
-    return other is _BudgetCategoryAmount &&
+    return other is _CategoryAmount &&
         runtimeType == other.runtimeType &&
         category == other.category;
   }
@@ -212,7 +212,7 @@ class _BudgetCategoryAmount implements BudgetCategoryAmount {
   }
 
   @override
-  BudgetCategoryAmount copyWith({required Period period}) {
-    return _BudgetCategoryAmount(category, period, amount);
+  CategoryAmount copyWith({required Period period}) {
+    return _CategoryAmount(category, period, amount);
   }
 }
