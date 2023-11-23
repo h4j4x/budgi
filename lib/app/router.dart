@@ -152,7 +152,7 @@ typedef PageWidgetBuilder = Widget Function(BuildContext, GoRouterState state);
 class AppRoute {
   final String path;
   final TextBuilder? menuText;
-  final Icon? icon;
+  final Widget? icon;
   final PageWidgetBuilder pageBuilder;
 
   AppRoute({

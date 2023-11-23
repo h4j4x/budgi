@@ -1,68 +1,85 @@
-import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-// https://github.com/microsoft/fluentui-system-icons/blob/main/icons_regular.md
-// https://fluenticons.co/
+// https://fontawesome.com/search?o=r&m=free
 class AppIcon {
   AppIcon._();
 
-  static Icon get about {
-    return const Icon(FluentIcons.info_24_regular);
+  static Widget get about {
+    return const FaIcon(FontAwesomeIcons.info);
   }
 
-  static Icon get add {
-    return const Icon(FluentIcons.add_24_regular);
+  static Widget get add {
+    return const FaIcon(FontAwesomeIcons.plus);
   }
 
-  static Icon get category {
-    return const Icon(FluentIcons.apps_24_regular);
+  static Widget get category {
+    return const FaIcon(FontAwesomeIcons.tags);
   }
 
-  static Icon get categoryAmount {
-    return const Icon(FluentIcons.apps_add_in_24_regular);
+  static Widget get categoryAmount {
+    return const FaIcon(FontAwesomeIcons.userTag);
   }
 
-  static Icon get calendar {
-    return const Icon(FluentIcons.calendar_24_regular);
+  static Widget get calendar {
+    return const FaIcon(FontAwesomeIcons.calendar);
   }
 
-  static Icon get delete {
-    return const Icon(FluentIcons.delete_24_regular);
+  static Widget get delete {
+    return const FaIcon(FontAwesomeIcons.trash);
   }
 
-  static Icon get expenseTransaction {
-    return const Icon(FluentIcons.washer_24_regular);
+  static Widget get home {
+    return const FaIcon(FontAwesomeIcons.house);
   }
 
-  static Icon get expenseTransfer {
-    return const Icon(FluentIcons.building_bank_toolbox_24_regular);
+  static Widget get loading {
+    return const SizedBox(
+      width: 24,
+      height: 24,
+      child: Center(
+        child: CircularProgressIndicator.adaptive(),
+      ),
+    );
   }
 
-  static Icon get home {
-    return const Icon(FluentIcons.board_24_regular);
+  static Widget get reload {
+    return const FaIcon(FontAwesomeIcons.rotate);
   }
 
-  static Icon get incomeTransaction {
-    return const Icon(FluentIcons.money_24_regular);
+  static Widget get transaction {
+    return const FaIcon(FontAwesomeIcons.moneyBillTrendUp);
   }
 
-  static Icon get incomeTransfer {
-    return const Icon(FluentIcons.building_bank_24_regular);
+  static Widget get transactionExpense {
+    return const FaIcon(FontAwesomeIcons.moneyCheck);
   }
 
-  static Icon get loading {
-    return const Icon(FluentIcons.timer_24_regular);
+  static Widget get transactionExpenseTransfer {
+    return const FaIcon(FontAwesomeIcons.moneyBillTransfer);
   }
 
-  static Icon get reload {
-    return const Icon(FluentIcons.arrow_sync_24_regular);
+  static Widget get transactionIncome {
+    return const FaIcon(FontAwesomeIcons.moneyCheckDollar);
   }
 
-  static Icon get transaction {
-    return const Icon(FluentIcons.payment_24_regular);
+  static Widget get transactionIncomeTransfer {
+    return const FaIcon(FontAwesomeIcons.moneyBillTransfer);
   }
 
-  static Icon get wallet {
-    return const Icon(FluentIcons.wallet_24_regular);
+  static Widget get wallet {
+    return const FaIcon(FontAwesomeIcons.wallet);
+  }
+
+  static Widget get walletCash {
+    return const FaIcon(FontAwesomeIcons.sackDollar);
+  }
+
+  static Widget get walletCreditCard {
+    return const FaIcon(FontAwesomeIcons.creditCard);
+  }
+
+  static Widget get walletDebitCard {
+    return const FaIcon(FontAwesomeIcons.solidCreditCard);
   }
 }

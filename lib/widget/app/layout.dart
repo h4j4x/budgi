@@ -91,6 +91,7 @@ class _AppScaffoldState extends State<AppScaffold> {
 
   Widget aboutWidget(BuildContext context) {
     return ListTile(
+      enabled: false,
       title: Text(L10n.of(context).appAbout(version, DateTime.now().year)),
       leading: AppIcon.about,
     );

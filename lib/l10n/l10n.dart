@@ -409,12 +409,6 @@ abstract class L10n {
   /// **'Select transaction wallet'**
   String get transactionWalletHint;
 
-  /// No description provided for @yes.
-  ///
-  /// In en, this message translates to:
-  /// **'Yes'**
-  String get yes;
-
   /// No description provided for @wallet.
   ///
   /// In en, this message translates to:
@@ -474,6 +468,12 @@ abstract class L10n {
   /// In en, this message translates to:
   /// **'Select wallet type'**
   String get walletTypeHint;
+
+  /// No description provided for @yes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get yes;
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {

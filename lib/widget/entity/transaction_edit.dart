@@ -172,10 +172,19 @@ class _TransactionEditState extends State<TransactionEdit> {
 
   Widget transactionTypeField() {
     return DropdownButtonFormField<TransactionType>(
-      items: TransactionType.values.map(transactionTypeOption).toList(),
+      items: TransactionType.values.map((value) {
+        return transactionTypeOption(value);
+      }).toList(),
+      selectedItemBuilder: (context) {
+        return TransactionType.values.map((value) {
+          return transactionTypeOption(value, false);
+        }).toList();
+      },
       value: transactionType,
       decoration: InputDecoration(
-        icon: AppIcon.transaction,
+        icon: transactionType == null
+            ? AppIcon.transaction
+            : transactionType!.icon(),
         hintText: L10n.of(context).transactionTypeHint,
         errorText: errors[TransactionValidator.description]?.l10n(context),
       ),
@@ -195,11 +204,25 @@ class _TransactionEditState extends State<TransactionEdit> {
   }
 
   DropdownMenuItem<TransactionType> transactionTypeOption(
-      TransactionType value) {
+    TransactionType value, [
+    bool withIcon = true,
+  ]) {
+    Widget child = Text(value.l10n(context));
+    if (withIcon) {
+      child = Row(
+        children: [
+          value.icon(),
+          Padding(
+            padding: const EdgeInsets.only(left: 4),
+            child: child,
+          ),
+        ],
+      );
+    }
     return DropdownMenuItem<TransactionType>(
       value: value,
       enabled: value != transactionType,
-      child: Text(value.l10n(context)),
+      child: child,
     );
   }
 

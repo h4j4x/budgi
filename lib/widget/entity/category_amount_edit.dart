@@ -88,7 +88,7 @@ class _CategoryAmountEditState extends State<CategoryAmountEdit> {
       items: (categories ?? []).map(categoryOption).toList(),
       value: category,
       decoration: InputDecoration(
-        icon: categories != null ? AppIcon.loading : AppIcon.category,
+        icon: categories == null ? AppIcon.loading : AppIcon.category,
         hintText: L10n.of(context).budgetAmountCategoryHint,
         errorText: errors[CategoryAmountValidator.category]?.l10n(context),
       ),

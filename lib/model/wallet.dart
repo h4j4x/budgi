@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../app/icon.dart';
 import '../l10n/l10n.dart';
 
 enum WalletType {
@@ -13,6 +14,14 @@ enum WalletType {
       cash => l10n.walletTypeCash,
       creditCard => l10n.walletTypeCreditCard,
       debitCard => l10n.walletTypeDebitCard,
+    };
+  }
+
+  Widget icon() {
+    return switch (this) {
+      cash => AppIcon.walletCash,
+      creditCard => AppIcon.walletCreditCard,
+      debitCard => AppIcon.walletDebitCard,
     };
   }
 }

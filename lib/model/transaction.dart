@@ -21,12 +21,12 @@ enum TransactionType {
     };
   }
 
-  Icon icon() {
+  Widget icon() {
     return switch (this) {
-      income => AppIcon.incomeTransaction,
-      incomeTransfer => AppIcon.incomeTransfer,
-      expense => AppIcon.expenseTransaction,
-      expenseTransfer => AppIcon.expenseTransfer,
+      income => AppIcon.transactionIncome,
+      incomeTransfer => AppIcon.transactionIncomeTransfer,
+      expense => AppIcon.transactionExpense,
+      expenseTransfer => AppIcon.transactionExpenseTransfer,
     };
   }
 }

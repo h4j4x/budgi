@@ -190,9 +190,6 @@ class L10nEn extends L10n {
   String get transactionWalletHint => 'Select transaction wallet';
 
   @override
-  String get yes => 'Yes';
-
-  @override
   String get wallet => 'Wallet';
 
   @override
@@ -223,4 +220,7 @@ class L10nEn extends L10n {
 
   @override
   String get walletTypeHint => 'Select wallet type';
+
+  @override
+  String get yes => 'Yes';
 }

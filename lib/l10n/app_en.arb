@@ -123,7 +123,6 @@
   "transactionTypeExpenseTransfer": "Expense transfer",
   "transactionTypeHint": "Select transaction type",
   "transactionWalletHint": "Select transaction wallet",
-  "yes": "Yes",
   "wallet": "Wallet",
   "walletDelete": "Delete wallet",
   "walletDeleteConfirm": "Confirm to delete wallet {name}.",
@@ -140,5 +139,6 @@
   "walletTypeCash": "Cash",
   "walletTypeCreditCard": "Credit card",
   "walletTypeDebitCard": "Debit card",
-  "walletTypeHint": "Select wallet type"
+  "walletTypeHint": "Select wallet type",
+  "yes": "Yes"
 }

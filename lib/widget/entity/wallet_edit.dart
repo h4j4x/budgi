@@ -69,10 +69,17 @@ class _WalletEditState extends State<WalletEdit> {
 
   Widget walletTypeField() {
     return DropdownButtonFormField<WalletType>(
-      items: WalletType.values.map(walletTypeOption).toList(),
+      items: WalletType.values.map((value) {
+        return walletTypeOption(value);
+      }).toList(),
+      selectedItemBuilder: (context) {
+        return WalletType.values.map((value) {
+          return walletTypeOption(value, false);
+        }).toList();
+      },
       value: walletType,
       decoration: InputDecoration(
-        icon: AppIcon.wallet,
+        icon: walletType == null ? AppIcon.wallet : walletType!.icon(),
         hintText: L10n.of(context).walletTypeHint,
         errorText: errors[WalletValidator.walletType]?.l10n(context),
       ),
@@ -91,11 +98,26 @@ class _WalletEditState extends State<WalletEdit> {
     );
   }
 
-  DropdownMenuItem<WalletType> walletTypeOption(WalletType value) {
+  DropdownMenuItem<WalletType> walletTypeOption(
+    WalletType value, [
+    bool withIcon = true,
+  ]) {
+    Widget child = Text(value.l10n(context));
+    if (withIcon) {
+      child = Row(
+        children: [
+          value.icon(),
+          Padding(
+            padding: const EdgeInsets.only(left: 4),
+            child: child,
+          ),
+        ],
+      );
+    }
     return DropdownMenuItem<WalletType>(
       value: value,
       enabled: value != walletType,
-      child: Text(value.l10n(context)),
+      child: child,
     );
   }
 
