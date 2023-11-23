@@ -8,6 +8,7 @@ import '../../model/crud_handler.dart';
 import '../../model/item_action.dart';
 import '../../model/period.dart';
 import '../../service/category.dart';
+import '../../util/ui.dart';
 import '../common/sliver_center.dart';
 
 class CategoryAmountList extends StatefulWidget {
@@ -93,8 +94,15 @@ class _CategoryAmountListState extends State<CategoryAmountList> {
       subtitle: Text('\$${item.amount.toStringAsFixed(2)}'),
       trailing: IconButton(
         icon: AppIcon.delete,
-        onPressed: () {
-          widget.crudHandler.onItemAction(context, item, ItemAction.delete);
+        onPressed: () async {
+          final l10n = L10n.of(context);
+          final confirm = await context.confirm(
+            title: l10n.budgetAmountDelete,
+            description: l10n.budgetAmountDeleteConfirm(item.category.name),
+          );
+          if (confirm && mounted) {
+            widget.crudHandler.onItemAction(context, item, ItemAction.delete);
+          }
         },
       ),
       onTap: () {

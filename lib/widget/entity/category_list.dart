@@ -7,6 +7,7 @@ import '../../model/category.dart';
 import '../../model/crud_handler.dart';
 import '../../model/item_action.dart';
 import '../../service/category.dart';
+import '../../util/ui.dart';
 import '../common/sliver_center.dart';
 
 class CategoryList extends StatefulWidget {
@@ -88,8 +89,15 @@ class _CategoryListState extends State<CategoryList> {
       title: Text(item.name),
       trailing: IconButton(
         icon: AppIcon.delete,
-        onPressed: () {
-          widget.crudHandler.onItemAction(context, item, ItemAction.delete);
+        onPressed: () async {
+          final l10n = L10n.of(context);
+          final confirm = await context.confirm(
+            title: l10n.budgetCategoryDelete,
+            description: l10n.budgetCategoryDeleteConfirm(item.name),
+          );
+          if (confirm && mounted) {
+            widget.crudHandler.onItemAction(context, item, ItemAction.delete);
+          }
         },
       ),
       onTap: () {

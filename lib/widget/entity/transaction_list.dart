@@ -7,6 +7,7 @@ import '../../model/crud_handler.dart';
 import '../../model/item_action.dart';
 import '../../model/transaction.dart';
 import '../../service/transaction.dart';
+import '../../util/ui.dart';
 import '../common/sliver_center.dart';
 
 class TransactionList extends StatefulWidget {
@@ -92,8 +93,15 @@ class _TransactionListState extends State<TransactionList> {
       subtitle: Text('${item.wallet.name}. ${item.description}'),
       trailing: IconButton(
         icon: AppIcon.delete,
-        onPressed: () {
-          widget.crudHandler.onItemAction(context, item, ItemAction.delete);
+        onPressed: () async {
+          final l10n = L10n.of(context);
+          final confirm = await context.confirm(
+            title: l10n.transactionDelete,
+            description: l10n.transactionDeleteConfirm(item.description),
+          );
+          if (confirm && mounted) {
+            widget.crudHandler.onItemAction(context, item, ItemAction.delete);
+          }
         },
       ),
       onTap: () {

@@ -24,16 +24,32 @@ class L10nEn extends L10n {
   String get budgetAmountCategoryHint => 'Select budget category';
 
   @override
+  String get budgetAmountDelete => 'Delete budget amount';
+
+  @override
+  String budgetAmountDeleteConfirm(String name) {
+    return 'Confirm to delete budget amount of $name.';
+  }
+
+  @override
   String get budgetAmountHint => 'Enter budget amount...';
+
+  @override
+  String get budgetCategory => 'Budget category';
+
+  @override
+  String get budgetCategoryDelete => 'Delete category';
+
+  @override
+  String budgetCategoryDeleteConfirm(String name) {
+    return 'Confirm to delete category $name.';
+  }
 
   @override
   String get budgetsAmounts => 'Budgets amounts';
 
   @override
   String get budgetsCategories => 'Budgets categories';
-
-  @override
-  String get budgetCategory => 'Budget category';
 
   @override
   String get budgetsCategoriesAmounts => 'Budgets categories amounts';
@@ -107,6 +123,9 @@ class L10nEn extends L10n {
   String get invalidWalletType => 'Invalid wallet type.';
 
   @override
+  String get no => 'No';
+
+  @override
   String get nothingHere => 'Nothing here :(';
 
   @override
@@ -136,6 +155,14 @@ class L10nEn extends L10n {
   String get transactionCategoryHint => 'Select transaction category';
 
   @override
+  String get transactionDelete => 'Delete transaction';
+
+  @override
+  String transactionDeleteConfirm(String description) {
+    return 'Confirm to delete transaction $description.';
+  }
+
+  @override
   String get transactionDescription => 'Transaction description';
 
   @override
@@ -163,7 +190,18 @@ class L10nEn extends L10n {
   String get transactionWalletHint => 'Select transaction wallet';
 
   @override
+  String get yes => 'Yes';
+
+  @override
   String get wallet => 'Wallet';
+
+  @override
+  String get walletDelete => 'Delete wallet';
+
+  @override
+  String walletDeleteConfirm(String name) {
+    return 'Confirm to delete wallet $name.';
+  }
 
   @override
   String get walletName => 'Wallet name';

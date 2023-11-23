@@ -121,11 +121,41 @@ abstract class L10n {
   /// **'Select budget category'**
   String get budgetAmountCategoryHint;
 
+  /// No description provided for @budgetAmountDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete budget amount'**
+  String get budgetAmountDelete;
+
+  /// No description provided for @budgetAmountDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm to delete budget amount of {name}.'**
+  String budgetAmountDeleteConfirm(String name);
+
   /// No description provided for @budgetAmountHint.
   ///
   /// In en, this message translates to:
   /// **'Enter budget amount...'**
   String get budgetAmountHint;
+
+  /// No description provided for @budgetCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget category'**
+  String get budgetCategory;
+
+  /// No description provided for @budgetCategoryDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete category'**
+  String get budgetCategoryDelete;
+
+  /// No description provided for @budgetCategoryDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm to delete category {name}.'**
+  String budgetCategoryDeleteConfirm(String name);
 
   /// No description provided for @budgetsAmounts.
   ///
@@ -138,12 +168,6 @@ abstract class L10n {
   /// In en, this message translates to:
   /// **'Budgets categories'**
   String get budgetsCategories;
-
-  /// No description provided for @budgetCategory.
-  ///
-  /// In en, this message translates to:
-  /// **'Budget category'**
-  String get budgetCategory;
 
   /// No description provided for @budgetsCategoriesAmounts.
   ///
@@ -265,6 +289,12 @@ abstract class L10n {
   /// **'Invalid wallet type.'**
   String get invalidWalletType;
 
+  /// No description provided for @no.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get no;
+
   /// No description provided for @nothingHere.
   ///
   /// In en, this message translates to:
@@ -312,6 +342,18 @@ abstract class L10n {
   /// In en, this message translates to:
   /// **'Select transaction category'**
   String get transactionCategoryHint;
+
+  /// No description provided for @transactionDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete transaction'**
+  String get transactionDelete;
+
+  /// No description provided for @transactionDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm to delete transaction {description}.'**
+  String transactionDeleteConfirm(String description);
 
   /// No description provided for @transactionDescription.
   ///
@@ -367,11 +409,29 @@ abstract class L10n {
   /// **'Select transaction wallet'**
   String get transactionWalletHint;
 
+  /// No description provided for @yes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get yes;
+
   /// No description provided for @wallet.
   ///
   /// In en, this message translates to:
   /// **'Wallet'**
   String get wallet;
+
+  /// No description provided for @walletDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete wallet'**
+  String get walletDelete;
+
+  /// No description provided for @walletDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm to delete wallet {name}.'**
+  String walletDeleteConfirm(String name);
 
   /// No description provided for @walletName.
   ///

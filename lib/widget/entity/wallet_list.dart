@@ -7,6 +7,7 @@ import '../../model/crud_handler.dart';
 import '../../model/item_action.dart';
 import '../../model/wallet.dart';
 import '../../service/wallet.dart';
+import '../../util/ui.dart';
 import '../common/sliver_center.dart';
 
 class WalletList extends StatefulWidget {
@@ -89,8 +90,15 @@ class _WalletListState extends State<WalletList> {
       subtitle: Text(item.walletType.l10n(context)),
       trailing: IconButton(
         icon: AppIcon.delete,
-        onPressed: () {
-          widget.crudHandler.onItemAction(context, item, ItemAction.delete);
+        onPressed: () async {
+          final l10n = L10n.of(context);
+          final confirm = await context.confirm(
+            title: l10n.walletDelete,
+            description: l10n.walletDeleteConfirm(item.name),
+          );
+          if (confirm && mounted) {
+            widget.crudHandler.onItemAction(context, item, ItemAction.delete);
+          }
         },
       ),
       onTap: () {
