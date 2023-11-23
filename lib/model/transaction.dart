@@ -21,12 +21,12 @@ enum TransactionType {
     };
   }
 
-  Widget icon() {
+  Widget icon(BuildContext context) {
     return switch (this) {
-      income => AppIcon.transactionIncome,
-      incomeTransfer => AppIcon.transactionIncomeTransfer,
-      expense => AppIcon.transactionExpense,
-      expenseTransfer => AppIcon.transactionExpenseTransfer,
+      income => AppIcon.transactionIncome(context),
+      incomeTransfer => AppIcon.transactionIncomeTransfer(context),
+      expense => AppIcon.transactionExpense(context),
+      expenseTransfer => AppIcon.transactionExpenseTransfer(context),
     };
   }
 }

@@ -184,7 +184,7 @@ class _TransactionEditState extends State<TransactionEdit> {
       decoration: InputDecoration(
         icon: transactionType == null
             ? AppIcon.transaction
-            : transactionType!.icon(),
+            : transactionType!.icon(context),
         hintText: L10n.of(context).transactionTypeHint,
         errorText: errors[TransactionValidator.description]?.l10n(context),
       ),
@@ -211,7 +211,7 @@ class _TransactionEditState extends State<TransactionEdit> {
     if (withIcon) {
       child = Row(
         children: [
-          value.icon(),
+          value.icon(context),
           Padding(
             padding: const EdgeInsets.only(left: 4),
             child: child,

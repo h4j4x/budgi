@@ -93,7 +93,7 @@ class _CategoryAmountListState extends State<CategoryAmountList> {
       title: Text(item.category.name),
       subtitle: Text('\$${item.amount.toStringAsFixed(2)}'),
       trailing: IconButton(
-        icon: AppIcon.delete,
+        icon: AppIcon.delete(context),
         onPressed: () async {
           final l10n = L10n.of(context);
           final confirm = await context.confirm(

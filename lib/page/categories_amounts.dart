@@ -91,6 +91,9 @@ class _CategoriesAmountsPageState extends State<CategoriesAmountsPage> {
         constraints: const BoxConstraints(maxWidth: 200),
         child: TextField(
           controller: periodController,
+          decoration: InputDecoration(
+            icon: AppIcon.calendar,
+          ),
           readOnly: true,
           enabled: false,
         ),

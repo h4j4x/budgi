@@ -1,4 +1,5 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 void initTheme() {
@@ -10,6 +11,17 @@ const scheme = FlexScheme.materialBaseline;
 
 // https://pub.dev/packages/google_fonts
 final fontFamily = GoogleFonts.openSans().fontFamily;
+
+// https://mui.com/material-ui/customization/palette/
+extension ColorSchemeExtension on ColorScheme {
+  Color get success => brightness == Brightness.light
+      ? const Color(0xFF2e7d32)
+      : const Color(0xFF1b5e20);
+
+  Color get warning => brightness == Brightness.light
+      ? const Color(0xFFed6c02)
+      : const Color(0xFFe65100);
+}
 
 final lightTheme = FlexThemeData.light(
   scheme: scheme,

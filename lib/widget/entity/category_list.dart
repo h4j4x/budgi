@@ -88,7 +88,7 @@ class _CategoryListState extends State<CategoryList> {
     return ListTile(
       title: Text(item.name),
       trailing: IconButton(
-        icon: AppIcon.delete,
+        icon: AppIcon.delete(context),
         onPressed: () async {
           final l10n = L10n.of(context);
           final confirm = await context.confirm(

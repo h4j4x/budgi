@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+import 'theme.dart';
+
 // https://fontawesome.com/search?o=r&m=free
 class AppIcon {
   AppIcon._();
@@ -25,8 +27,9 @@ class AppIcon {
     return const FaIcon(FontAwesomeIcons.calendar);
   }
 
-  static Widget get delete {
-    return const FaIcon(FontAwesomeIcons.trash);
+  static Widget delete(BuildContext context) {
+    final color = Theme.of(context).colorScheme.error;
+    return FaIcon(FontAwesomeIcons.trash, color: color);
   }
 
   static Widget get home {
@@ -51,20 +54,24 @@ class AppIcon {
     return const FaIcon(FontAwesomeIcons.moneyBillTrendUp);
   }
 
-  static Widget get transactionExpense {
-    return const FaIcon(FontAwesomeIcons.moneyCheck);
+  static Widget transactionExpense(BuildContext context) {
+    final color = Theme.of(context).colorScheme.warning;
+    return FaIcon(FontAwesomeIcons.moneyCheck, color: color);
   }
 
-  static Widget get transactionExpenseTransfer {
-    return const FaIcon(FontAwesomeIcons.moneyBillTransfer);
+  static Widget transactionExpenseTransfer(BuildContext context) {
+    final color = Theme.of(context).colorScheme.warning;
+    return FaIcon(FontAwesomeIcons.moneyBillTransfer, color: color);
   }
 
-  static Widget get transactionIncome {
-    return const FaIcon(FontAwesomeIcons.moneyCheckDollar);
+  static Widget transactionIncome(BuildContext context) {
+    final color = Theme.of(context).colorScheme.success;
+    return FaIcon(FontAwesomeIcons.moneyCheckDollar, color: color);
   }
 
-  static Widget get transactionIncomeTransfer {
-    return const FaIcon(FontAwesomeIcons.moneyBillTransfer);
+  static Widget transactionIncomeTransfer(BuildContext context) {
+    final color = Theme.of(context).colorScheme.success;
+    return FaIcon(FontAwesomeIcons.moneyBillTransfer, color: color);
   }
 
   static Widget get wallet {

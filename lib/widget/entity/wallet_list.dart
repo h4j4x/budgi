@@ -89,7 +89,7 @@ class _WalletListState extends State<WalletList> {
       title: Text(item.name),
       subtitle: Text(item.walletType.l10n(context)),
       trailing: IconButton(
-        icon: AppIcon.delete,
+        icon: AppIcon.delete(context),
         onPressed: () async {
           final l10n = L10n.of(context);
           final confirm = await context.confirm(

@@ -88,11 +88,11 @@ class _TransactionListState extends State<TransactionList> {
     final transactionType = item.transactionType.l10n(context);
     final amount = item.amount.toStringAsFixed(2);
     return ListTile(
-      leading: item.transactionType.icon(),
+      leading: item.transactionType.icon(context),
       title: Text('${item.category.name}. $transactionType \$$amount'),
       subtitle: Text('${item.wallet.name}. ${item.description}'),
       trailing: IconButton(
-        icon: AppIcon.delete,
+        icon: AppIcon.delete(context),
         onPressed: () async {
           final l10n = L10n.of(context);
           final confirm = await context.confirm(
