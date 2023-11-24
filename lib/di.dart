@@ -36,14 +36,17 @@ class DI {
       ),
     );
 
+    final transactionValidator = TransactionValidator();
+    final transactionService =
+        TransactionMemoryService(transactionValidator: transactionValidator);
+    _getIt.registerSingleton<TransactionService>(transactionService);
+
     final walletValidator = WalletValidator();
     _getIt.registerSingleton<WalletService>(
-      WalletMemoryService(walletValidator: walletValidator),
-    );
-
-    final transactionValidator = TransactionValidator();
-    _getIt.registerSingleton<TransactionService>(
-      TransactionMemoryService(transactionValidator: transactionValidator),
+      WalletMemoryService(
+        transactionService: transactionService,
+        walletValidator: walletValidator,
+      ),
     );
   }
 

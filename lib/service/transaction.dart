@@ -1,5 +1,6 @@
 import '../model/category.dart';
 import '../model/period.dart';
+import '../model/sort.dart';
 import '../model/transaction.dart';
 import '../model/wallet.dart';
 
@@ -19,6 +20,7 @@ abstract class TransactionService {
     Category? category,
     Wallet? wallet,
     Period? period,
+    Sort? dateTimeSort,
   });
 
   Future<void> deleteTransaction({

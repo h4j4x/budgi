@@ -1,17 +1,21 @@
 import '../../error/validation.dart';
 import '../../model/period.dart';
+import '../../model/sort.dart';
 import '../../model/wallet.dart';
 import '../../model/wallet_error.dart';
 import '../../util/string.dart';
+import '../transaction.dart';
 import '../validator.dart';
 import '../wallet.dart';
 
 class WalletMemoryService implements WalletService {
+  final TransactionService transactionService;
   final Validator<Wallet, WalletError>? walletValidator;
 
   final _wallets = <String, Wallet>{};
 
   WalletMemoryService({
+    required this.transactionService,
     this.walletValidator,
   });
 
@@ -46,9 +50,17 @@ class WalletMemoryService implements WalletService {
   }
 
   @override
-  Future<Map<Wallet, double>> walletsBalance({required Period period}) {
-    // TODO: implement walletsBalance
-    throw UnimplementedError();
+  Future<Map<Wallet, double>> walletsBalance({required Period period}) async {
+    final transactions = await transactionService.listTransactions(
+      period: period,
+      dateTimeSort: Sort.asc,
+    );
+    final map = <Wallet, double>{};
+    for (var transaction in transactions) {
+      map[transaction.wallet] =
+          (map[transaction.wallet] ?? 0) + transaction.signedAmount;
+    }
+    return map;
   }
 }
 

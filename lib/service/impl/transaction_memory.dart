@@ -1,6 +1,7 @@
 import '../../error/validation.dart';
 import '../../model/category.dart';
 import '../../model/period.dart';
+import '../../model/sort.dart';
 import '../../model/transaction.dart';
 import '../../model/transaction_error.dart';
 import '../../model/wallet.dart';
@@ -52,6 +53,7 @@ class TransactionMemoryService implements TransactionService {
     Category? category,
     Wallet? wallet,
     Period? period,
+    Sort? dateTimeSort,
   }) {
     final list = _transactions.values.toList().where((transaction) {
       if (transactionType != null &&
@@ -68,7 +70,18 @@ class TransactionMemoryService implements TransactionService {
         return false;
       }
       return true;
-    }).toList();
+    }).toList()
+      ..sort(
+        (value1, value2) {
+          if (dateTimeSort == Sort.asc) {
+            return value1.dateTime.compareTo(value2.dateTime);
+          }
+          if (dateTimeSort == Sort.desc) {
+            return value2.dateTime.compareTo(value1.dateTime);
+          }
+          return 0;
+        },
+      );
     return Future.value(list);
   }
 
@@ -81,7 +94,7 @@ class TransactionMemoryService implements TransactionService {
   }
 }
 
-class _Transaction implements Transaction {
+class _Transaction extends Transaction {
   _Transaction(
     this.code,
     this.category,

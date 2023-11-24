@@ -6,10 +6,14 @@ import 'category.dart';
 import 'wallet.dart';
 
 enum TransactionType {
-  income,
-  incomeTransfer,
-  expense,
-  expenseTransfer;
+  income(true),
+  incomeTransfer(true),
+  expense(false),
+  expenseTransfer(false);
+
+  final bool isIncome;
+
+  const TransactionType(this.isIncome);
 
   String l10n(BuildContext context) {
     final l10n = L10n.of(context);
@@ -45,4 +49,9 @@ abstract class Transaction {
   double get amount;
 
   String get description;
+
+  double get signedAmount {
+    final sign = transactionType.isIncome ? 1 : -1;
+    return amount * sign;
+  }
 }

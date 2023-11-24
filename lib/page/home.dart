@@ -7,9 +7,12 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // todo: period selector (defaults to current) and list with wallets balance (with sort by amount)
     return const Scaffold(
       body: Center(
-        child: Text('TODO'),
+        child: Text(
+          'TODO',
+        ),
       ),
     );
   }
