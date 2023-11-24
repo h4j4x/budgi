@@ -86,6 +86,7 @@ class _WalletListState extends State<WalletList> {
 
   Widget listItem(Wallet item) {
     return ListTile(
+      leading: item.walletType.icon(),
       title: Text(item.name),
       subtitle: Text(item.walletType.l10n(context)),
       trailing: IconButton(
