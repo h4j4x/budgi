@@ -1,6 +1,8 @@
-# budgi
+# Budg1
 
 Budgi Flutter project.
+
+![Test](https://github.com/h4j4x/budgi/actions/workflows/test.yml/badge.svg)
 
 ## Getting Started
 
