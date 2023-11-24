@@ -1,4 +1,3 @@
-- gh actions
 - dashboard with wallets balance, filter by period (defaults current), sort by amount (defaults DESC)
 - dashboard with categories amount vs expenses, filter by period (defaults current), sort by amount (defaults DESC)
 - authentication

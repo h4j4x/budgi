@@ -1,0 +1,21 @@
+# https://blog.logrocket.com/flutter-ci-cd-using-github-actions/
+name: Test
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.x'
+          channel: 'stable'
+          cache: true
+      - run: flutter --version
+      - run: flutter pub get
+      - run: flutter test
