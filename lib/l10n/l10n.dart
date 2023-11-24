@@ -445,6 +445,12 @@ abstract class L10n {
   /// **'Wallets'**
   String get wallets;
 
+  /// No description provided for @walletsBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallets balance'**
+  String get walletsBalance;
+
   /// No description provided for @walletTypeCash.
   ///
   /// In en, this message translates to:

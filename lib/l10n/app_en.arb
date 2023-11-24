@@ -136,6 +136,7 @@
   "walletName": "Wallet name",
   "walletNameHint": "Enter wallet name...",
   "wallets": "Wallets",
+  "walletsBalance": "Wallets balance",
   "walletTypeCash": "Cash",
   "walletTypeCreditCard": "Credit card",
   "walletTypeDebitCard": "Debit card",

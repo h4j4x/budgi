@@ -210,6 +210,9 @@ class L10nEn extends L10n {
   String get wallets => 'Wallets';
 
   @override
+  String get walletsBalance => 'Wallets balance';
+
+  @override
   String get walletTypeCash => 'Cash';
 
   @override

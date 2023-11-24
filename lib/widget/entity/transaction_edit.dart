@@ -144,6 +144,9 @@ class _TransactionEditState extends State<TransactionEdit> {
       },
       selectedValue: wallet,
       icon: wallets == null ? AppIcon.loading : AppIcon.wallet,
+      iconBuilder: (context, value) {
+        return value.walletType.icon();
+      },
       hintText: L10n.of(context).transactionWalletHint,
       errorText: errors[CategoryAmountValidator.category]?.l10n(context),
     );
