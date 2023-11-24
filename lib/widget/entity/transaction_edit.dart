@@ -17,6 +17,7 @@ import '../../service/impl/transaction_validator.dart';
 import '../../service/transaction.dart';
 import '../../service/wallet.dart';
 import '../common/form_toolbar.dart';
+import '../common/select_field.dart';
 
 class TransactionEdit extends StatefulWidget {
   final Transaction? value;
@@ -109,120 +110,66 @@ class _TransactionEditState extends State<TransactionEdit> {
   }
 
   Widget categoryField() {
-    return DropdownButtonFormField<Category>(
-      items: (categories ?? []).map(categoryOption).toList(),
-      value: category,
-      decoration: InputDecoration(
-        icon: categories == null ? AppIcon.loading : AppIcon.category,
-        hintText: L10n.of(context).transactionCategoryHint,
-        errorText: errors[CategoryAmountValidator.category]?.l10n(context),
-      ),
-      isExpanded: true,
-      onChanged: canEdit
-          ? (selectedCategory) {
-              if (selectedCategory != null) {
-                setState(() {
-                  errors.remove(TransactionValidator.category);
-                  category = selectedCategory;
-                });
-              }
-            }
-          : null,
-    );
-  }
-
-  DropdownMenuItem<Category> categoryOption(Category value) {
-    return DropdownMenuItem<Category>(
-      value: value,
-      enabled: value != category,
-      child: Text(value.name),
+    return SelectField<Category>(
+      enabled: canEdit,
+      items: categories ?? [],
+      itemBuilder: (context, value) {
+        return Text(value.name);
+      },
+      onChanged: (value) {
+        setState(() {
+          errors.remove(TransactionValidator.category);
+          category = value;
+        });
+      },
+      selectedValue: category,
+      icon: categories == null ? AppIcon.loading : AppIcon.category,
+      hintText: L10n.of(context).transactionCategoryHint,
+      errorText: errors[CategoryAmountValidator.category]?.l10n(context),
     );
   }
 
   Widget walletField() {
-    return DropdownButtonFormField<Wallet>(
-      items: (wallets ?? []).map(walletOption).toList(),
-      value: wallet,
-      decoration: InputDecoration(
-        icon: wallets == null ? AppIcon.loading : AppIcon.wallet,
-        hintText: L10n.of(context).transactionWalletHint,
-        errorText: errors[CategoryAmountValidator.category]?.l10n(context),
-      ),
-      isExpanded: true,
-      onChanged: canEdit
-          ? (selectedWallet) {
-              if (selectedWallet != null) {
-                setState(() {
-                  errors.remove(TransactionValidator.wallet);
-                  wallet = selectedWallet;
-                });
-              }
-            }
-          : null,
-    );
-  }
-
-  DropdownMenuItem<Wallet> walletOption(Wallet value) {
-    return DropdownMenuItem<Wallet>(
-      value: value,
-      enabled: value != wallet,
-      child: Text(value.name),
+    return SelectField<Wallet>(
+      enabled: canEdit,
+      items: wallets ?? [],
+      itemBuilder: (context, value) {
+        return Text(value.name);
+      },
+      onChanged: (value) {
+        setState(() {
+          errors.remove(TransactionValidator.wallet);
+          wallet = value;
+        });
+      },
+      selectedValue: wallet,
+      icon: wallets == null ? AppIcon.loading : AppIcon.wallet,
+      hintText: L10n.of(context).transactionWalletHint,
+      errorText: errors[CategoryAmountValidator.category]?.l10n(context),
     );
   }
 
   Widget transactionTypeField() {
-    return DropdownButtonFormField<TransactionType>(
-      items: TransactionType.values.map((value) {
-        return transactionTypeOption(value);
-      }).toList(),
-      selectedItemBuilder: (context) {
-        return TransactionType.values.map((value) {
-          return transactionTypeOption(value, false);
-        }).toList();
+    return SelectField<TransactionType>(
+      enabled: canEdit,
+      items: TransactionType.values,
+      itemBuilder: (context, value) {
+        return Text(value.l10n(context));
       },
-      value: transactionType,
-      decoration: InputDecoration(
-        icon: transactionType == null
-            ? AppIcon.transaction
-            : transactionType!.icon(context),
-        hintText: L10n.of(context).transactionTypeHint,
-        errorText: errors[TransactionValidator.description]?.l10n(context),
-      ),
-      isExpanded: true,
-      onChanged: canEdit
-          ? (selectedTransactionType) {
-              if (selectedTransactionType != null) {
-                setState(() {
-                  errors.remove(TransactionValidator.transactionType);
-                  transactionType = selectedTransactionType;
-                });
-                amountFocus.requestFocus();
-              }
-            }
-          : null,
-    );
-  }
-
-  DropdownMenuItem<TransactionType> transactionTypeOption(
-    TransactionType value, [
-    bool withIcon = true,
-  ]) {
-    Widget child = Text(value.l10n(context));
-    if (withIcon) {
-      child = Row(
-        children: [
-          value.icon(context),
-          Padding(
-            padding: const EdgeInsets.only(left: 4),
-            child: child,
-          ),
-        ],
-      );
-    }
-    return DropdownMenuItem<TransactionType>(
-      value: value,
-      enabled: value != transactionType,
-      child: child,
+      onChanged: (value) {
+        setState(() {
+          errors.remove(TransactionValidator.transactionType);
+          transactionType = value;
+        });
+        amountFocus.requestFocus();
+      },
+      selectedValue: transactionType,
+      icon: AppIcon.transaction,
+      iconBuilder: (context, value) {
+        return value.icon(context);
+      },
+      hintText: L10n.of(context).transactionTypeHint,
+      errorText: errors[TransactionValidator.description]?.l10n(context),
     );
   }
 

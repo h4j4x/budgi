@@ -11,6 +11,7 @@ import '../../model/period.dart';
 import '../../service/category.dart';
 import '../../service/impl/category_validator.dart';
 import '../common/form_toolbar.dart';
+import '../common/select_field.dart';
 
 class CategoryAmountEdit extends StatefulWidget {
   final CategoryAmount? value;
@@ -84,34 +85,22 @@ class _CategoryAmountEditState extends State<CategoryAmountEdit> {
   }
 
   Widget categoryField() {
-    return DropdownButtonFormField<Category>(
-      items: (categories ?? []).map(categoryOption).toList(),
-      value: category,
-      decoration: InputDecoration(
-        icon: categories == null ? AppIcon.loading : AppIcon.category,
-        hintText: L10n.of(context).budgetAmountCategoryHint,
-        errorText: errors[CategoryAmountValidator.category]?.l10n(context),
-      ),
-      isExpanded: true,
-      onChanged: widget.value == null
-          ? (selectedCategory) {
-              if (selectedCategory != null) {
-                setState(() {
-                  errors.remove(CategoryAmountValidator.category);
-                  category = selectedCategory;
-                });
-                amountFocus.requestFocus();
-              }
-            }
-          : null,
-    );
-  }
-
-  DropdownMenuItem<Category> categoryOption(Category value) {
-    return DropdownMenuItem<Category>(
-      value: value,
-      enabled: value != category,
-      child: Text(value.name),
+    return SelectField<Category>(
+      enabled: widget.value == null,
+      items: categories ?? [],
+      itemBuilder: (context, value) {
+        return Text(value.name);
+      },
+      onChanged: (value) {
+        setState(() {
+          errors.remove(CategoryAmountValidator.category);
+          category = value;
+        });
+      },
+      selectedValue: category,
+      icon: categories == null ? AppIcon.loading : AppIcon.category,
+      hintText: L10n.of(context).budgetAmountCategoryHint,
+      errorText: errors[CategoryAmountValidator.category]?.l10n(context),
     );
   }
 
