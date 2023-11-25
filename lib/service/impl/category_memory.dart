@@ -179,7 +179,7 @@ class CategoryMemoryService implements CategoryService {
         map[categoryAmount] ??= 0;
       }
     }
-    return Future.delayed(const Duration(seconds: 5), () {
+    return Future.delayed(const Duration(seconds: 1), () {
       return map;
     });
   }

@@ -4,9 +4,11 @@ import '../../app/icon.dart';
 import '../../di.dart';
 import '../../l10n/l10n.dart';
 import '../../model/period.dart';
+import '../../model/sort.dart';
 import '../../model/wallet.dart';
 import '../../service/wallet.dart';
-import '../common/month_input.dart';
+import '../common/month_field.dart';
+import '../common/sort_field.dart';
 
 class WalletsBalance extends StatefulWidget {
   const WalletsBalance({super.key});
@@ -24,6 +26,7 @@ class _WalletsBalanceState extends State<WalletsBalance> {
   bool loading = false;
 
   Period period = Period.currentMonth;
+  Sort amountSort = Sort.desc;
 
   @override
   void initState() {
@@ -43,6 +46,16 @@ class _WalletsBalanceState extends State<WalletsBalance> {
     wallets.addAll(values.keys);
     walletsMap.clear();
     walletsMap.addAll(values);
+    sortKeys();
+  }
+
+  void sortKeys() {
+    wallets.sort((w1, w2) {
+      if (amountSort == Sort.asc) {
+        return walletsMap[w1]!.compareTo(walletsMap[w2]!);
+      }
+      return walletsMap[w2]!.compareTo(walletsMap[w1]!);
+    });
     setState(() {
       loading = false;
     });
@@ -62,9 +75,9 @@ class _WalletsBalanceState extends State<WalletsBalance> {
   Widget toolbar() {
     return SliverAppBar(
       toolbarHeight: kToolbarHeight + 16,
-      title: MonthInputWidget(
+      title: MonthFieldWidget(
         period: period,
-        onChange: !loading
+        onChanged: !loading
             ? (value) {
                 period = value;
                 loadMap();
@@ -72,6 +85,18 @@ class _WalletsBalanceState extends State<WalletsBalance> {
             : null,
       ),
       actions: [
+        Container(
+          constraints: const BoxConstraints(maxWidth: 200),
+          padding: const EdgeInsets.only(right: 4),
+          child: SortField(
+              value: amountSort,
+              onChanged: !loading && wallets.isNotEmpty
+                  ? (value) {
+                      amountSort = value;
+                      sortKeys();
+                    }
+                  : null),
+        ),
         IconButton(
           onPressed: !loading ? loadMap : null,
           icon: AppIcon.reload,

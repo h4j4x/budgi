@@ -9,7 +9,7 @@ import '../model/crud_handler.dart';
 import '../model/item_action.dart';
 import '../model/period.dart';
 import '../service/category.dart';
-import '../widget/common/month_input.dart';
+import '../widget/common/month_field.dart';
 import '../widget/entity/category_amount_list.dart';
 import 'category_amount.dart';
 
@@ -82,7 +82,7 @@ class _CategoriesAmountsPageState extends State<CategoriesAmountsPage> {
       toolbarHeight: kToolbarHeight + 16,
       title: Container(
         constraints: const BoxConstraints(maxWidth: 200),
-        child: MonthInputWidget(period: period),
+        child: MonthFieldWidget(period: period),
       ),
       actions: [
         IconButton(

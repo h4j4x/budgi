@@ -313,6 +313,18 @@ abstract class L10n {
   /// **'Save'**
   String get saveAction;
 
+  /// No description provided for @sortAsc.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort asc'**
+  String get sortAsc;
+
+  /// No description provided for @sortDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort desc'**
+  String get sortDesc;
+
   /// No description provided for @toDate.
   ///
   /// In en, this message translates to:

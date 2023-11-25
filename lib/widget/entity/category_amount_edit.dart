@@ -86,17 +86,16 @@ class _CategoryAmountEditState extends State<CategoryAmountEdit> {
 
   Widget categoryField() {
     return SelectField<Category>(
-      enabled: widget.value == null,
       items: categories ?? [],
       itemBuilder: (context, value) {
         return Text(value.name);
       },
-      onChanged: (value) {
+      onChanged: widget.value == null ? (value) {
         setState(() {
           errors.remove(CategoryAmountValidator.category);
           category = value;
         });
-      },
+      } : null,
       selectedValue: category,
       icon: categories == null ? AppIcon.loading : AppIcon.category,
       hintText: L10n.of(context).budgetAmountCategoryHint,

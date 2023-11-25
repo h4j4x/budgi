@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 
+import '../../model/callback.dart';
+
 typedef TypedWidgetBuilder<T> = Widget Function(BuildContext context, T item);
 
-typedef TypedCallback<T> = void Function(T value);
-
 class SelectField<T> extends StatelessWidget {
-  final bool enabled;
   final List<T> items;
   final TypedWidgetBuilder<T> itemBuilder;
-  final TypedCallback<T> onChanged;
+  final TypedCallback<T>? onChanged;
   final T? selectedValue;
   final Widget? icon;
   final TypedWidgetBuilder<T>? iconBuilder;
@@ -19,8 +18,7 @@ class SelectField<T> extends StatelessWidget {
     super.key,
     required this.items,
     required this.itemBuilder,
-    required this.onChanged,
-    this.enabled = true,
+    this.onChanged,
     this.selectedValue,
     this.icon,
     this.iconBuilder,
@@ -46,10 +44,10 @@ class SelectField<T> extends StatelessWidget {
         errorText: errorText,
       ),
       isExpanded: true,
-      onChanged: enabled
+      onChanged: onChanged != null
           ? (selected) {
               if (selected != null) {
-                onChanged(selected);
+                onChanged!(selected);
               }
             }
           : null,

@@ -140,6 +140,12 @@ class L10nEn extends L10n {
   String get saveAction => 'Save';
 
   @override
+  String get sortAsc => 'Sort asc';
+
+  @override
+  String get sortDesc => 'Sort desc';
+
+  @override
   String get toDate => 'To date';
 
   @override

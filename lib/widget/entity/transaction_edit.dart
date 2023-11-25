@@ -55,8 +55,7 @@ class _TransactionEditState extends State<TransactionEdit> {
       category = widget.value!.category;
       wallet = widget.value!.wallet;
       transactionType = widget.value!.transactionType;
-      amountController.text =
-          widget.value!.amount.toStringAsFixed(2).toString();
+      amountController.text = widget.value!.amount.toStringAsFixed(2).toString();
       descriptionController.text = widget.value!.description;
       canEdit = Period.currentMonth.contains(widget.value!.dateTime);
     } else {
@@ -111,17 +110,18 @@ class _TransactionEditState extends State<TransactionEdit> {
 
   Widget categoryField() {
     return SelectField<Category>(
-      enabled: canEdit,
       items: categories ?? [],
       itemBuilder: (context, value) {
         return Text(value.name);
       },
-      onChanged: (value) {
-        setState(() {
-          errors.remove(TransactionValidator.category);
-          category = value;
-        });
-      },
+      onChanged: canEdit
+          ? (value) {
+              setState(() {
+                errors.remove(TransactionValidator.category);
+                category = value;
+              });
+            }
+          : null,
       selectedValue: category,
       icon: categories == null ? AppIcon.loading : AppIcon.category,
       hintText: L10n.of(context).transactionCategoryHint,
@@ -131,17 +131,18 @@ class _TransactionEditState extends State<TransactionEdit> {
 
   Widget walletField() {
     return SelectField<Wallet>(
-      enabled: canEdit,
       items: wallets ?? [],
       itemBuilder: (context, value) {
         return Text(value.name);
       },
-      onChanged: (value) {
-        setState(() {
-          errors.remove(TransactionValidator.wallet);
-          wallet = value;
-        });
-      },
+      onChanged: canEdit
+          ? (value) {
+              setState(() {
+                errors.remove(TransactionValidator.wallet);
+                wallet = value;
+              });
+            }
+          : null,
       selectedValue: wallet,
       icon: wallets == null ? AppIcon.loading : AppIcon.wallet,
       iconBuilder: (context, value) {
@@ -154,18 +155,19 @@ class _TransactionEditState extends State<TransactionEdit> {
 
   Widget transactionTypeField() {
     return SelectField<TransactionType>(
-      enabled: canEdit,
       items: TransactionType.values,
       itemBuilder: (context, value) {
         return Text(value.l10n(context));
       },
-      onChanged: (value) {
-        setState(() {
-          errors.remove(TransactionValidator.transactionType);
-          transactionType = value;
-        });
-        amountFocus.requestFocus();
-      },
+      onChanged: canEdit
+          ? (value) {
+              setState(() {
+                errors.remove(TransactionValidator.transactionType);
+                transactionType = value;
+              });
+              amountFocus.requestFocus();
+            }
+          : null,
       selectedValue: transactionType,
       icon: AppIcon.transaction,
       iconBuilder: (context, value) {
@@ -231,8 +233,7 @@ class _TransactionEditState extends State<TransactionEdit> {
 
     if (category == null) {
       setState(() {
-        errors[TransactionValidator.category] =
-            TransactionError.invalidCategory;
+        errors[TransactionValidator.category] = TransactionError.invalidCategory;
       });
       return;
     }
@@ -246,8 +247,7 @@ class _TransactionEditState extends State<TransactionEdit> {
 
     if (transactionType == null) {
       setState(() {
-        errors[TransactionValidator.transactionType] =
-            TransactionError.invalidTransactionType;
+        errors[TransactionValidator.transactionType] = TransactionError.invalidTransactionType;
       });
       return;
     }

@@ -2,24 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:month_year_picker/month_year_picker.dart';
 
 import '../../app/icon.dart';
+import '../../model/callback.dart';
 import '../../model/period.dart';
 import '../../util/datetime.dart';
 
-class MonthInputWidget extends StatefulWidget {
+class MonthFieldWidget extends StatefulWidget {
   final Period period;
-  final Function(Period)? onChange;
+  final TypedCallback<Period>? onChanged;
 
-  const MonthInputWidget({
+  const MonthFieldWidget({
     super.key,
     required this.period,
-    this.onChange,
+    this.onChanged,
   });
 
   @override
-  State<MonthInputWidget> createState() => _MonthInputWidgetState();
+  State<MonthFieldWidget> createState() => _MonthFieldWidgetState();
 }
 
-class _MonthInputWidgetState extends State<MonthInputWidget> {
+class _MonthFieldWidgetState extends State<MonthFieldWidget> {
   final controller = TextEditingController();
 
   late Period period;
@@ -41,21 +42,25 @@ class _MonthInputWidgetState extends State<MonthInputWidget> {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: widget.onChange != null ? onSelect : null,
+      onTap: widget.onChanged != null ? onSelect : null,
       child: Container(
         constraints: const BoxConstraints(maxWidth: 200),
-        child: TextField(
-          controller: controller,
-          decoration: InputDecoration(
-            icon: AppIcon.calendar,
+        child: AbsorbPointer(
+          absorbing: true,
+          child: TextField(
+            controller: controller,
+            decoration: InputDecoration(
+              icon: AppIcon.calendar,
+            ),
+            readOnly: true,
+            enabled: widget.onChanged != null,
           ),
-          readOnly: true,
-          enabled: false,
         ),
       ),
     );
   }
 
+  // https://pub.dev/packages/month_year_picker
   void onSelect() async {
     final dateTime = await showMonthYearPicker(
       context: context,
@@ -68,7 +73,7 @@ class _MonthInputWidgetState extends State<MonthInputWidget> {
         period = Period.monthFromDateTime(dateTime);
         updateController();
       });
-      widget.onChange!(period);
+      widget.onChanged!(period);
     }
   }
 }

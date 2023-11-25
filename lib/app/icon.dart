@@ -50,6 +50,14 @@ class AppIcon {
     return const FaIcon(FontAwesomeIcons.rotate);
   }
 
+  static Widget get sortAsc {
+    return const FaIcon(FontAwesomeIcons.arrowUpShortWide);
+  }
+
+  static Widget get sortDesc {
+    return const FaIcon(FontAwesomeIcons.arrowDownWideShort);
+  }
+
   static Widget get transaction {
     return const FaIcon(FontAwesomeIcons.moneyBillTrendUp);
   }
