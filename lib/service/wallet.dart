@@ -15,8 +15,11 @@ abstract class WalletService {
     required String code,
   });
 
+  /// Obtains wallets balance for given period.
+  ///
   /// period dates are inclusive.
   Future<Map<Wallet, double>> walletsBalance({
     required Period period,
+    bool showZeroBalance = false,
   });
 }

@@ -1,3 +1,4 @@
+import '../../di.dart';
 import '../../error/validation.dart';
 import '../../model/period.dart';
 import '../../model/sort.dart';
@@ -9,13 +10,11 @@ import '../validator.dart';
 import '../wallet.dart';
 
 class WalletMemoryService implements WalletService {
-  final TransactionService transactionService;
   final Validator<Wallet, WalletError>? walletValidator;
 
   final _wallets = <String, Wallet>{};
 
   WalletMemoryService({
-    required this.transactionService,
     this.walletValidator,
   });
 
@@ -50,15 +49,22 @@ class WalletMemoryService implements WalletService {
   }
 
   @override
-  Future<Map<Wallet, double>> walletsBalance({required Period period}) async {
-    final transactions = await transactionService.listTransactions(
-      period: period,
-      dateTimeSort: Sort.asc,
-    );
+  Future<Map<Wallet, double>> walletsBalance({
+    required Period period,
+    bool showZeroBalance = false,
+  }) async {
+    final transactions = await DI().get<TransactionService>().listTransactions(
+          period: period,
+          dateTimeSort: Sort.asc,
+        );
     final map = <Wallet, double>{};
     for (var transaction in transactions) {
-      map[transaction.wallet] =
-          (map[transaction.wallet] ?? 0) + transaction.signedAmount;
+      map[transaction.wallet] = (map[transaction.wallet] ?? 0) + transaction.signedAmount;
+    }
+    if (showZeroBalance) {
+      for (var wallet in _wallets.values) {
+        map[wallet] ??= 0;
+      }
     }
     return Future.delayed(const Duration(seconds: 5), () {
       return map;
@@ -83,9 +89,7 @@ class _Wallet implements Wallet {
     if (identical(this, other)) {
       return true;
     }
-    return other is _Wallet &&
-        runtimeType == other.runtimeType &&
-        code == other.code;
+    return other is _Wallet && runtimeType == other.runtimeType && code == other.code;
   }
 
   @override

@@ -60,4 +60,12 @@ abstract class CategoryService {
   ///
   /// Should save given period as last used.
   Future copyPreviousPeriodAmountsInto(Period period);
+
+  /// Obtains categories amounts balance for given period.
+  ///
+  /// period dates are inclusive.
+  Future<Map<CategoryAmount, double>> categoriesAmountsBalance({
+    required Period period,
+    bool showZeroBalance = false,
+  });
 }
