@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../l10n/l10n.dart';
 import '../util/collection.dart';
+import '../widget/home/categories_expenses.dart';
 import '../widget/home/wallets_balance.dart';
 
 final _panels = <_Panel>[
@@ -15,12 +16,10 @@ final _panels = <_Panel>[
   ),
   _Panel(
     headerBuilder: (context) {
-      return const Text('CATEGORIES_BUDGETS_TODO');
+      return Text(L10n.of(context).categoriesExpenses);
     },
     bodyBuilder: (context) {
-      return const Center(
-        child: Text('TODO'),
-      );
+      return const CategoriesExpenses();
     },
   ),
 ];

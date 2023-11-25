@@ -49,15 +49,14 @@ class TransactionMemoryService implements TransactionService {
 
   @override
   Future<List<Transaction>> listTransactions({
-    TransactionType? transactionType,
+    List<TransactionType>? transactionTypes,
     Category? category,
     Wallet? wallet,
     Period? period,
     Sort? dateTimeSort,
   }) {
     final list = _transactions.values.toList().where((transaction) {
-      if (transactionType != null &&
-          transaction.transactionType != transactionType) {
+      if (transactionTypes != null && !transactionTypes.contains(transaction.transactionType)) {
         return false;
       }
       if (category != null && transaction.category != category) {
@@ -131,9 +130,7 @@ class _Transaction extends Transaction {
     if (identical(this, other)) {
       return true;
     }
-    return other is _Transaction &&
-        runtimeType == other.runtimeType &&
-        code == other.code;
+    return other is _Transaction && runtimeType == other.runtimeType && code == other.code;
   }
 
   @override

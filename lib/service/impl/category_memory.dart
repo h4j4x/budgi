@@ -4,6 +4,7 @@ import '../../model/category.dart';
 import '../../model/category_error.dart';
 import '../../model/period.dart';
 import '../../model/sort.dart';
+import '../../model/transaction.dart';
 import '../../util/string.dart';
 import '../category.dart';
 import '../transaction.dart';
@@ -158,11 +159,19 @@ class CategoryMemoryService implements CategoryService {
   }
 
   @override
-  Future<Map<CategoryAmount, double>> categoriesAmountsBalance({
+  Future<Map<CategoryAmount, double>> categoriesTransactionsTotal({
     required Period period,
-    bool showZeroBalance = false,
+    bool expensesTransactions = true,
+    bool showZeroTotal = false,
   }) async {
+    final transactionTypes = TransactionType.values.where((type) {
+      if (expensesTransactions) {
+        return !type.isIncome;
+      }
+      return type.isIncome;
+    }).toList();
     final transactions = await DI().get<TransactionService>().listTransactions(
+          transactionTypes: transactionTypes,
           period: period,
           dateTimeSort: Sort.asc,
         );
@@ -174,7 +183,7 @@ class CategoryMemoryService implements CategoryService {
         map[categoryAmount.first] = (map[categoryAmount.first] ?? 0) + transaction.signedAmount;
       }
     }
-    if (showZeroBalance) {
+    if (showZeroTotal) {
       for (var categoryAmount in amounts) {
         map[categoryAmount] ??= 0;
       }

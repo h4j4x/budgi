@@ -187,6 +187,12 @@ abstract class L10n {
   /// **'Cancel'**
   String get cancelAction;
 
+  /// No description provided for @categoriesExpenses.
+  ///
+  /// In en, this message translates to:
+  /// **'Categories expenses'**
+  String get categoriesExpenses;
+
   /// No description provided for @categoryName.
   ///
   /// In en, this message translates to:

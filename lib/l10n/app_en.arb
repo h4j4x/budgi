@@ -39,6 +39,7 @@
   "budgetsCategoriesAmounts": "Budgets categories amounts",
   "budgetsCategoryAmount": "Budget category amount",
   "cancelAction": "Cancel",
+  "categoriesExpenses": "Categories expenses",
   "categoryName": "Category name",
   "categoryNameHint": "Enter category name...",
   "copyingPreviousPeriod": "Copying previous period amounts. Please wait...",
