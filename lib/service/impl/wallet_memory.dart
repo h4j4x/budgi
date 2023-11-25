@@ -60,7 +60,9 @@ class WalletMemoryService implements WalletService {
       map[transaction.wallet] =
           (map[transaction.wallet] ?? 0) + transaction.signedAmount;
     }
-    return map;
+    return Future.delayed(const Duration(seconds: 5), () {
+      return map;
+    });
   }
 }
 

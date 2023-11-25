@@ -7,11 +7,12 @@ class Period {
     required this.to,
   });
 
+  Period.monthFromDateTime(DateTime dateTime)
+      : from = DateTime(dateTime.year, dateTime.month),
+        to = DateTime(dateTime.year, dateTime.month + 1).add(const Duration(days: -1));
+
   static Period get currentMonth {
-    final now = DateTime.now();
-    final from = DateTime(now.year, now.month);
-    final to = DateTime(now.year, now.month + 1).add(const Duration(days: -1));
-    return Period(from: from, to: to);
+    return Period.monthFromDateTime(DateTime.now());
   }
 
   @override

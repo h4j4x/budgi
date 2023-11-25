@@ -9,7 +9,7 @@ import '../model/crud_handler.dart';
 import '../model/item_action.dart';
 import '../model/period.dart';
 import '../service/category.dart';
-import '../util/datetime.dart';
+import '../widget/common/month_input.dart';
 import '../widget/entity/category_amount_list.dart';
 import 'category_amount.dart';
 
@@ -25,7 +25,6 @@ class CategoriesAmountsPage extends StatefulWidget {
 }
 
 class _CategoriesAmountsPageState extends State<CategoriesAmountsPage> {
-  final periodController = TextEditingController();
   final period = Period.currentMonth;
 
   late CrudHandler<CategoryAmount> crudHandler;
@@ -37,13 +36,7 @@ class _CategoriesAmountsPageState extends State<CategoriesAmountsPage> {
   void initState() {
     super.initState();
     crudHandler = CrudHandler(onItemAction: onItemAction);
-    Future.delayed(Duration.zero, () {
-      periodController.text = formatDateTimePeriod(
-        context,
-        period: period,
-      );
-      checkPreviousPeriod();
-    });
+    Future.delayed(Duration.zero, checkPreviousPeriod);
   }
 
   void checkPreviousPeriod() async {
@@ -89,14 +82,7 @@ class _CategoriesAmountsPageState extends State<CategoriesAmountsPage> {
       toolbarHeight: kToolbarHeight + 16,
       title: Container(
         constraints: const BoxConstraints(maxWidth: 200),
-        child: TextField(
-          controller: periodController,
-          decoration: InputDecoration(
-            icon: AppIcon.calendar,
-          ),
-          readOnly: true,
-          enabled: false,
-        ),
+        child: MonthInputWidget(period: period),
       ),
       actions: [
         IconButton(

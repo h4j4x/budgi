@@ -6,7 +6,7 @@ import '../../l10n/l10n.dart';
 import '../../model/period.dart';
 import '../../model/wallet.dart';
 import '../../service/wallet.dart';
-import '../../util/datetime.dart';
+import '../common/month_input.dart';
 
 class WalletsBalance extends StatefulWidget {
   const WalletsBalance({super.key});
@@ -18,7 +18,6 @@ class WalletsBalance extends StatefulWidget {
 }
 
 class _WalletsBalanceState extends State<WalletsBalance> {
-  final periodController = TextEditingController();
   final wallets = <Wallet>[];
   final walletsMap = <Wallet, double>{};
 
@@ -29,13 +28,7 @@ class _WalletsBalanceState extends State<WalletsBalance> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration.zero, () {
-      periodController.text = formatDateTimePeriod(
-        context,
-        period: period,
-      );
-      loadMap();
-    });
+    Future.delayed(Duration.zero, loadMap);
   }
 
   void loadMap() async {
@@ -57,18 +50,6 @@ class _WalletsBalanceState extends State<WalletsBalance> {
 
   @override
   Widget build(BuildContext context) {
-    if (loading) {
-      return const Center(
-        child: Padding(
-          padding: EdgeInsets.all(8),
-          child: CircularProgressIndicator.adaptive(),
-        ),
-      );
-    }
-    return body();
-  }
-
-  Widget body() {
     return CustomScrollView(
       shrinkWrap: true,
       slivers: [
@@ -81,20 +62,18 @@ class _WalletsBalanceState extends State<WalletsBalance> {
   Widget toolbar() {
     return SliverAppBar(
       toolbarHeight: kToolbarHeight + 16,
-      title: Container(
-        constraints: const BoxConstraints(maxWidth: 200),
-        child: TextField(
-          controller: periodController,
-          decoration: InputDecoration(
-            icon: AppIcon.calendar,
-          ),
-          readOnly: true,
-          enabled: false,
-        ),
+      title: MonthInputWidget(
+        period: period,
+        onChange: !loading
+            ? (value) {
+                period = value;
+                loadMap();
+              }
+            : null,
       ),
       actions: [
         IconButton(
-          onPressed: loadMap,
+          onPressed: !loading ? loadMap : null,
           icon: AppIcon.reload,
         ),
       ],
@@ -104,11 +83,11 @@ class _WalletsBalanceState extends State<WalletsBalance> {
   Widget list() {
     return SliverList.separated(
       itemBuilder: (_, index) {
-        if (wallets.isEmpty) {
+        if (loading || wallets.isEmpty) {
           return Center(
             child: Padding(
               padding: const EdgeInsets.all(8),
-              child: Text(L10n.of(context).nothingHere),
+              child: loading ? const CircularProgressIndicator.adaptive() : Text(L10n.of(context).nothingHere),
             ),
           );
         }
@@ -117,7 +96,7 @@ class _WalletsBalanceState extends State<WalletsBalance> {
       separatorBuilder: (_, __) {
         return const Divider();
       },
-      itemCount: wallets.isNotEmpty ? wallets.length : 1,
+      itemCount: wallets.isNotEmpty && !loading ? wallets.length : 1,
     );
   }
 
