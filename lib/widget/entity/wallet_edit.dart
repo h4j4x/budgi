@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../app/config.dart';
 import '../../app/icon.dart';
-import '../../app/info.dart';
 import '../../app/router.dart';
 import '../../di.dart';
 import '../../error/validation.dart';
@@ -98,7 +98,7 @@ class _WalletEditState extends State<WalletEdit> {
       textInputAction: TextInputAction.go,
       enabled: !saving,
       focusNode: nameFocus,
-      maxLength: AppInfo.textFieldMaxLength,
+      maxLength: AppConfig.textFieldMaxLength,
       decoration: InputDecoration(
         labelText: l10n.walletName,
         hintText: l10n.walletNameHint,

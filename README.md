@@ -1,18 +1,27 @@
 # Budg1
 
-Budgi Flutter project.
+Budg1 Flutter project.
 
 ![Test](https://github.com/h4j4x/budgi/actions/workflows/test.yml/badge.svg)
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+### Configuration
 
-A few resources to get you started if this is your first Flutter project:
+Create config in file `config.json`:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+```json
+{
+  "AUTH_PROVIDER": "supabase",
+  "SUPABASE_URL": "<SUPABASE_URL>",
+  "SUPABASE_TOKEN": "<SUPABASE_TOKEN>"
+}
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### Run the application
+
+Run the app specifying the config file:
+
+```shell
+flutter run --dart-define-from-file=config.json
+```

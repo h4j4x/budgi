@@ -143,6 +143,9 @@ class L10nEn extends L10n {
   String get saveAction => 'Save';
 
   @override
+  String get signInGithub => 'Sign in with github';
+
+  @override
   String get sortAsc => 'Sort asc';
 
   @override

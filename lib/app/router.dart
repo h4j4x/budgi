@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../di.dart';
 import '../l10n/l10n.dart';
 import '../model/category.dart';
 import '../model/transaction.dart';
@@ -10,14 +11,24 @@ import '../page/categories_amounts.dart';
 import '../page/category.dart';
 import '../page/category_amount.dart';
 import '../page/home.dart';
+import '../page/sign_in.dart';
 import '../page/transaction.dart';
 import '../page/transactions.dart';
 import '../page/wallet.dart';
 import '../page/wallets.dart';
+import '../service/auth.dart';
 import '../widget/app/layout.dart';
 import 'icon.dart';
 
 final _routes = <AppRoute>[
+  // sign in
+  AppRoute(
+    anon: true,
+    path: SignInPage.route,
+    pageBuilder: (_, __) {
+      return const SignInPage();
+    },
+  ),
   // home
   AppRoute(
     path: HomePage.route,
@@ -113,12 +124,23 @@ final _shellNavigatorKey = GlobalKey<NavigatorState>();
 final _menuRoutes = _routes.where((route) {
   return route.menuText != null;
 }).toList();
+final _redirectRoute = _routes.firstWhere((route) => route.anon).path;
 
 // https://pub.dev/documentation/go_router/latest/topics/Get%20started-topic.html
 final router = GoRouter(
   initialLocation: HomePage.route,
   navigatorKey: _rootNavigatorKey,
   routes: [
+    ..._routes.where((route) => route.anon).map((route) {
+      return GoRoute(
+        path: route.path,
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (context, state) {
+          final child = route.pageBuilder(context, state);
+          return NoTransitionPage(child: child);
+        },
+      );
+    }),
     ShellRoute(
       parentNavigatorKey: _rootNavigatorKey,
       navigatorKey: _shellNavigatorKey,
@@ -131,7 +153,7 @@ final router = GoRouter(
           ),
         );
       },
-      routes: _routes.map((route) {
+      routes: _routes.where((route) => !route.anon).map((route) {
         return GoRoute(
           path: route.path,
           parentNavigatorKey: _shellNavigatorKey,
@@ -143,6 +165,15 @@ final router = GoRouter(
       }).toList(),
     ),
   ],
+  redirect: (context, state) {
+    if (DI().has<AuthService>()) {
+      final route = _routes.where((r) => r.path == state.matchedLocation);
+      if (route.isNotEmpty && !route.first.anon && DI().get<AuthService>().user() == null) {
+        return _redirectRoute;
+      }
+    }
+    return null;
+  },
 );
 
 typedef TextBuilder = String Function(BuildContext);
@@ -150,12 +181,14 @@ typedef TextBuilder = String Function(BuildContext);
 typedef PageWidgetBuilder = Widget Function(BuildContext, GoRouterState state);
 
 class AppRoute {
+  final bool anon;
   final String path;
   final TextBuilder? menuText;
   final Widget? icon;
   final PageWidgetBuilder pageBuilder;
 
   AppRoute({
+    this.anon = false,
     required this.path,
     required this.pageBuilder,
     this.menuText,

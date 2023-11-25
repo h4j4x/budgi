@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../app/info.dart';
+import '../app/config.dart';
 import '../l10n/l10n.dart';
 
 enum TransactionError {
@@ -17,8 +17,7 @@ enum TransactionError {
       invalidWallet => l10n.invalidTransactionWallet,
       invalidCategory => l10n.invalidBudgetCategory,
       invalidAmount => l10n.invalidTransactionAmount,
-      invalidDescription =>
-        l10n.invalidTransactionDescription(AppInfo.textFieldMaxLength),
+      invalidDescription => l10n.invalidTransactionDescription(AppConfig.textFieldMaxLength),
     };
   }
 }

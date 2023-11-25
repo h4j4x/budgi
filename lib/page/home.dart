@@ -5,6 +5,15 @@ import '../util/collection.dart';
 import '../widget/home/categories_expenses.dart';
 import '../widget/home/wallets_balance.dart';
 
+class HomePage extends StatefulWidget {
+  static const route = '/home';
+
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
 final _panels = <_Panel>[
   _Panel(
     headerBuilder: (context) {
@@ -23,15 +32,6 @@ final _panels = <_Panel>[
     },
   ),
 ];
-
-class HomePage extends StatefulWidget {
-  static const route = '/home';
-
-  const HomePage({super.key});
-
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
 
 class _HomePageState extends State<HomePage> {
   int selectedPanel = 0;

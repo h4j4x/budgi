@@ -8,8 +8,8 @@ import 'app/theme.dart';
 import 'di.dart';
 import 'l10n/l10n.dart';
 
-void main() {
-  DI().setup();
+void main() async {
+  await DI().setup();
 
   LicenseRegistry.addLicense(() async* {
     final license = await rootBundle.loadString('fonts/Open_Sans/OFL.txt');

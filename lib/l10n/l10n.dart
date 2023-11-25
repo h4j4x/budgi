@@ -319,6 +319,12 @@ abstract class L10n {
   /// **'Save'**
   String get saveAction;
 
+  /// No description provided for @signInGithub.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with github'**
+  String get signInGithub;
+
   /// No description provided for @sortAsc.
   ///
   /// In en, this message translates to:

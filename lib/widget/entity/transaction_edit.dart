@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../app/config.dart';
 import '../../app/icon.dart';
-import '../../app/info.dart';
 import '../../app/router.dart';
 import '../../di.dart';
 import '../../error/validation.dart';
@@ -209,7 +209,7 @@ class _TransactionEditState extends State<TransactionEdit> {
       textInputAction: TextInputAction.go,
       enabled: !saving,
       focusNode: descriptionFocus,
-      maxLength: AppInfo.textFieldMaxLength,
+      maxLength: AppConfig.textFieldMaxLength,
       decoration: InputDecoration(
         labelText: l10n.transactionDescription,
         hintText: l10n.transactionDescriptionHint,

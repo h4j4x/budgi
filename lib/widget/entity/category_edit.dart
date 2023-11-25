@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../app/info.dart';
+import '../../app/config.dart';
 import '../../app/router.dart';
 import '../../di.dart';
 import '../../error/validation.dart';
@@ -68,7 +68,7 @@ class _CategoryEditState extends State<CategoryEdit> {
       controller: nameController,
       textInputAction: TextInputAction.go,
       autofocus: true,
-      maxLength: AppInfo.textFieldMaxLength,
+      maxLength: AppConfig.textFieldMaxLength,
       enabled: !saving,
       decoration: InputDecoration(
         labelText: l10n.categoryName,

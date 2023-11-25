@@ -1,7 +1,10 @@
 import 'package:get_it/get_it.dart';
 
+import 'app/config.dart';
 import 'app/info.dart';
+import 'service/auth.dart';
 import 'service/category.dart';
+import 'service/impl/auth_supabase.dart';
 import 'service/impl/category_memory.dart';
 import 'service/impl/category_validator.dart';
 import 'service/impl/transaction_memory.dart';
@@ -9,6 +12,7 @@ import 'service/impl/transaction_validator.dart';
 import 'service/impl/wallet_memory.dart';
 import 'service/impl/wallet_validator.dart';
 import 'service/transaction.dart';
+import 'service/vendor/supabase.dart';
 import 'service/wallet.dart';
 
 class DI {
@@ -22,10 +26,16 @@ class DI {
 
   DI._() : _getIt = GetIt.instance;
 
-  void setup() {
-    _getIt.registerSingleton<AppInfo>(
-      PackageAppInfo(),
-    );
+  Future setup() async {
+    final config = AppConfig.create();
+    _getIt.registerSingleton<AppConfig>(config);
+    _getIt.registerSingleton<AppInfo>(PackageAppInfo());
+
+    if (config.hasSupabaseAuth()) {
+      final supabaseConfig = SupabaseConfig(url: config.supabaseUrl!, token: config.supabaseToken!);
+      await supabaseConfig.initialize();
+      _getIt.registerSingleton<AuthService>(AuthSupabaseService(config: supabaseConfig));
+    }
 
     final categoryValidator = CategoryValidator();
     final categoryAmountValidator = CategoryAmountValidator();
@@ -49,5 +59,9 @@ class DI {
 
   T get<T extends Object>() {
     return _getIt<T>();
+  }
+
+  bool has<T extends Object>() {
+    return _getIt.isRegistered<T>();
   }
 }

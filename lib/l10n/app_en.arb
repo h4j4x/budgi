@@ -101,6 +101,7 @@
     }
   },
   "saveAction": "Save",
+  "signInGithub": "Sign in with github",
   "sortAsc": "Sort asc",
   "sortDesc": "Sort desc",
   "toDate": "To date",

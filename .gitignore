@@ -860,4 +860,4 @@ Temporary Items
 
 ### ------------------------- Project Specific ------------------------- ###
 
-# Include any specific files here.
+/config.json
