@@ -110,4 +110,10 @@ class _CategoryEditState extends State<CategoryEdit> {
       });
     }
   }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    super.dispose();
+  }
 }

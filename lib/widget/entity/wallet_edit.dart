@@ -148,4 +148,10 @@ class _WalletEditState extends State<WalletEdit> {
       });
     }
   }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    super.dispose();
+  }
 }

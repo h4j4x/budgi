@@ -14,6 +14,7 @@ class SupabaseConfig {
     return Supabase.initialize(
       url: url,
       anonKey: token,
+      authFlowType: AuthFlowType.pkce,
     );
   }
 

@@ -86,6 +86,10 @@ class AppIcon {
     return FaIcon(FontAwesomeIcons.moneyBillTransfer, color: color);
   }
 
+  static Widget get user {
+    return const FaIcon(FontAwesomeIcons.user);
+  }
+
   static Widget get wallet {
     return const FaIcon(FontAwesomeIcons.wallet);
   }

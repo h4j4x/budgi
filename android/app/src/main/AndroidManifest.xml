@@ -26,9 +26,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data
-                    android:host="sign-in-callback"
-                    android:scheme="com.sp1ke.budgi.flutter" />
+                <data android:scheme="com.sp1ke.budgi.flutter" />
             </intent-filter>
         </activity>
         <meta-data

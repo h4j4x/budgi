@@ -162,4 +162,10 @@ class _CategoryAmountEditState extends State<CategoryAmountEdit> {
       });
     }
   }
+
+  @override
+  void dispose() {
+    amountController.dispose();
+    super.dispose();
+  }
 }

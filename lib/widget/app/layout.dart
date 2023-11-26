@@ -5,6 +5,7 @@ import '../../app/info.dart';
 import '../../app/router.dart';
 import '../../di.dart';
 import '../../l10n/l10n.dart';
+import '../../service/auth.dart';
 
 class AppScaffold extends StatefulWidget {
   final String path;
@@ -36,8 +37,19 @@ class _AppScaffoldState extends State<AppScaffold> {
 
   @override
   Widget build(BuildContext context) {
+    final user = DI().get<AuthService>().user();
     return Scaffold(
-      appBar: AppBar(title: title(context)),
+      appBar: AppBar(
+        title: title(context),
+        actions: [
+          if (user != null)
+            TextButton.icon(
+              onPressed: () {},
+              icon: user.icon,
+              label: Text(user.name),
+            ),
+        ],
+      ),
       body: SafeArea(child: widget.child),
       drawer: Drawer(
         child: ListView.separated(

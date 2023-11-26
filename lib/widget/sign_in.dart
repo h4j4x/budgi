@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../l10n/l10n.dart';
@@ -19,7 +21,21 @@ class SignIn extends StatefulWidget {
 }
 
 class _SignInState extends State<SignIn> {
+  StreamSubscription<bool>? authSubscription;
+
   bool processing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration.zero, () {
+      authSubscription = DI().get<AuthService>().authenticatedStream().listen((isAuthenticated) {
+        if (isAuthenticated) {
+          context.go(HomePage.route);
+        }
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,18 +65,11 @@ class _SignInState extends State<SignIn> {
   Widget githubButton() {
     return Container(
       constraints: const BoxConstraints(maxWidth: 220, minWidth: 100),
-      child: ElevatedButton(
+      child: TextButton.icon(
+        icon: AppIcon.github,
+        label: Text(L10n.of(context).signInGithub),
+        style: ElevatedButtonTheme.of(context).style,
         onPressed: !processing ? onGithub : null,
-        child: Row(
-          children: [
-            AppIcon.github,
-            Expanded(
-                child: Padding(
-              padding: const EdgeInsets.only(left: 8),
-              child: Text(L10n.of(context).signInGithub),
-            )),
-          ],
-        ),
       ),
     );
   }
@@ -78,5 +87,11 @@ class _SignInState extends State<SignIn> {
         processing = false;
       });
     }
+  }
+
+  @override
+  void dispose() {
+    authSubscription?.cancel();
+    super.dispose();
   }
 }

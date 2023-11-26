@@ -277,4 +277,11 @@ class _TransactionEditState extends State<TransactionEdit> {
       });
     }
   }
+
+  @override
+  void dispose() {
+    amountController.dispose();
+    descriptionController.dispose();
+    super.dispose();
+  }
 }

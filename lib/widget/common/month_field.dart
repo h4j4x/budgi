@@ -76,4 +76,10 @@ class _MonthFieldWidgetState extends State<MonthFieldWidget> {
       widget.onChanged!(period);
     }
   }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
 }
