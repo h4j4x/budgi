@@ -10,4 +10,6 @@ abstract class AuthService {
   Stream<bool> authenticatedStream();
 
   AppUser? user();
+
+  Future<void> signOut();
 }

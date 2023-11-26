@@ -40,6 +40,11 @@ class AuthSupabaseService implements AuthService {
     final session = config.supabase.auth.currentSession;
     return session != null ? _User(session.user) : null;
   }
+
+  @override
+  Future<void> signOut() {
+    return config.supabase.auth.signOut();
+  }
 }
 
 class _User implements AppUser {

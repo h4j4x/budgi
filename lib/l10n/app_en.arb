@@ -102,6 +102,7 @@
   },
   "saveAction": "Save",
   "signInGithub": "Sign in with github",
+  "signOut": "Sign out",
   "sortAsc": "Sort asc",
   "sortByAmount": "Sort by amount",
   "sortDesc": "Sort desc",

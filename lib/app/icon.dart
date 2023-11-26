@@ -54,6 +54,11 @@ class AppIcon {
     return const FaIcon(FontAwesomeIcons.rotate);
   }
 
+  static Widget signOut(BuildContext context) {
+    final color = Theme.of(context).colorScheme.warning;
+    return FaIcon(FontAwesomeIcons.arrowRightFromBracket, color: color);
+  }
+
   static Widget get sortAsc {
     return const FaIcon(FontAwesomeIcons.arrowUpShortWide);
   }

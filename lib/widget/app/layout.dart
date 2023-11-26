@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import '../../app/icon.dart';
 import '../../app/info.dart';
 import '../../app/router.dart';
+import '../../app/theme.dart';
 import '../../di.dart';
 import '../../l10n/l10n.dart';
+import '../../page/sign_in.dart';
 import '../../service/auth.dart';
 
 class AppScaffold extends StatefulWidget {
@@ -53,12 +55,15 @@ class _AppScaffoldState extends State<AppScaffold> {
       body: SafeArea(child: widget.child),
       drawer: Drawer(
         child: ListView.separated(
-          itemCount: widget.routes.length + 1,
+          itemCount: widget.routes.length + 2,
           itemBuilder: (context, index) {
             if (index < widget.routes.length) {
               return routeWidget(context, widget.routes[index]);
             }
-            return aboutWidget(context);
+            if (index == widget.routes.length) {
+              return aboutWidget(context);
+            }
+            return signOutWidget(context);
           },
           separatorBuilder: (_, __) {
             return const Divider();
@@ -106,6 +111,24 @@ class _AppScaffoldState extends State<AppScaffold> {
       enabled: false,
       title: Text(L10n.of(context).appAbout(version, DateTime.now().year)),
       leading: AppIcon.about,
+    );
+  }
+
+  Widget signOutWidget(BuildContext context) {
+    return ListTile(
+      title: Text(
+        L10n.of(context).signOut,
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.warning,
+        ),
+      ),
+      leading: AppIcon.signOut(context),
+      onTap: () async {
+        await DI().get<AuthService>().signOut();
+        if (mounted) {
+          context.go(SignInPage.route);
+        }
+      },
     );
   }
 }

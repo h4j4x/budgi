@@ -325,6 +325,12 @@ abstract class L10n {
   /// **'Sign in with github'**
   String get signInGithub;
 
+  /// No description provided for @signOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out'**
+  String get signOut;
+
   /// No description provided for @sortAsc.
   ///
   /// In en, this message translates to:
