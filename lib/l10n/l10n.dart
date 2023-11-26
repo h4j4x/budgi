@@ -331,6 +331,12 @@ abstract class L10n {
   /// **'Sort asc'**
   String get sortAsc;
 
+  /// No description provided for @sortByAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort by amount'**
+  String get sortByAmount;
+
   /// No description provided for @sortDesc.
   ///
   /// In en, this message translates to:

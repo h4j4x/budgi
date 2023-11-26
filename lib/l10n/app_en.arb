@@ -103,6 +103,7 @@
   "saveAction": "Save",
   "signInGithub": "Sign in with github",
   "sortAsc": "Sort asc",
+  "sortByAmount": "Sort by amount",
   "sortDesc": "Sort desc",
   "toDate": "To date",
   "transaction": "Transaction",

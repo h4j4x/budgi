@@ -8,6 +8,7 @@ import '../../model/sort.dart';
 import '../../model/wallet.dart';
 import '../../service/wallet.dart';
 import '../common/month_field.dart';
+import '../common/responsive.dart';
 import '../common/sort_field.dart';
 
 class WalletsBalance extends StatefulWidget {
@@ -63,16 +64,20 @@ class _WalletsBalanceState extends State<WalletsBalance> {
 
   @override
   Widget build(BuildContext context) {
+    return ResponsiveWidget(mobile: body(true), desktop: body(false));
+  }
+
+  Widget body(bool mobileSize) {
     return CustomScrollView(
       shrinkWrap: true,
       slivers: [
-        toolbar(),
+        toolbar(mobileSize),
         list(),
       ],
     );
   }
 
-  Widget toolbar() {
+  Widget toolbar(bool mobileSize) {
     return SliverAppBar(
       toolbarHeight: kToolbarHeight + 16,
       title: MonthFieldWidget(
@@ -89,6 +94,8 @@ class _WalletsBalanceState extends State<WalletsBalance> {
           constraints: const BoxConstraints(maxWidth: 200),
           padding: const EdgeInsets.only(right: 4),
           child: SortField(
+              mobileSize: mobileSize,
+              title: L10n.of(context).sortByAmount,
               value: amountSort,
               onChanged: !loading && wallets.isNotEmpty
                   ? (value) {
