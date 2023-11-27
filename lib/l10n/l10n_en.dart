@@ -70,8 +70,7 @@ class L10nEn extends L10n {
   String get categoryNameHint => 'Enter category name...';
 
   @override
-  String get copyingPreviousPeriod =>
-      'Copying previous period amounts. Please wait...';
+  String get copyingPreviousPeriod => 'Copying previous period amounts. Please wait...';
 
   @override
   String get createAction => 'Create';
@@ -94,8 +93,7 @@ class L10nEn extends L10n {
   String get home => 'Home';
 
   @override
-  String get invalidBudgetAmount =>
-      'Invalid budget amount. Enter a non negative number for amount.';
+  String get invalidBudgetAmount => 'Invalid budget amount. Enter a non negative number for amount.';
 
   @override
   String get invalidBudgetCategory => 'Invalid category.';
@@ -106,8 +104,7 @@ class L10nEn extends L10n {
   }
 
   @override
-  String get invalidTransactionAmount =>
-      'Invalid transaction amount. Enter a non negative number for amount.';
+  String get invalidTransactionAmount => 'Invalid transaction amount. Enter a non negative number for amount.';
 
   @override
   String invalidTransactionDescription(int maxLength) {
@@ -119,6 +116,17 @@ class L10nEn extends L10n {
 
   @override
   String get invalidTransactionWallet => 'Invalid wallet';
+
+  @override
+  String get invalidUser => 'Invalid user';
+
+  @override
+  String get invalidUserEmail => 'Enter a valid email address.';
+
+  @override
+  String invalidUserPassword(int minLength) {
+    return 'Enter a valid password with no less than $minLength characters.';
+  }
 
   @override
   String invalidWalletName(int maxLength) {
@@ -144,6 +152,9 @@ class L10nEn extends L10n {
 
   @override
   String get saveAction => 'Save';
+
+  @override
+  String get signIn => 'Sign in';
 
   @override
   String get signInGithub => 'Sign in with github';
@@ -209,6 +220,21 @@ class L10nEn extends L10n {
 
   @override
   String get transactionWalletHint => 'Select transaction wallet';
+
+  @override
+  String get userEmail => 'Email';
+
+  @override
+  String get userEmailHint => 'Enter email...';
+
+  @override
+  String get userPassword => 'Password';
+
+  @override
+  String get userPasswordHint => 'Enter password...';
+
+  @override
+  String get userSignIn => 'Sign in';
 
   @override
   String get wallet => 'Wallet';

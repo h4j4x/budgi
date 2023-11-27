@@ -48,7 +48,7 @@ class _AppScaffoldState extends State<AppScaffold> {
             TextButton.icon(
               onPressed: () {},
               icon: user.icon,
-              label: Text(user.name),
+              label: Text(user.usernameOrEmail),
             ),
         ],
       ),

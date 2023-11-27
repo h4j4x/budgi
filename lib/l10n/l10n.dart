@@ -59,8 +59,7 @@ import 'l10n_en.dart';
 /// be consistent with the languages listed in the L10n.supportedLocales
 /// property.
 abstract class L10n {
-  L10n(String locale)
-      : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  L10n(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -80,8 +79,7 @@ abstract class L10n {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
-      <LocalizationsDelegate<dynamic>>[
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
     delegate,
     GlobalMaterialLocalizations.delegate,
     GlobalCupertinoLocalizations.delegate,
@@ -89,7 +87,9 @@ abstract class L10n {
   ];
 
   /// A list of this localizations delegate's supported locales.
-  static const List<Locale> supportedLocales = <Locale>[Locale('en')];
+  static const List<Locale> supportedLocales = <Locale>[
+    Locale('en')
+  ];
 
   /// No description provided for @addAction.
   ///
@@ -283,6 +283,24 @@ abstract class L10n {
   /// **'Invalid wallet'**
   String get invalidTransactionWallet;
 
+  /// No description provided for @invalidUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid user'**
+  String get invalidUser;
+
+  /// No description provided for @invalidUserEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid email address.'**
+  String get invalidUserEmail;
+
+  /// No description provided for @invalidUserPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid password with no less than {minLength} characters.'**
+  String invalidUserPassword(int minLength);
+
   /// No description provided for @invalidWalletName.
   ///
   /// In en, this message translates to:
@@ -318,6 +336,12 @@ abstract class L10n {
   /// In en, this message translates to:
   /// **'Save'**
   String get saveAction;
+
+  /// No description provided for @signIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in'**
+  String get signIn;
 
   /// No description provided for @signInGithub.
   ///
@@ -445,6 +469,36 @@ abstract class L10n {
   /// **'Select transaction wallet'**
   String get transactionWalletHint;
 
+  /// No description provided for @userEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get userEmail;
+
+  /// No description provided for @userEmailHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter email...'**
+  String get userEmailHint;
+
+  /// No description provided for @userPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get userPassword;
+
+  /// No description provided for @userPasswordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter password...'**
+  String get userPasswordHint;
+
+  /// No description provided for @userSignIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in'**
+  String get userSignIn;
+
   /// No description provided for @wallet.
   ///
   /// In en, this message translates to:
@@ -527,23 +581,24 @@ class _L10nDelegate extends LocalizationsDelegate<L10n> {
   }
 
   @override
-  bool isSupported(Locale locale) =>
-      <String>['en'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>['en'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_L10nDelegate old) => false;
 }
 
 L10n lookupL10n(Locale locale) {
+
+
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
-    case 'en':
-      return L10nEn();
+    case 'en': return L10nEn();
   }
 
   throw FlutterError(
-      'L10n.delegate failed to load unsupported locale "$locale". This is likely '
-      'an issue with the localizations generation tool. Please file an issue '
-      'on GitHub with a reproducible sample app and the gen-l10n configuration '
-      'that was used.');
+    'L10n.delegate failed to load unsupported locale "$locale". This is likely '
+    'an issue with the localizations generation tool. Please file an issue '
+    'on GitHub with a reproducible sample app and the gen-l10n configuration '
+    'that was used.'
+  );
 }

@@ -16,6 +16,20 @@ class AuthSupabaseService implements AuthService {
     required this.config,
   });
 
+  // https://supabase.com/docs/reference/dart/auth-signinwithpassword
+  @override
+  Future<bool> signIn(
+    BuildContext context, {
+    required String email,
+    required String password,
+  }) async {
+    final response = await config.supabase.auth.signInWithPassword(
+      email: email,
+      password: password,
+    );
+    return response.session != null;
+  }
+
   // https://supabase.com/docs/reference/dart/auth-signinwithoauth
   @override
   Future<bool> signInWithGithub(BuildContext context) {
@@ -53,6 +67,11 @@ class _User implements AppUser {
   _User(this.user);
 
   @override
+  String get id {
+    return user.id;
+  }
+
+  @override
   String? get avatarUrl {
     if (user.userMetadata != null) {
       return user.userMetadata!['avatar_url'] as String?;
@@ -71,10 +90,8 @@ class _User implements AppUser {
   @override
   String get name {
     if (user.userMetadata != null &&
-        (user.userMetadata!['full_name'] is String ||
-            user.userMetadata!['name'] is String)) {
-      return user.userMetadata!['full_name'] as String? ??
-          user.userMetadata!['name'] as String;
+        (user.userMetadata!['full_name'] is String || user.userMetadata!['name'] is String)) {
+      return user.userMetadata!['full_name'] as String? ?? user.userMetadata!['name'] as String;
     }
     return '-';
   }
@@ -82,10 +99,8 @@ class _User implements AppUser {
   @override
   String get username {
     if (user.userMetadata != null &&
-        (user.userMetadata!['preferred_username'] is String ||
-            user.userMetadata!['user_name'] is String)) {
-      return user.userMetadata!['preferred_username'] as String? ??
-          user.userMetadata!['user_name'] as String;
+        (user.userMetadata!['preferred_username'] is String || user.userMetadata!['user_name'] is String)) {
+      return user.userMetadata!['preferred_username'] as String? ?? user.userMetadata!['user_name'] as String;
     }
     return name;
   }
@@ -103,5 +118,13 @@ class _User implements AppUser {
       );
     }
     return AppIcon.user;
+  }
+
+  @override
+  String get usernameOrEmail {
+    if (username.length > 1) {
+      return username;
+    }
+    return email ?? '-';
   }
 }

@@ -18,6 +18,10 @@ class AppConfig {
     return 200;
   }
 
+  static int get passwordMinLength {
+    return 6;
+  }
+
   final AuthProvider authProvider;
   final String? supabaseUrl;
   final String? supabaseToken;
@@ -35,15 +39,9 @@ class AppConfig {
   }
 
   static AppConfig create() {
-    const authProviderStr = bool.hasEnvironment('AUTH_PROVIDER')
-        ? String.fromEnvironment('AUTH_PROVIDER')
-        : null;
-    const supabaseUrl = bool.hasEnvironment('SUPABASE_URL')
-        ? String.fromEnvironment('SUPABASE_URL')
-        : null;
-    const supabaseToken = bool.hasEnvironment('SUPABASE_TOKEN')
-        ? String.fromEnvironment('SUPABASE_TOKEN')
-        : null;
+    const authProviderStr = bool.hasEnvironment('AUTH_PROVIDER') ? String.fromEnvironment('AUTH_PROVIDER') : null;
+    const supabaseUrl = bool.hasEnvironment('SUPABASE_URL') ? String.fromEnvironment('SUPABASE_URL') : null;
+    const supabaseToken = bool.hasEnvironment('SUPABASE_TOKEN') ? String.fromEnvironment('SUPABASE_TOKEN') : null;
     return AppConfig(
       authProviderStr: authProviderStr,
       supabaseUrl: supabaseUrl,

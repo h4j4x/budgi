@@ -77,6 +77,16 @@
   },
   "invalidTransactionType": "Invalid transaction type",
   "invalidTransactionWallet": "Invalid wallet",
+  "invalidUser": "Invalid user",
+  "invalidUserEmail": "Enter a valid email address.",
+  "invalidUserPassword": "Enter a valid password with no less than {minLength} characters.",
+  "@invalidUserPassword": {
+    "placeholders": {
+      "minLength": {
+        "type": "int"
+      }
+    }
+  },
   "invalidWalletName": "Invalid wallet name. Enter a non empty name with no more than {maxLength} characters.",
   "@invalidWalletName": {
     "placeholders": {
@@ -101,6 +111,7 @@
     }
   },
   "saveAction": "Save",
+  "signIn": "Sign in",
   "signInGithub": "Sign in with github",
   "signOut": "Sign out",
   "sortAsc": "Sort asc",
@@ -129,6 +140,11 @@
   "transactionTypeExpenseTransfer": "Expense transfer",
   "transactionTypeHint": "Select transaction type",
   "transactionWalletHint": "Select transaction wallet",
+  "userEmail": "Email",
+  "userEmailHint": "Enter email...",
+  "userPassword": "Password",
+  "userPasswordHint": "Enter password...",
+  "userSignIn": "Sign in",
   "wallet": "Wallet",
   "walletDelete": "Delete wallet",
   "walletDeleteConfirm": "Confirm to delete wallet {name}.",
