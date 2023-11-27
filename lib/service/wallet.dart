@@ -1,5 +1,5 @@
 import '../model/period.dart';
-import '../model/wallet.dart';
+import '../model/domain/wallet.dart';
 
 abstract class WalletService {
   /// @throws ValidationError

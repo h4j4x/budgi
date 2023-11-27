@@ -1,4 +1,4 @@
-import '../../model/category.dart';
+import '../../model/domain/category.dart';
 import '../../model/error/category_error.dart';
 import '../validator.dart';
 

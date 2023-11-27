@@ -1,4 +1,4 @@
-import '../../model/wallet.dart';
+import '../../model/domain/wallet.dart';
 import '../../model/error/wallet_error.dart';
 import '../validator.dart';
 

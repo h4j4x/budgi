@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../model/user.dart';
+import '../model/domain/user.dart';
 
 abstract class AuthService {
   Future<bool> signInWithGithub(BuildContext context);

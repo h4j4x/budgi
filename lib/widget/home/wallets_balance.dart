@@ -5,7 +5,7 @@ import '../../di.dart';
 import '../../l10n/l10n.dart';
 import '../../model/period.dart';
 import '../../model/sort.dart';
-import '../../model/wallet.dart';
+import '../../model/domain/wallet.dart';
 import '../../service/wallet.dart';
 import '../common/month_field.dart';
 import '../common/responsive.dart';

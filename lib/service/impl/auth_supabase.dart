@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../app/icon.dart';
-import '../../model/user.dart';
+import '../../model/domain/user.dart';
 import '../auth.dart';
 import '../vendor/supabase.dart';
 

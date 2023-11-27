@@ -1,5 +1,5 @@
 import '../../app/config.dart';
-import '../../model/transaction.dart';
+import '../../model/domain/transaction.dart';
 import '../../model/error/transaction_error.dart';
 import '../validator.dart';
 

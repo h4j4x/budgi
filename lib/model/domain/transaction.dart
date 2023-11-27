@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../app/icon.dart';
-import '../l10n/l10n.dart';
+import '../../app/icon.dart';
+import '../../l10n/l10n.dart';
 import 'category.dart';
 import 'wallet.dart';
 

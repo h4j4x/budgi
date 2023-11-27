@@ -5,7 +5,7 @@ import '../../app/router.dart';
 import '../../di.dart';
 import '../../model/error/validation.dart';
 import '../../l10n/l10n.dart';
-import '../../model/category.dart';
+import '../../model/domain/category.dart';
 import '../../model/error/category_error.dart';
 import '../../service/category.dart';
 import '../../service/impl/category_validator.dart';

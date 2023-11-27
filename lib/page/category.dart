@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../l10n/l10n.dart';
-import '../model/category.dart';
+import '../model/domain/category.dart';
 import '../widget/entity/category_edit.dart';
 
 class CategoryPage extends StatelessWidget {

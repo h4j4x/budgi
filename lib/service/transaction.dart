@@ -1,8 +1,8 @@
-import '../model/category.dart';
+import '../model/domain/category.dart';
 import '../model/period.dart';
 import '../model/sort.dart';
-import '../model/transaction.dart';
-import '../model/wallet.dart';
+import '../model/domain/transaction.dart';
+import '../model/domain/wallet.dart';
 
 abstract class TransactionService {
   /// @throws ValidationError

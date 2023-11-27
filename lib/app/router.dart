@@ -3,9 +3,9 @@ import 'package:go_router/go_router.dart';
 
 import '../di.dart';
 import '../l10n/l10n.dart';
-import '../model/category.dart';
-import '../model/transaction.dart';
-import '../model/wallet.dart';
+import '../model/domain/category.dart';
+import '../model/domain/transaction.dart';
+import '../model/domain/wallet.dart';
 import '../page/categories.dart';
 import '../page/categories_amounts.dart';
 import '../page/category.dart';

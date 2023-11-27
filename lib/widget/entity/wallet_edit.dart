@@ -6,7 +6,7 @@ import '../../app/router.dart';
 import '../../di.dart';
 import '../../model/error/validation.dart';
 import '../../l10n/l10n.dart';
-import '../../model/wallet.dart';
+import '../../model/domain/wallet.dart';
 import '../../model/error/wallet_error.dart';
 import '../../service/impl/wallet_validator.dart';
 import '../../service/wallet.dart';

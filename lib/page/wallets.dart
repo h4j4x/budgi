@@ -6,7 +6,7 @@ import '../di.dart';
 import '../l10n/l10n.dart';
 import '../util/function.dart';
 import '../model/item_action.dart';
-import '../model/wallet.dart';
+import '../model/domain/wallet.dart';
 import '../service/wallet.dart';
 import '../widget/entity/wallet_list.dart';
 import 'wallet.dart';

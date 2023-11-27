@@ -2,7 +2,7 @@ import '../../di.dart';
 import '../../model/error/validation.dart';
 import '../../model/period.dart';
 import '../../model/sort.dart';
-import '../../model/wallet.dart';
+import '../../model/domain/wallet.dart';
 import '../../model/error/wallet_error.dart';
 import '../../util/string.dart';
 import '../transaction.dart';

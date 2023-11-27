@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../app/icon.dart';
 import '../../di.dart';
 import '../../l10n/l10n.dart';
-import '../../model/category.dart';
+import '../../model/domain/category.dart';
 import '../../util/function.dart';
 import '../../model/item_action.dart';
 import '../../service/category.dart';

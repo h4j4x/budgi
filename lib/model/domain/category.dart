@@ -1,4 +1,4 @@
-import 'period.dart';
+import '../period.dart';
 
 abstract class Category {
   String get code;

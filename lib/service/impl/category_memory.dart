@@ -1,10 +1,10 @@
 import '../../di.dart';
 import '../../model/error/validation.dart';
-import '../../model/category.dart';
+import '../../model/domain/category.dart';
 import '../../model/error/category_error.dart';
 import '../../model/period.dart';
 import '../../model/sort.dart';
-import '../../model/transaction.dart';
+import '../../model/domain/transaction.dart';
 import '../../util/string.dart';
 import '../category.dart';
 import '../transaction.dart';

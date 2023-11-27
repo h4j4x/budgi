@@ -6,7 +6,7 @@ import '../di.dart';
 import '../l10n/l10n.dart';
 import '../util/function.dart';
 import '../model/item_action.dart';
-import '../model/transaction.dart';
+import '../model/domain/transaction.dart';
 import '../service/transaction.dart';
 import '../widget/entity/transaction_list.dart';
 import 'transaction.dart';
