@@ -4,7 +4,7 @@ import '../app/icon.dart';
 import '../app/router.dart';
 import '../di.dart';
 import '../l10n/l10n.dart';
-import '../model/crud_handler.dart';
+import '../util/function.dart';
 import '../model/item_action.dart';
 import '../model/transaction.dart';
 import '../service/transaction.dart';

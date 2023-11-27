@@ -1,5 +1,5 @@
 import '../../model/wallet.dart';
-import '../../model/wallet_error.dart';
+import '../../model/error/wallet_error.dart';
 import '../validator.dart';
 
 class WalletValidator implements Validator<Wallet, WalletError> {

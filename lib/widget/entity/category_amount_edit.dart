@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import '../../app/icon.dart';
 import '../../app/router.dart';
 import '../../di.dart';
-import '../../error/validation.dart';
+import '../../model/error/validation.dart';
 import '../../l10n/l10n.dart';
 import '../../model/category.dart';
-import '../../model/category_error.dart';
+import '../../model/error/category_error.dart';
 import '../../model/period.dart';
 import '../../service/category.dart';
 import '../../service/impl/category_validator.dart';
@@ -90,12 +90,14 @@ class _CategoryAmountEditState extends State<CategoryAmountEdit> {
       itemBuilder: (context, value) {
         return Text(value.name);
       },
-      onChanged: widget.value == null ? (value) {
-        setState(() {
-          errors.remove(CategoryAmountValidator.category);
-          category = value;
-        });
-      } : null,
+      onChanged: widget.value == null
+          ? (value) {
+              setState(() {
+                errors.remove(CategoryAmountValidator.category);
+                category = value;
+              });
+            }
+          : null,
       selectedValue: category,
       icon: categories == null ? AppIcon.loading : AppIcon.category,
       hintText: L10n.of(context).budgetAmountCategoryHint,

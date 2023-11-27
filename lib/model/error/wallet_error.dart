@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../app/config.dart';
-import '../l10n/l10n.dart';
+import '../../app/config.dart';
+import '../../l10n/l10n.dart';
 
 enum WalletError {
   invalidWalletName,

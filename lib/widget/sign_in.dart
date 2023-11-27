@@ -29,7 +29,10 @@ class _SignInState extends State<SignIn> {
   void initState() {
     super.initState();
     Future.delayed(Duration.zero, () {
-      authSubscription = DI().get<AuthService>().authenticatedStream().listen((isAuthenticated) {
+      authSubscription = DI()
+          .get<AuthService>()
+          .authenticatedStream()
+          .listen((isAuthenticated) {
         if (isAuthenticated) {
           context.go(HomePage.route);
         }

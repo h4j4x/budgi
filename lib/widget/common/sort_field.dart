@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../app/router.dart';
 import '../../l10n/l10n.dart';
-import '../../model/callback.dart';
+import '../../util/function.dart';
 import '../../model/sort.dart';
 import 'select_field.dart';
 

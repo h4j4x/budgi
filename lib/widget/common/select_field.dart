@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../model/callback.dart';
+import '../../util/function.dart';
 
 typedef TypedWidgetBuilder<T> = Widget Function(BuildContext context, T item);
 

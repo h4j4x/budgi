@@ -42,7 +42,8 @@ class _WalletsBalanceState extends State<WalletsBalance> {
     setState(() {
       loading = true;
     });
-    final values = await DI().get<WalletService>().walletsBalance(period: period);
+    final values =
+        await DI().get<WalletService>().walletsBalance(period: period);
     wallets.clear();
     wallets.addAll(values.keys);
     walletsMap.clear();
@@ -119,7 +120,9 @@ class _WalletsBalanceState extends State<WalletsBalance> {
           return Center(
             child: Padding(
               padding: const EdgeInsets.all(8),
-              child: loading ? const CircularProgressIndicator.adaptive() : Text(L10n.of(context).nothingHere),
+              child: loading
+                  ? const CircularProgressIndicator.adaptive()
+                  : Text(L10n.of(context).nothingHere),
             ),
           );
         }

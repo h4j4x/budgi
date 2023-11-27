@@ -9,7 +9,8 @@ class Period {
 
   Period.monthFromDateTime(DateTime dateTime)
       : from = DateTime(dateTime.year, dateTime.month),
-        to = DateTime(dateTime.year, dateTime.month + 1).add(const Duration(days: -1));
+        to = DateTime(dateTime.year, dateTime.month + 1)
+            .add(const Duration(days: -1));
 
   static Period get currentMonth {
     return Period.monthFromDateTime(DateTime.now());

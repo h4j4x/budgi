@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'item_action.dart';
+import '../model/item_action.dart';
+
+typedef TypedCallback<T> = void Function(T value);
 
 class CrudHandler<T> {
   VoidCallback reload = () {};

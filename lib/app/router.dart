@@ -168,7 +168,9 @@ final router = GoRouter(
   redirect: (context, state) {
     if (DI().has<AuthService>()) {
       final route = _routes.where((r) => r.path == state.matchedLocation);
-      if (route.isNotEmpty && !route.first.anon && DI().get<AuthService>().user() == null) {
+      if (route.isNotEmpty &&
+          !route.first.anon &&
+          DI().get<AuthService>().user() == null) {
         return _redirectRoute;
       }
     }
