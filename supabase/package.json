@@ -5,8 +5,8 @@
   "scripts": {
     "start": "npx supabase start",
     "stop": "npx supabase stop --no-backup",
-    "pull-migrations": "npx supabase db pull",
-    "apply-migrations": "npx supabase migrations up"
+    "migrations-pull": "npx supabase db pull",
+    "migrations-apply": "npx supabase migrations up"
   },
   "devDependencies": {
     "supabase": "^1.113.3"

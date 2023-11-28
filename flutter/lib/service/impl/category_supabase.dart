@@ -11,19 +11,24 @@ import '../../util/collection.dart';
 import '../../util/string.dart';
 import '../auth.dart';
 import '../category.dart';
+import '../storage.dart';
 import '../validator.dart';
 import '../vendor/supabase.dart';
 
 const categoryTable = 'categories';
 const categoryAmountTable = 'categories_amounts';
 
+const lastUsedPeriodKey = 'last_used_period';
+
 class CategorySupabaseService implements CategoryService {
   final SupabaseConfig config;
+  final StorageService storageService;
   final Validator<Category, CategoryError>? categoryValidator;
   final Validator<CategoryAmount, CategoryError>? amountValidator;
 
   CategorySupabaseService({
     required this.config,
+    required this.storageService,
     this.categoryValidator,
     this.amountValidator,
   });
@@ -34,7 +39,7 @@ class CategorySupabaseService implements CategoryService {
     required String name,
   }) async {
     final categoryCode = code ?? randomString(6);
-    final category = _Category(categoryCode, name);
+    final category = _Category(code: categoryCode, name: name);
     final errors = categoryValidator?.validate(category);
     if (errors?.isNotEmpty ?? false) {
       throw ValidationError<CategoryError>(errors!);
@@ -113,26 +118,51 @@ class CategorySupabaseService implements CategoryService {
     String? amountCode,
     required Period period,
     required double amount,
-  }) {
-    // _saveLastUsed(period);
-    //
-    // final category = _categories[categoryCode];
-    // if (category == null) {
-    //   throw ValidationError({
-    //     'category': CategoryError.invalidCategory,
-    //   });
-    // }
-    // final categoryAmount = _CategoryAmount(category, period, amount);
-    // final errors = amountValidator?.validate(categoryAmount);
-    // if (errors?.isNotEmpty ?? false) {
-    //   throw ValidationError(errors!);
-    // }
-    //
-    // final periodKey = period.toString();
-    // _values[periodKey] ??= <CategoryAmount>{};
-    // _values[periodKey]!.removeWhere((amount) => amount.category.code == category.code);
-    // _values[periodKey]!.add(categoryAmount);
-    return Future.value();
+  }) async {
+    _saveLastUsed(period);
+
+    final categoryData = await config.supabase.from(categoryTable).select(idField).eq(codeField, categoryCode);
+    final category = _Category.from(categoryData);
+    if (category == null) {
+      throw ValidationError({
+        'category': CategoryError.invalidCategory,
+      });
+    }
+
+    final categoryAmount = _CategoryAmount(category: category, period: period, amount: amount);
+    final errors = amountValidator?.validate(categoryAmount);
+    if (errors?.isNotEmpty ?? false) {
+      throw ValidationError(errors!);
+    }
+
+    final user = DI().get<AuthService>().user();
+    if (user == null) {
+      throw ValidationError<CategoryError>({
+        'user': CategoryError.invalidUser,
+      });
+    }
+
+    final PostgrestResponse<dynamic> count = await config.supabase
+        .from(categoryAmountTable)
+        .select(
+          codeField,
+          const FetchOptions(
+            count: CountOption.exact,
+          ),
+        )
+        .eq(categoryIdField, category.id)
+        .eq(fromDateField, period.from.toIso8601String())
+        .eq(toDateField, period.to.toIso8601String());
+    if (count.count != null && count.count! > 0) {
+      await config.supabase.from(categoryAmountTable).update(categoryAmount.toMap(user)).match({
+        categoryIdField: category.id,
+        fromDateField: period.from.toIso8601String(),
+        toDateField: period.to.toIso8601String(),
+      });
+    } else {
+      await config.supabase.from(categoryAmountTable).insert(categoryAmount.toMap(user));
+    }
+    return categoryAmount;
   }
 
   @override
@@ -140,7 +170,7 @@ class CategorySupabaseService implements CategoryService {
     required Period period,
     Sort? amountSort,
   }) {
-    // _saveLastUsed(period);
+    _saveLastUsed(period);
     //
     // final set = _values[period.toString()] ?? {};
     // return Future.value(set.toList()
@@ -170,20 +200,15 @@ class CategorySupabaseService implements CategoryService {
     return Future.value();
   }
 
-  // void _saveLastUsed(Period period) {
-  //   final periodKey = period.toString();
-  //   if (!_periods.contains(periodKey)) {
-  //     _periods.add(periodKey);
-  //   }
-  // }
+  void _saveLastUsed(Period period) {
+    storageService.writeString(lastUsedPeriodKey, period.toString());
+  }
 
   @override
-  Future<bool> periodHasChanged(Period period) {
-    // if (_periods.isNotEmpty) {
-    //   final periodKey = period.toString();
-    //   return Future.value(!_periods.contains(periodKey));
-    // }
-    return Future.value(false);
+  Future<bool> periodHasChanged(Period period) async {
+    final periodKey = period.toString();
+    final savedKey = await storageService.readString(lastUsedPeriodKey);
+    return periodKey != savedKey;
   }
 
   @override
@@ -233,12 +258,21 @@ class CategorySupabaseService implements CategoryService {
   }
 }
 
+typedef _CategoryFetcher = Future<_Category?> Function(String);
+
+const idField = 'id';
 const userIdField = 'user_id';
 const codeField = 'code';
 const nameField = 'name';
 
 class _Category implements Category {
-  _Category(this.code, this.name);
+  final String id;
+
+  _Category({
+    this.id = '',
+    required this.code,
+    required this.name,
+  });
 
   @override
   String code;
@@ -256,10 +290,11 @@ class _Category implements Category {
 
   static _Category? from(dynamic raw) {
     if (raw is Map<String, dynamic>) {
+      final id = raw[idField] as String?;
       final code = raw[codeField] as String?;
       final name = raw[nameField] as String?;
-      if (code != null && name != null) {
-        return _Category(code, name);
+      if (id != null && code != null && name != null) {
+        return _Category(id: id, code: code, name: name);
       }
     }
     return null;
@@ -279,17 +314,60 @@ class _Category implements Category {
   }
 }
 
+const categoryIdField = 'category_id';
+const fromDateField = 'from_date';
+const toDateField = 'to_date';
+const amountField = 'amount';
+
 class _CategoryAmount implements CategoryAmount {
-  _CategoryAmount(this.category, this.period, this.amount);
+  final String id;
+  final _Category _category;
+
+  _CategoryAmount({
+    this.id = '',
+    required _Category category,
+    required this.period,
+    required this.amount,
+  }) : _category = category;
 
   @override
-  Category category;
+  Category get category {
+    return _category;
+  }
 
   @override
   Period period;
 
   @override
   double amount;
+
+  Map<String, Object> toMap(AppUser user) {
+    return <String, Object>{
+      userIdField: user.id,
+      categoryIdField: _category.id,
+      fromDateField: period.from.toIso8601String(),
+      toDateField: period.to.toIso8601String(),
+      amountField: amount,
+    };
+  }
+
+  static Future<_CategoryAmount?> from(dynamic raw, _CategoryFetcher fetcher) async {
+    if (raw is Map<String, dynamic>) {
+      final id = raw[idField] as String?;
+      final categoryId = raw[categoryIdField] as String?;
+      final fromDate = DateTime.tryParse((raw[fromDateField] as String?) ?? '');
+      final toDate = DateTime.tryParse((raw[toDateField] as String?) ?? '');
+      final amount = raw[amountField] as double?;
+      if (id != null && categoryId != null && fromDate != null && toDate != null && amount != null) {
+        final category = await fetcher(categoryId);
+        if (category != null) {
+          final period = Period(from: fromDate, to: toDate);
+          return _CategoryAmount(id: id, category: category, period: period, amount: amount);
+        }
+      }
+    }
+    return null;
+  }
 
   @override
   bool operator ==(Object other) {
@@ -306,6 +384,6 @@ class _CategoryAmount implements CategoryAmount {
 
   @override
   CategoryAmount copyWith({required Period period}) {
-    return _CategoryAmount(category, period, amount);
+    return _CategoryAmount(id: id, category: _category, period: period, amount: amount);
   }
 }

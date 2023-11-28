@@ -1,3 +1,4 @@
+import 'service/storage.dart';
 import 'package:get_it/get_it.dart';
 
 import 'app/config.dart';
@@ -13,6 +14,7 @@ import 'service/impl/transaction_validator.dart';
 import 'service/impl/wallet_memory.dart';
 import 'service/impl/wallet_validator.dart';
 import 'service/transaction.dart';
+import 'service/vendor/storage.dart';
 import 'service/vendor/supabase.dart';
 import 'service/wallet.dart';
 
@@ -32,6 +34,9 @@ class DI {
     _getIt.registerSingleton<AppConfig>(config);
     _getIt.registerSingleton<AppInfo>(PackageAppInfo());
 
+    final storageService = SecureStorageService();
+    _getIt.registerSingleton<StorageService>(storageService);
+
     CategoryService categoryService;
 
     final categoryValidator = CategoryValidator();
@@ -44,6 +49,7 @@ class DI {
 
       categoryService = CategorySupabaseService(
         config: supabaseConfig,
+        storageService: storageService,
         categoryValidator: categoryValidator,
         amountValidator: categoryAmountValidator,
       );
