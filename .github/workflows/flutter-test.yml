@@ -1,5 +1,5 @@
 # https://blog.logrocket.com/flutter-ci-cd-using-github-actions/
-name: Test
+name: Flutter Test
 
 on:
   push:
@@ -17,5 +17,8 @@ jobs:
           channel: 'stable'
           cache: true
       - run: flutter --version
+        working-directory: ./flutter
       - run: flutter pub get
+        working-directory: ./flutter
       - run: flutter test
+        working-directory: ./flutter
