@@ -1,3 +1,5 @@
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../../di.dart';
 import '../../model/domain/category.dart';
 import '../../model/domain/user.dart';
@@ -13,6 +15,7 @@ import '../validator.dart';
 import '../vendor/supabase.dart';
 
 const categoryTable = 'categories';
+const categoryAmountTable = 'categories_amounts';
 
 class CategorySupabaseService implements CategoryService {
   final SupabaseConfig config;
@@ -43,7 +46,21 @@ class CategorySupabaseService implements CategoryService {
         'user': CategoryError.invalidUser,
       });
     }
-    await config.supabase.from(categoryTable).insert(category.toMap(user)).select();
+
+    final PostgrestResponse<dynamic> count = await config.supabase
+        .from(categoryTable)
+        .select(
+          codeField,
+          const FetchOptions(
+            count: CountOption.exact,
+          ),
+        )
+        .eq(codeField, categoryCode);
+    if (count.count != null && count.count! > 0) {
+      await config.supabase.from(categoryTable).update(category.toMap(user)).match({codeField: categoryCode});
+    } else {
+      await config.supabase.from(categoryTable).insert(category.toMap(user));
+    }
     return category;
   }
 
@@ -86,9 +103,8 @@ class CategorySupabaseService implements CategoryService {
   @override
   Future<void> deleteCategory({
     required String code,
-  }) {
-    // _categories.remove(code);
-    return Future.value();
+  }) async {
+    await config.supabase.from(categoryTable).delete().match({codeField: code});
   }
 
   @override
