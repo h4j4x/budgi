@@ -1,0 +1,14 @@
+{
+  "name": "budgi",
+  "version": "0.0.1",
+  "description": "Budgi supabase",
+  "scripts": {
+    "start": "npx supabase start",
+    "stop": "npx supabase stop --no-backup",
+    "pull-migrations": "npx supabase db pull",
+    "apply-migrations": "npx supabase migrations up"
+  },
+  "devDependencies": {
+    "supabase": "^1.113.3"
+  }
+}
