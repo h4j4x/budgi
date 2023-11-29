@@ -1,6 +1,6 @@
 import '../../app/config.dart';
 import '../../model/domain/transaction.dart';
-import '../../model/error/transaction_error.dart';
+import '../../model/error/transaction.dart';
 import '../validator.dart';
 
 class TransactionValidator implements Validator<Transaction, TransactionError> {

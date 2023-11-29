@@ -3,7 +3,7 @@ import '../../model/domain/category.dart';
 import '../../model/period.dart';
 import '../../model/sort.dart';
 import '../../model/domain/transaction.dart';
-import '../../model/error/transaction_error.dart';
+import '../../model/error/transaction.dart';
 import '../../model/domain/wallet.dart';
 import '../../util/string.dart';
 import '../transaction.dart';

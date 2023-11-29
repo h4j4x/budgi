@@ -7,6 +7,7 @@ import '../app/config.dart';
 import '../app/icon.dart';
 import '../app/router.dart';
 import '../di.dart';
+import '../model/error/sign_in.dart';
 import '../page/home.dart';
 import '../service/auth.dart';
 
@@ -37,7 +38,10 @@ class _SignInState extends State<SignIn> {
   void initState() {
     super.initState();
     Future.delayed(Duration.zero, () {
-      authSubscription = DI().get<AuthService>().authenticatedStream().listen((isAuthenticated) {
+      authSubscription = DI()
+          .get<AuthService>()
+          .authenticatedStream()
+          .listen((isAuthenticated) {
         if (isAuthenticated) {
           context.go(HomePage.route);
         }
@@ -160,7 +164,8 @@ class _SignInState extends State<SignIn> {
     final password = passwordController.text;
     if (password.length < AppConfig.passwordMinLength) {
       setState(() {
-        emailError = L10n.of(context).invalidUserPassword(AppConfig.passwordMinLength);
+        emailError =
+            L10n.of(context).invalidUserPassword(AppConfig.passwordMinLength);
       });
       return;
     }
@@ -168,14 +173,21 @@ class _SignInState extends State<SignIn> {
     setState(() {
       processing = true;
     });
-    final success = await DI().get<AuthService>().signIn(context, email: email, password: password);
-    if (success && mounted) {
-      context.go(HomePage.route);
-    } else {
+    bool success = false;
+    try {
+      success = await DI()
+          .get<AuthService>()
+          .signIn(context, email: email, password: password);
+    } on SignInError catch (_) {
       // TODO: show error message
-      setState(() {
-        processing = false;
-      });
+    } finally {
+      if (success && mounted) {
+        context.go(HomePage.route);
+      } else {
+        setState(() {
+          processing = false;
+        });
+      }
     }
   }
 

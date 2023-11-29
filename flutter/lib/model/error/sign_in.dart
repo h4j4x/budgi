@@ -1,0 +1,1 @@
+class SignInError extends Error {}

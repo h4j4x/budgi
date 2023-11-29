@@ -1,5 +1,5 @@
 import '../../model/domain/category.dart';
-import '../../model/error/category_error.dart';
+import '../../model/error/category.dart';
 import '../validator.dart';
 
 class CategoryValidator implements Validator<Category, CategoryError> {

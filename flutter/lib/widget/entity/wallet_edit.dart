@@ -7,7 +7,7 @@ import '../../di.dart';
 import '../../model/error/validation.dart';
 import '../../l10n/l10n.dart';
 import '../../model/domain/wallet.dart';
-import '../../model/error/wallet_error.dart';
+import '../../model/error/wallet.dart';
 import '../../service/impl/wallet_validator.dart';
 import '../../service/wallet.dart';
 import '../common/form_toolbar.dart';

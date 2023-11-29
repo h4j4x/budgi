@@ -9,7 +9,7 @@ import '../../l10n/l10n.dart';
 import '../../model/domain/category.dart';
 import '../../model/period.dart';
 import '../../model/domain/transaction.dart';
-import '../../model/error/transaction_error.dart';
+import '../../model/error/transaction.dart';
 import '../../model/domain/wallet.dart';
 import '../../service/category.dart';
 import '../../service/impl/category_validator.dart';

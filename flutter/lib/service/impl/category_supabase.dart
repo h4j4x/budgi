@@ -3,7 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../di.dart';
 import '../../model/domain/category.dart';
 import '../../model/domain/user.dart';
-import '../../model/error/category_error.dart';
+import '../../model/error/category.dart';
 import '../../model/error/validation.dart';
 import '../../model/period.dart';
 import '../../model/sort.dart';
@@ -55,14 +55,17 @@ class CategorySupabaseService implements CategoryService {
     final PostgrestResponse<dynamic> count = await config.supabase
         .from(categoryTable)
         .select(
-          codeField,
+          idField,
           const FetchOptions(
             count: CountOption.exact,
           ),
         )
         .eq(codeField, categoryCode);
     if (count.count != null && count.count! > 0) {
-      await config.supabase.from(categoryTable).update(category.toMap(user)).match({codeField: categoryCode});
+      await config.supabase
+          .from(categoryTable)
+          .update(category.toMap(user))
+          .match({codeField: categoryCode});
     } else {
       await config.supabase.from(categoryTable).insert(category.toMap(user));
     }
@@ -79,7 +82,10 @@ class CategorySupabaseService implements CategoryService {
       return [];
     }
 
-    final data = await config.supabase.from(categoryTable).select('$codeField, $nameField').eq(userIdField, user.id);
+    final data = await config.supabase
+        .from(categoryTable)
+        .select()
+        .eq(userIdField, user.id);
     if (data is List) {
       return data
           .map((item) {
@@ -121,15 +127,10 @@ class CategorySupabaseService implements CategoryService {
   }) async {
     _saveLastUsed(period);
 
-    final categoryData = await config.supabase.from(categoryTable).select(idField).eq(codeField, categoryCode);
-    final category = _Category.from(categoryData);
-    if (category == null) {
-      throw ValidationError({
-        'category': CategoryError.invalidCategory,
-      });
-    }
+    final category = await _fetchCategoryByCode(categoryCode);
 
-    final categoryAmount = _CategoryAmount(category: category, period: period, amount: amount);
+    final categoryAmount =
+        _CategoryAmount(category: category, period: period, amount: amount);
     final errors = amountValidator?.validate(categoryAmount);
     if (errors?.isNotEmpty ?? false) {
       throw ValidationError(errors!);
@@ -145,7 +146,7 @@ class CategorySupabaseService implements CategoryService {
     final PostgrestResponse<dynamic> count = await config.supabase
         .from(categoryAmountTable)
         .select(
-          codeField,
+          idField,
           const FetchOptions(
             count: CountOption.exact,
           ),
@@ -154,13 +155,18 @@ class CategorySupabaseService implements CategoryService {
         .eq(fromDateField, period.from.toIso8601String())
         .eq(toDateField, period.to.toIso8601String());
     if (count.count != null && count.count! > 0) {
-      await config.supabase.from(categoryAmountTable).update(categoryAmount.toMap(user)).match({
+      await config.supabase
+          .from(categoryAmountTable)
+          .update(categoryAmount.toMap(user))
+          .match({
         categoryIdField: category.id,
         fromDateField: period.from.toIso8601String(),
         toDateField: period.to.toIso8601String(),
       });
     } else {
-      await config.supabase.from(categoryAmountTable).insert(categoryAmount.toMap(user));
+      await config.supabase
+          .from(categoryAmountTable)
+          .insert(categoryAmount.toMap(user));
     }
     return categoryAmount;
   }
@@ -169,39 +175,61 @@ class CategorySupabaseService implements CategoryService {
   Future<List<CategoryAmount>> listAmounts({
     required Period period,
     Sort? amountSort,
-  }) {
+  }) async {
     _saveLastUsed(period);
-    //
-    // final set = _values[period.toString()] ?? {};
-    // return Future.value(set.toList()
-    //   ..sort(
-    //     (value1, value2) {
-    //       if (amountSort == Sort.asc) {
-    //         return value1.amount.compareTo(value2.amount);
-    //       }
-    //       if (amountSort == Sort.desc) {
-    //         return value2.amount.compareTo(value1.amount);
-    //       }
-    //       return 0;
-    //     },
-    //   ));
-    return Future.value([]);
+
+    final user = DI().get<AuthService>().user();
+    if (user == null) {
+      return [];
+    }
+
+    final query = config.supabase
+        .from(categoryAmountTable)
+        .select()
+        .eq(userIdField, user.id)
+        .eq(fromDateField, period.from.toIso8601String())
+        .eq(toDateField, period.to.toIso8601String());
+    dynamic data;
+    if (amountSort != null) {
+      data = await query.order(amountField, ascending: amountSort == Sort.asc);
+    } else {
+      data = await query;
+    }
+
+    final list = <CategoryAmount>[];
+    if (data is List) {
+      for (var item in data) {
+        final categoryAmount = await _CategoryAmount.from(
+          item,
+          (id) async {
+            final categoryData = await config.supabase
+                .from(categoryTable)
+                .select()
+                .eq(idField, id);
+            return _Category.from(categoryData);
+          },
+        );
+        if (categoryAmount != null) {
+          list.add(categoryAmount);
+        }
+      }
+    }
+    return list;
   }
 
   @override
   Future<void> deleteAmount({
     required String categoryCode,
     required Period period,
-  }) {
-    // _saveLastUsed(period);
-    //
-    // final set = _values[period.toString()] ?? {};
-    // set.removeWhere((amount) => amount.category.code == categoryCode);
-    return Future.value();
-  }
+  }) async {
+    _saveLastUsed(period);
 
-  void _saveLastUsed(Period period) {
-    storageService.writeString(lastUsedPeriodKey, period.toString());
+    final category = await _fetchCategoryByCode(categoryCode);
+    await config.supabase.from(categoryAmountTable).delete().match({
+      categoryIdField: category.id,
+      fromDateField: period.from.toIso8601String(),
+      toDateField: period.to.toIso8601String(),
+    });
   }
 
   @override
@@ -256,9 +284,25 @@ class CategorySupabaseService implements CategoryService {
     // }
     return Future.value({});
   }
+
+  void _saveLastUsed(Period period) {
+    storageService.writeString(lastUsedPeriodKey, period.toString());
+  }
+
+  Future<_Category> _fetchCategoryByCode(String code) async {
+    final categoryData =
+        await config.supabase.from(categoryTable).select().eq(codeField, code);
+    final category = _Category.from(categoryData);
+    if (category != null) {
+      return category;
+    }
+    throw ValidationError({
+      'category': CategoryError.invalidCategory,
+    });
+  }
 }
 
-typedef _CategoryFetcher = Future<_Category?> Function(String);
+typedef _CategoryFetcher = Future<_Category?> Function(int);
 
 const idField = 'id';
 const userIdField = 'user_id';
@@ -266,10 +310,10 @@ const codeField = 'code';
 const nameField = 'name';
 
 class _Category implements Category {
-  final String id;
+  final int id;
 
   _Category({
-    this.id = '',
+    this.id = 0,
     required this.code,
     required this.name,
   });
@@ -289,10 +333,16 @@ class _Category implements Category {
   }
 
   static _Category? from(dynamic raw) {
-    if (raw is Map<String, dynamic>) {
-      final id = raw[idField] as String?;
-      final code = raw[codeField] as String?;
-      final name = raw[nameField] as String?;
+    dynamic rawData;
+    if (raw is List && raw.isNotEmpty) {
+      rawData = raw[0];
+    } else {
+      rawData = raw;
+    }
+    if (rawData is Map<String, dynamic>) {
+      final id = rawData[idField] as int?;
+      final code = rawData[codeField] as String?;
+      final name = rawData[nameField] as String?;
       if (id != null && code != null && name != null) {
         return _Category(id: id, code: code, name: name);
       }
@@ -305,7 +355,9 @@ class _Category implements Category {
     if (identical(this, other)) {
       return true;
     }
-    return other is _Category && runtimeType == other.runtimeType && code == other.code;
+    return other is _Category &&
+        runtimeType == other.runtimeType &&
+        code == other.code;
   }
 
   @override
@@ -320,11 +372,11 @@ const toDateField = 'to_date';
 const amountField = 'amount';
 
 class _CategoryAmount implements CategoryAmount {
-  final String id;
+  final int id;
   final _Category _category;
 
   _CategoryAmount({
-    this.id = '',
+    this.id = 0,
     required _Category category,
     required this.period,
     required this.amount,
@@ -351,18 +403,27 @@ class _CategoryAmount implements CategoryAmount {
     };
   }
 
-  static Future<_CategoryAmount?> from(dynamic raw, _CategoryFetcher fetcher) async {
+  static Future<_CategoryAmount?> from(
+      dynamic raw, _CategoryFetcher fetcher) async {
     if (raw is Map<String, dynamic>) {
-      final id = raw[idField] as String?;
-      final categoryId = raw[categoryIdField] as String?;
+      final id = raw[idField] as int?;
+      final categoryId = raw[categoryIdField] as int?;
       final fromDate = DateTime.tryParse((raw[fromDateField] as String?) ?? '');
       final toDate = DateTime.tryParse((raw[toDateField] as String?) ?? '');
-      final amount = raw[amountField] as double?;
-      if (id != null && categoryId != null && fromDate != null && toDate != null && amount != null) {
+      final amount = raw[amountField] as num?;
+      if (id != null &&
+          categoryId != null &&
+          fromDate != null &&
+          toDate != null &&
+          amount != null) {
         final category = await fetcher(categoryId);
         if (category != null) {
           final period = Period(from: fromDate, to: toDate);
-          return _CategoryAmount(id: id, category: category, period: period, amount: amount);
+          return _CategoryAmount(
+              id: id,
+              category: category,
+              period: period,
+              amount: amount.toDouble());
         }
       }
     }
@@ -374,7 +435,9 @@ class _CategoryAmount implements CategoryAmount {
     if (identical(this, other)) {
       return true;
     }
-    return other is _CategoryAmount && runtimeType == other.runtimeType && category == other.category;
+    return other is _CategoryAmount &&
+        runtimeType == other.runtimeType &&
+        category == other.category;
   }
 
   @override
@@ -384,6 +447,7 @@ class _CategoryAmount implements CategoryAmount {
 
   @override
   CategoryAmount copyWith({required Period period}) {
-    return _CategoryAmount(id: id, category: _category, period: period, amount: amount);
+    return _CategoryAmount(
+        id: id, category: _category, period: period, amount: amount);
   }
 }

@@ -1,7 +1,7 @@
 import '../../di.dart';
 import '../../model/error/validation.dart';
 import '../../model/domain/category.dart';
-import '../../model/error/category_error.dart';
+import '../../model/error/category.dart';
 import '../../model/period.dart';
 import '../../model/sort.dart';
 import '../../model/domain/transaction.dart';

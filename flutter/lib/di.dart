@@ -43,9 +43,11 @@ class DI {
     final categoryAmountValidator = CategoryAmountValidator();
 
     if (config.hasSupabaseAuth()) {
-      final supabaseConfig = SupabaseConfig(url: config.supabaseUrl!, token: config.supabaseToken!);
+      final supabaseConfig = SupabaseConfig(
+          url: config.supabaseUrl!, token: config.supabaseToken!);
       await supabaseConfig.initialize();
-      _getIt.registerSingleton<AuthService>(AuthSupabaseService(config: supabaseConfig));
+      _getIt.registerSingleton<AuthService>(
+          AuthSupabaseService(config: supabaseConfig));
 
       categoryService = CategorySupabaseService(
         config: supabaseConfig,

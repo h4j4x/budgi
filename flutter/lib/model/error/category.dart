@@ -13,7 +13,8 @@ enum CategoryError {
     final l10n = L10n.of(context);
     return switch (this) {
       invalidUser => l10n.invalidUser,
-      invalidCategoryName => l10n.invalidBudgetCategoryName(AppConfig.textFieldMaxLength),
+      invalidCategoryName =>
+        l10n.invalidBudgetCategoryName(AppConfig.textFieldMaxLength),
       invalidCategory => l10n.invalidBudgetCategory,
       invalidAmount => l10n.invalidBudgetAmount,
     };
