@@ -6,11 +6,4 @@ extension AppIterable<T> on Iterable<T> {
       index += 1;
     }
   }
-
-  Iterable<E> toNonNull<E>() {
-    final list = where((item) {
-      return item != null;
-    }).toList();
-    return List.castFrom<T, E>(list);
-  }
 }
