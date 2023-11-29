@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import '../../app/icon.dart';
 import '../../di.dart';
 import '../../l10n/l10n.dart';
-import '../../model/domain/category.dart';
-import '../../util/function.dart';
+import '../../model/domain/category_amount.dart';
 import '../../model/item_action.dart';
 import '../../model/period.dart';
-import '../../service/category.dart';
+import '../../service/category_amount.dart';
+import '../../util/function.dart';
 import '../../util/ui.dart';
 import '../common/sliver_center.dart';
 
@@ -51,7 +51,7 @@ class _CategoryAmountListState extends State<CategoryAmountList> {
     setState(() {
       loading = true;
     });
-    final values = await DI().get<CategoryService>().listAmounts(
+    final values = await DI().get<CategoryAmountService>().listAmounts(
           period: widget.period,
         );
     list.clear();

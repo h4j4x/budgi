@@ -1,16 +1,18 @@
 import '../../di.dart';
-import '../../model/error/validation.dart';
 import '../../model/domain/category.dart';
+import '../../model/domain/category_amount.dart';
+import '../../model/domain/transaction.dart';
 import '../../model/error/category.dart';
+import '../../model/error/validation.dart';
 import '../../model/period.dart';
 import '../../model/sort.dart';
-import '../../model/domain/transaction.dart';
 import '../../util/string.dart';
 import '../category.dart';
+import '../category_amount.dart';
 import '../transaction.dart';
 import '../validator.dart';
 
-class CategoryMemoryService implements CategoryService {
+class CategoryMemoryService implements CategoryService, CategoryAmountService {
   final Validator<Category, CategoryError>? categoryValidator;
   final Validator<CategoryAmount, CategoryError>? amountValidator;
 
@@ -47,9 +49,7 @@ class CategoryMemoryService implements CategoryService {
     final list = _categories.values.toList();
     if (period != null) {
       final amountsCategories =
-          (_values[period.toString()] ?? <CategoryAmount>{})
-              .map((amount) => amount.category.code)
-              .toList();
+          (_values[period.toString()] ?? <CategoryAmount>{}).map((amount) => amount.category.code).toList();
       list.removeWhere((category) {
         final match = amountsCategories.contains(category.code);
         if (withAmount) {
@@ -92,8 +92,7 @@ class CategoryMemoryService implements CategoryService {
 
     final periodKey = period.toString();
     _values[periodKey] ??= <CategoryAmount>{};
-    _values[periodKey]!
-        .removeWhere((amount) => amount.category.code == category.code);
+    _values[periodKey]!.removeWhere((amount) => amount.category.code == category.code);
     _values[periodKey]!.add(categoryAmount);
     return Future.value(categoryAmount);
   }
@@ -181,12 +180,9 @@ class CategoryMemoryService implements CategoryService {
     final map = <CategoryAmount, double>{};
     final amounts = _values[period.toString()] ?? {};
     for (var transaction in transactions) {
-      final categoryAmount = amounts
-          .where((amount) => amount.category == transaction.category)
-          .toList();
+      final categoryAmount = amounts.where((amount) => amount.category == transaction.category).toList();
       if (categoryAmount.length == 1) {
-        map[categoryAmount.first] =
-            (map[categoryAmount.first] ?? 0) + transaction.signedAmount;
+        map[categoryAmount.first] = (map[categoryAmount.first] ?? 0) + transaction.signedAmount;
       }
     }
     if (showZeroTotal) {
@@ -194,9 +190,17 @@ class CategoryMemoryService implements CategoryService {
         map[categoryAmount] ??= 0;
       }
     }
-    return Future.delayed(const Duration(seconds: 1), () {
-      return map;
-    });
+    return map;
+  }
+
+  @override
+  Future<Category> fetchCategoryByCode(String code) {
+    return Future.value(_categories[code]);
+  }
+
+  @override
+  Future<Category?> fetchCategoryById(int id) {
+    return Future.value();
   }
 }
 
@@ -214,9 +218,7 @@ class _Category implements Category {
     if (identical(this, other)) {
       return true;
     }
-    return other is _Category &&
-        runtimeType == other.runtimeType &&
-        code == other.code;
+    return other is _Category && runtimeType == other.runtimeType && code == other.code;
   }
 
   @override
@@ -242,9 +244,7 @@ class _CategoryAmount implements CategoryAmount {
     if (identical(this, other)) {
       return true;
     }
-    return other is _CategoryAmount &&
-        runtimeType == other.runtimeType &&
-        category == other.category;
+    return other is _CategoryAmount && runtimeType == other.runtimeType && category == other.category;
   }
 
   @override

@@ -4,11 +4,11 @@ import '../app/icon.dart';
 import '../app/router.dart';
 import '../di.dart';
 import '../l10n/l10n.dart';
-import '../model/domain/category.dart';
-import '../util/function.dart';
+import '../model/domain/category_amount.dart';
 import '../model/item_action.dart';
 import '../model/period.dart';
-import '../service/category.dart';
+import '../service/category_amount.dart';
+import '../util/function.dart';
 import '../widget/common/month_field.dart';
 import '../widget/entity/category_amount_list.dart';
 import 'category_amount.dart';
@@ -40,7 +40,7 @@ class _CategoriesAmountsPageState extends State<CategoriesAmountsPage> {
   }
 
   void checkPreviousPeriod() async {
-    final categoryService = DI().get<CategoryService>();
+    final categoryService = DI().get<CategoryAmountService>();
     final periodChanged = await categoryService.periodHasChanged(period);
     if (periodChanged) {
       setState(() {
@@ -128,7 +128,7 @@ class _CategoriesAmountsPageState extends State<CategoriesAmountsPage> {
         }
       case ItemAction.delete:
         {
-          await DI().get<CategoryService>().deleteAmount(
+          await DI().get<CategoryAmountService>().deleteAmount(
                 categoryCode: item.category.code,
                 period: period,
               );

@@ -4,6 +4,8 @@ import '../model/item_action.dart';
 
 typedef TypedCallback<T> = void Function(T value);
 
+typedef TypedFutureFetcher<T, E> = Future<T?> Function(E value);
+
 class CrudHandler<T> {
   VoidCallback reload = () {};
 

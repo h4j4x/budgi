@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../l10n/l10n.dart';
-import '../model/domain/category.dart';
+import '../model/domain/category_amount.dart';
 import '../model/period.dart';
 import '../widget/entity/category_amount_edit.dart';
 

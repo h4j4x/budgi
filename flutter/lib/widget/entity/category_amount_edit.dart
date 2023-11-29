@@ -3,13 +3,15 @@ import 'package:flutter/material.dart';
 import '../../app/icon.dart';
 import '../../app/router.dart';
 import '../../di.dart';
-import '../../model/error/validation.dart';
 import '../../l10n/l10n.dart';
 import '../../model/domain/category.dart';
+import '../../model/domain/category_amount.dart';
 import '../../model/error/category.dart';
+import '../../model/error/validation.dart';
 import '../../model/period.dart';
 import '../../service/category.dart';
-import '../../service/impl/category_validator.dart';
+import '../../service/category_amount.dart';
+import '../../service/impl/category_amount_validator.dart';
 import '../common/form_toolbar.dart';
 import '../common/select_field.dart';
 
@@ -42,8 +44,7 @@ class _CategoryAmountEditState extends State<CategoryAmountEdit> {
   void initState() {
     super.initState();
     if (widget.value != null) {
-      amountController.text =
-          widget.value!.amount.toStringAsFixed(2).toString();
+      amountController.text = widget.value!.amount.toStringAsFixed(2).toString();
       categories = <Category>[widget.value!.category];
       category = widget.value!.category;
     } else {
@@ -136,8 +137,7 @@ class _CategoryAmountEditState extends State<CategoryAmountEdit> {
 
     if (category == null) {
       setState(() {
-        errors[CategoryAmountValidator.category] =
-            CategoryError.invalidCategory;
+        errors[CategoryAmountValidator.category] = CategoryError.invalidCategory;
       });
       return;
     }
@@ -148,7 +148,7 @@ class _CategoryAmountEditState extends State<CategoryAmountEdit> {
     });
     try {
       final amount = double.tryParse(amountController.text) ?? -1;
-      await DI().get<CategoryService>().saveAmount(
+      await DI().get<CategoryAmountService>().saveAmount(
             categoryCode: category!.code,
             period: widget.period,
             amount: amount,

@@ -1,11 +1,13 @@
-import 'service/storage.dart';
 import 'package:get_it/get_it.dart';
 
 import 'app/config.dart';
 import 'app/info.dart';
 import 'service/auth.dart';
 import 'service/category.dart';
+import 'service/category_amount.dart';
 import 'service/impl/auth_supabase.dart';
+import 'service/impl/category_amount_supabase.dart';
+import 'service/impl/category_amount_validator.dart';
 import 'service/impl/category_memory.dart';
 import 'service/impl/category_supabase.dart';
 import 'service/impl/category_validator.dart';
@@ -13,6 +15,7 @@ import 'service/impl/transaction_memory.dart';
 import 'service/impl/transaction_validator.dart';
 import 'service/impl/wallet_memory.dart';
 import 'service/impl/wallet_validator.dart';
+import 'service/storage.dart';
 import 'service/transaction.dart';
 import 'service/vendor/storage.dart';
 import 'service/vendor/supabase.dart';
@@ -38,21 +41,24 @@ class DI {
     _getIt.registerSingleton<StorageService>(storageService);
 
     CategoryService categoryService;
+    CategoryAmountService categoryAmountService;
 
     final categoryValidator = CategoryValidator();
     final categoryAmountValidator = CategoryAmountValidator();
 
     if (config.hasSupabaseAuth()) {
-      final supabaseConfig = SupabaseConfig(
-          url: config.supabaseUrl!, token: config.supabaseToken!);
+      final supabaseConfig = SupabaseConfig(url: config.supabaseUrl!, token: config.supabaseToken!);
       await supabaseConfig.initialize();
-      _getIt.registerSingleton<AuthService>(
-          AuthSupabaseService(config: supabaseConfig));
+      _getIt.registerSingleton<AuthService>(AuthSupabaseService(config: supabaseConfig));
 
       categoryService = CategorySupabaseService(
         config: supabaseConfig,
         storageService: storageService,
         categoryValidator: categoryValidator,
+      );
+      categoryAmountService = CategoryAmountSupabaseService(
+        config: supabaseConfig,
+        storageService: storageService,
         amountValidator: categoryAmountValidator,
       );
     } else {
@@ -60,9 +66,14 @@ class DI {
         categoryValidator: categoryValidator,
         amountValidator: categoryAmountValidator,
       );
+      categoryAmountService = CategoryMemoryService(
+        categoryValidator: categoryValidator,
+        amountValidator: categoryAmountValidator,
+      );
     }
 
     _getIt.registerSingleton<CategoryService>(categoryService);
+    _getIt.registerSingleton<CategoryAmountService>(categoryAmountService);
 
     final transactionValidator = TransactionValidator();
     _getIt.registerSingleton<TransactionService>(

@@ -4,15 +4,14 @@ import '../../app/config.dart';
 import '../../app/icon.dart';
 import '../../app/router.dart';
 import '../../di.dart';
-import '../../model/error/validation.dart';
 import '../../l10n/l10n.dart';
 import '../../model/domain/category.dart';
-import '../../model/period.dart';
 import '../../model/domain/transaction.dart';
-import '../../model/error/transaction.dart';
 import '../../model/domain/wallet.dart';
+import '../../model/error/transaction.dart';
+import '../../model/error/validation.dart';
+import '../../model/period.dart';
 import '../../service/category.dart';
-import '../../service/impl/category_validator.dart';
 import '../../service/impl/transaction_validator.dart';
 import '../../service/transaction.dart';
 import '../../service/wallet.dart';
@@ -55,8 +54,7 @@ class _TransactionEditState extends State<TransactionEdit> {
       category = widget.value!.category;
       wallet = widget.value!.wallet;
       transactionType = widget.value!.transactionType;
-      amountController.text =
-          widget.value!.amount.toStringAsFixed(2).toString();
+      amountController.text = widget.value!.amount.toStringAsFixed(2).toString();
       descriptionController.text = widget.value!.description;
       canEdit = Period.currentMonth.contains(widget.value!.dateTime);
     } else {
@@ -126,7 +124,7 @@ class _TransactionEditState extends State<TransactionEdit> {
       selectedValue: category,
       icon: categories == null ? AppIcon.loading : AppIcon.category,
       hintText: L10n.of(context).transactionCategoryHint,
-      errorText: errors[CategoryAmountValidator.category]?.l10n(context),
+      errorText: errors[TransactionValidator.category]?.l10n(context),
     );
   }
 
@@ -150,7 +148,7 @@ class _TransactionEditState extends State<TransactionEdit> {
         return value.walletType.icon();
       },
       hintText: L10n.of(context).transactionWalletHint,
-      errorText: errors[CategoryAmountValidator.category]?.l10n(context),
+      errorText: errors[TransactionValidator.wallet]?.l10n(context),
     );
   }
 
@@ -190,11 +188,11 @@ class _TransactionEditState extends State<TransactionEdit> {
       decoration: InputDecoration(
         labelText: l10n.transactionAmount,
         hintText: l10n.transactionAmountHint,
-        errorText: errors[CategoryAmountValidator.amount]?.l10n(context),
+        errorText: errors[TransactionValidator.amount]?.l10n(context),
       ),
       onChanged: (_) {
         setState(() {
-          errors.remove(CategoryAmountValidator.amount);
+          errors.remove(TransactionValidator.amount);
         });
       },
       onSubmitted: (_) {
@@ -234,8 +232,7 @@ class _TransactionEditState extends State<TransactionEdit> {
 
     if (category == null) {
       setState(() {
-        errors[TransactionValidator.category] =
-            TransactionError.invalidCategory;
+        errors[TransactionValidator.category] = TransactionError.invalidCategory;
       });
       return;
     }
@@ -249,8 +246,7 @@ class _TransactionEditState extends State<TransactionEdit> {
 
     if (transactionType == null) {
       setState(() {
-        errors[TransactionValidator.transactionType] =
-            TransactionError.invalidTransactionType;
+        errors[TransactionValidator.transactionType] = TransactionError.invalidTransactionType;
       });
       return;
     }

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../di.dart';
 import '../l10n/l10n.dart';
 import '../model/domain/category.dart';
+import '../model/domain/category_amount.dart';
 import '../model/domain/transaction.dart';
 import '../model/domain/wallet.dart';
 import '../page/categories.dart';
@@ -168,9 +169,7 @@ final router = GoRouter(
   redirect: (context, state) {
     if (DI().has<AuthService>()) {
       final route = _routes.where((r) => r.path == state.matchedLocation);
-      if (route.isNotEmpty &&
-          !route.first.anon &&
-          DI().get<AuthService>().user() == null) {
+      if (route.isNotEmpty && !route.first.anon && DI().get<AuthService>().user() == null) {
         return _redirectRoute;
       }
     }

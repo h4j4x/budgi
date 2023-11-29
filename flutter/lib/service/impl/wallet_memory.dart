@@ -1,9 +1,9 @@
 import '../../di.dart';
+import '../../model/domain/wallet.dart';
 import '../../model/error/validation.dart';
+import '../../model/error/wallet.dart';
 import '../../model/period.dart';
 import '../../model/sort.dart';
-import '../../model/domain/wallet.dart';
-import '../../model/error/wallet.dart';
 import '../../util/string.dart';
 import '../transaction.dart';
 import '../validator.dart';
@@ -59,17 +59,14 @@ class WalletMemoryService implements WalletService {
         );
     final map = <Wallet, double>{};
     for (var transaction in transactions) {
-      map[transaction.wallet] =
-          (map[transaction.wallet] ?? 0) + transaction.signedAmount;
+      map[transaction.wallet] = (map[transaction.wallet] ?? 0) + transaction.signedAmount;
     }
     if (showZeroBalance) {
       for (var wallet in _wallets.values) {
         map[wallet] ??= 0;
       }
     }
-    return Future.delayed(const Duration(seconds: 1), () {
-      return map;
-    });
+    return map;
   }
 }
 
@@ -90,9 +87,7 @@ class _Wallet implements Wallet {
     if (identical(this, other)) {
       return true;
     }
-    return other is _Wallet &&
-        runtimeType == other.runtimeType &&
-        code == other.code;
+    return other is _Wallet && runtimeType == other.runtimeType && code == other.code;
   }
 
   @override
