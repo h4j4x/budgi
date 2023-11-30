@@ -13,8 +13,10 @@ import '../../model/sort.dart';
 import '../../util/function.dart';
 import '../../util/string.dart';
 import '../auth.dart';
+import '../category.dart';
 import '../transaction.dart';
 import '../validator.dart';
+import '../wallet.dart';
 import 'category_supabase.dart';
 import 'supabase.dart';
 import 'wallet_supabase.dart';
@@ -80,20 +82,60 @@ class TransactionSupabaseService implements TransactionService {
   }
 
   @override
-  Future<List<Transaction>> listTransactions(
-      {List<TransactionType>? transactionTypes,
-      Category? category,
-      Wallet? wallet,
-      Period? period,
-      Sort? dateTimeSort}) {
-    // TODO: implement listTransactions
-    throw UnimplementedError();
+  Future<List<Transaction>> listTransactions({
+    List<TransactionType>? transactionTypes,
+    Category? category,
+    Wallet? wallet,
+    Period? period,
+    Sort? dateTimeSort,
+  }) async {
+    final user = DI().get<AuthService>().user();
+    if (user == null) {
+      return [];
+    }
+
+    var query = config.supabase.from(transactionTable).select().eq(userIdField, user.id);
+    if (transactionTypes?.isNotEmpty ?? false) {
+      query = query.in_(
+          transactionTypeField,
+          transactionTypes!.map((transactionType) {
+            return transactionType.name;
+          }).toList());
+    }
+    if (category is SupabaseCategory) {
+      query = query.eq(categoryIdField, category.id);
+    }
+    if (wallet is SupabaseWallet) {
+      query = query.eq(walletIdField, wallet.id);
+    }
+    if (period != null) {
+      query = query.gte(dateTimeField, period.from.toIso8601String()).lte(dateTimeField, period.to.toIso8601String());
+    }
+
+    dynamic data;
+    if (dateTimeSort != null) {
+      data = await query.order(dateTimeField, ascending: dateTimeSort == Sort.asc);
+    } else {
+      data = await query;
+    }
+
+    if (data is List) {
+      final futureList = data.map((item) {
+        return _Transaction.from(
+          item,
+          categoryFetcher: _fetchCategoryById,
+          walletFetcher: _fetchWalletById,
+        );
+      });
+      final list = await Future.wait(futureList);
+      return list.whereType<Transaction>().toList();
+    }
+    return [];
   }
 
   @override
-  Future<void> deleteTransaction({required String code}) {
-    // TODO: implement deleteTransaction
-    throw UnimplementedError();
+  Future<void> deleteTransaction({required String code}) async {
+    await config.supabase.from(transactionTable).delete().match({codeField: code});
   }
 
   Future<bool> _transactionExistsByCode(String code) async {
@@ -107,6 +149,22 @@ class TransactionSupabaseService implements TransactionService {
         )
         .eq(codeField, code);
     return count.count != null && count.count! > 0;
+  }
+
+  Future<SupabaseCategory?> _fetchCategoryById(int id) async {
+    final category = await DI().get<CategoryService>().fetchCategoryById(id);
+    if (category is SupabaseCategory) {
+      return category;
+    }
+    return null;
+  }
+
+  Future<SupabaseWallet?> _fetchWalletById(int id) async {
+    final wallet = await DI().get<WalletService>().fetchWalletById(id);
+    if (wallet is SupabaseWallet) {
+      return wallet;
+    }
+    return null;
   }
 }
 
@@ -191,6 +249,7 @@ class _Transaction extends Transaction {
         final wallet = await walletFetcher(walletId);
         if (category != null && wallet != null) {
           return _Transaction(
+            id: id,
             category: category,
             wallet: wallet,
             code: code,
