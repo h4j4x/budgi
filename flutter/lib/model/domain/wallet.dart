@@ -24,6 +24,18 @@ enum WalletType {
       debitCard => AppIcon.walletDebitCard,
     };
   }
+
+  static WalletType? tryParse(String? value) {
+    if (value != null) {
+      final theValue = value.trim();
+      for (var walletType in values) {
+        if (theValue == walletType.name) {
+          return walletType;
+        }
+      }
+    }
+    return null;
+  }
 }
 
 abstract class Wallet {

@@ -18,6 +18,7 @@ import '../validator.dart';
 import 'supabase.dart';
 import 'category_supabase.dart';
 
+const categoryAmountTable = 'categories_amounts';
 const lastUsedPeriodKey = 'last_used_period';
 
 class CategoryAmountSupabaseService implements CategoryAmountService {

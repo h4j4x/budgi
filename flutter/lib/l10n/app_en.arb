@@ -87,6 +87,7 @@
       }
     }
   },
+  "invalidWallet": "Invalid wallet.",
   "invalidWalletName": "Invalid wallet name. Enter a non empty name with no more than {maxLength} characters.",
   "@invalidWalletName": {
     "placeholders": {

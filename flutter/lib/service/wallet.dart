@@ -1,5 +1,5 @@
-import '../model/period.dart';
 import '../model/domain/wallet.dart';
+import '../model/period.dart';
 
 abstract class WalletService {
   /// @throws ValidationError
@@ -14,6 +14,10 @@ abstract class WalletService {
   Future<void> deleteWallet({
     required String code,
   });
+
+  Future<Wallet> fetchWalletByCode(String code);
+
+  Future<Wallet?> fetchWalletById(int id);
 
   /// Obtains wallets balance for given period.
   ///

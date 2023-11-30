@@ -69,6 +69,16 @@ class WalletMemoryService implements WalletService {
     }
     return map;
   }
+
+  @override
+  Future<Wallet> fetchWalletByCode(String code) {
+    return Future.value(_wallets[code]);
+  }
+
+  @override
+  Future<Wallet?> fetchWalletById(int id) {
+    return Future.value();
+  }
 }
 
 class _Wallet implements Wallet {

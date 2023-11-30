@@ -132,6 +132,9 @@ class L10nEn extends L10n {
   }
 
   @override
+  String get invalidWallet => 'Invalid wallet.';
+
+  @override
   String invalidWalletName(int maxLength) {
     return 'Invalid wallet name. Enter a non empty name with no more than $maxLength characters.';
   }

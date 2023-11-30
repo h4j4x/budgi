@@ -301,6 +301,12 @@ abstract class L10n {
   /// **'Enter a valid password with no less than {minLength} characters.'**
   String invalidUserPassword(int minLength);
 
+  /// No description provided for @invalidWallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid wallet.'**
+  String get invalidWallet;
+
   /// No description provided for @invalidWalletName.
   ///
   /// In en, this message translates to:

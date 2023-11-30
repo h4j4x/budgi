@@ -12,12 +12,10 @@ import '../auth.dart';
 import '../category.dart';
 import '../storage.dart';
 import '../validator.dart';
+import 'category_amount_supabase.dart';
 import 'supabase.dart';
 
 const categoryTable = 'categories';
-const categoryAmountTable = 'categories_amounts';
-
-const lastUsedPeriodKey = 'last_used_period';
 
 class CategorySupabaseService implements CategoryService {
   final SupabaseConfig config;
