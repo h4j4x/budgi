@@ -36,8 +36,16 @@ class WalletMemoryService implements WalletService {
   }
 
   @override
-  Future<List<Wallet>> listWallets() {
-    return Future.value(_wallets.values.toList());
+  Future<List<Wallet>> listWallets({
+    List<String>? excludingCodes,
+  }) {
+    final list = _wallets.values.toList();
+    if (excludingCodes?.isNotEmpty ?? false) {
+      list.removeWhere((wallet) {
+        return excludingCodes!.contains(wallet.code);
+      });
+    }
+    return Future.value(list);
   }
 
   @override
@@ -55,7 +63,7 @@ class WalletMemoryService implements WalletService {
   }) async {
     final transactions = await DI().get<TransactionService>().listTransactions(
           period: period,
-          dateTimeSort: Sort.asc,
+          dateTimeSort: Sort.desc,
         );
     final map = <Wallet, double>{};
     for (var transaction in transactions) {

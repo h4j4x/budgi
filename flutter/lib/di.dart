@@ -17,7 +17,7 @@ import 'service/storage.dart';
 import 'service/supabase/auth_supabase.dart';
 import 'service/supabase/category_amount_supabase.dart';
 import 'service/supabase/category_supabase.dart';
-import 'service/supabase/supabase.dart';
+import 'service/supabase/config.dart';
 import 'service/supabase/transaction_supabase.dart';
 import 'service/supabase/wallet_supabase.dart';
 import 'service/transaction.dart';
@@ -53,7 +53,8 @@ class DI {
     final transactionValidator = TransactionValidator();
 
     if (config.hasSupabaseAuth()) {
-      final supabaseConfig = SupabaseConfig(url: config.supabaseUrl!, token: config.supabaseToken!);
+      final supabaseConfig = SupabaseConfig(
+          url: config.supabaseUrl!, token: config.supabaseToken!);
       await supabaseConfig.initialize();
       _getIt.registerSingleton<AuthService>(
         AuthSupabaseService(config: supabaseConfig),

@@ -8,7 +8,7 @@ import '../../app/icon.dart';
 import '../../model/domain/user.dart';
 import '../../model/error/sign_in.dart';
 import '../auth.dart';
-import 'supabase.dart';
+import 'config.dart';
 
 class AuthSupabaseService extends AuthService {
   final SupabaseConfig config;
@@ -95,8 +95,10 @@ class _User implements AppUser {
   @override
   String get name {
     if (user.userMetadata != null &&
-        (user.userMetadata!['full_name'] is String || user.userMetadata!['name'] is String)) {
-      return user.userMetadata!['full_name'] as String? ?? user.userMetadata!['name'] as String;
+        (user.userMetadata!['full_name'] is String ||
+            user.userMetadata!['name'] is String)) {
+      return user.userMetadata!['full_name'] as String? ??
+          user.userMetadata!['name'] as String;
     }
     return '-';
   }
@@ -104,8 +106,10 @@ class _User implements AppUser {
   @override
   String get username {
     if (user.userMetadata != null &&
-        (user.userMetadata!['preferred_username'] is String || user.userMetadata!['user_name'] is String)) {
-      return user.userMetadata!['preferred_username'] as String? ?? user.userMetadata!['user_name'] as String;
+        (user.userMetadata!['preferred_username'] is String ||
+            user.userMetadata!['user_name'] is String)) {
+      return user.userMetadata!['preferred_username'] as String? ??
+          user.userMetadata!['user_name'] as String;
     }
     return name;
   }

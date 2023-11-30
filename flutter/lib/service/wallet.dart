@@ -9,7 +9,9 @@ abstract class WalletService {
     required String name,
   });
 
-  Future<List<Wallet>> listWallets();
+  Future<List<Wallet>> listWallets({
+    List<String>? excludingCodes,
+  });
 
   Future<void> deleteWallet({
     required String code,
