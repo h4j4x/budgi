@@ -33,7 +33,7 @@ class CategorySupabaseService implements CategoryService {
     String? code,
     required String name,
   }) async {
-    final user = _fetchUser();
+    final user = DI().get<AuthService>().fetchUser(errorIfMissing: CategoryError.invalidUser);
 
     final categoryCode = code ?? randomString(6);
     final category = SupabaseCategory(code: categoryCode, name: name);
@@ -44,10 +44,7 @@ class CategorySupabaseService implements CategoryService {
 
     final categoryExists = await _categoryExistsByCode(categoryCode);
     if (categoryExists) {
-      await config.supabase
-          .from(categoryTable)
-          .update(category.toMap(user))
-          .match({codeField: categoryCode});
+      await config.supabase.from(categoryTable).update(category.toMap(user)).match({codeField: categoryCode});
     } else {
       await config.supabase.from(categoryTable).insert(category.toMap(user));
     }
@@ -86,23 +83,9 @@ class CategorySupabaseService implements CategoryService {
     await config.supabase.from(categoryTable).delete().match({codeField: code});
   }
 
-  Future<bool> _categoryExistsByCode(String code) async {
-    final count = await config.supabase
-        .from(categoryTable)
-        .select(
-          idField,
-          const FetchOptions(
-            count: CountOption.exact,
-          ),
-        )
-        .eq(codeField, code);
-    return count.count != null && count.count! > 0;
-  }
-
   @override
   Future<Category> fetchCategoryByCode(String code) async {
-    final categoryData =
-        await config.supabase.from(categoryTable).select().eq(codeField, code);
+    final categoryData = await config.supabase.from(categoryTable).select().eq(codeField, code);
     final category = SupabaseCategory.from(categoryData);
     if (category != null) {
       return category;
@@ -114,13 +97,11 @@ class CategorySupabaseService implements CategoryService {
 
   @override
   Future<Category?> fetchCategoryById(int id) async {
-    final categoryData =
-        await config.supabase.from(categoryTable).select().eq(idField, id);
+    final categoryData = await config.supabase.from(categoryTable).select().eq(idField, id);
     return SupabaseCategory.from(categoryData);
   }
 
-  Future<List<int>> _fetchCategoriesIdsOfAmounts(
-      String userId, Period period) async {
+  Future<List<int>> _fetchCategoriesIdsOfAmounts(String userId, Period period) async {
     final data = await config.supabase
         .from(categoryAmountTable)
         .select(categoryIdField)
@@ -141,14 +122,17 @@ class CategorySupabaseService implements CategoryService {
     return list;
   }
 
-  AppUser _fetchUser() {
-    final user = DI().get<AuthService>().user();
-    if (user != null) {
-      return user;
-    }
-    throw ValidationError<CategoryError>({
-      'user': CategoryError.invalidUser,
-    });
+  Future<bool> _categoryExistsByCode(String code) async {
+    final count = await config.supabase
+        .from(categoryTable)
+        .select(
+          idField,
+          const FetchOptions(
+            count: CountOption.exact,
+          ),
+        )
+        .eq(codeField, code);
+    return count.count != null && count.count! > 0;
   }
 }
 
@@ -198,9 +182,7 @@ class SupabaseCategory implements Category {
     if (identical(this, other)) {
       return true;
     }
-    return other is SupabaseCategory &&
-        runtimeType == other.runtimeType &&
-        code == other.code;
+    return other is SupabaseCategory && runtimeType == other.runtimeType && code == other.code;
   }
 
   @override

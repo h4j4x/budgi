@@ -44,8 +44,7 @@ class _CategoryAmountEditState extends State<CategoryAmountEdit> {
   void initState() {
     super.initState();
     if (widget.value != null) {
-      amountController.text =
-          widget.value!.amount.toStringAsFixed(2).toString();
+      amountController.text = widget.value!.amount.toStringAsFixed(2).toString();
       categories = <Category>[widget.value!.category];
       category = widget.value!.category;
     } else {
@@ -138,8 +137,7 @@ class _CategoryAmountEditState extends State<CategoryAmountEdit> {
 
     if (category == null) {
       setState(() {
-        errors[CategoryAmountValidator.category] =
-            CategoryError.invalidCategory;
+        errors[CategoryAmountValidator.category] = CategoryError.invalidCategory;
       });
       return;
     }
@@ -151,7 +149,7 @@ class _CategoryAmountEditState extends State<CategoryAmountEdit> {
     try {
       final amount = double.tryParse(amountController.text) ?? -1;
       await DI().get<CategoryAmountService>().saveAmount(
-            categoryCode: category!.code,
+            category: category!,
             period: widget.period,
             amount: amount,
           );

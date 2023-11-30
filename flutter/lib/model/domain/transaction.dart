@@ -33,6 +33,18 @@ enum TransactionType {
       expenseTransfer => AppIcon.transactionExpenseTransfer(context),
     };
   }
+
+  static TransactionType? tryParse(String? value) {
+    if (value != null) {
+      final theValue = value.trim();
+      for (var transactionType in values) {
+        if (theValue == transactionType.name) {
+          return transactionType;
+        }
+      }
+    }
+    return null;
+  }
 }
 
 abstract class Transaction {

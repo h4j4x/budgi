@@ -1,8 +1,8 @@
 import '../model/domain/category.dart';
-import '../model/period.dart';
-import '../model/sort.dart';
 import '../model/domain/transaction.dart';
 import '../model/domain/wallet.dart';
+import '../model/period.dart';
+import '../model/sort.dart';
 
 abstract class TransactionService {
   /// @throws ValidationError
@@ -12,6 +12,7 @@ abstract class TransactionService {
     required Category category,
     required Wallet wallet,
     required double amount,
+    DateTime? dateTime,
     String? description,
   });
 

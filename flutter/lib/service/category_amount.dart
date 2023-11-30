@@ -1,3 +1,4 @@
+import '../model/domain/category.dart';
 import '../model/domain/category_amount.dart';
 import '../model/period.dart';
 import '../model/sort.dart';
@@ -8,7 +9,7 @@ abstract class CategoryAmountService {
   /// Should save given period as last used.
   /// @throws ValidationError
   Future<CategoryAmount> saveAmount({
-    required String categoryCode,
+    required Category category,
     String? amountCode,
     required Period period,
     required double amount,
@@ -26,7 +27,7 @@ abstract class CategoryAmountService {
   ///
   /// Should save given period as last used.
   Future<void> deleteAmount({
-    required String categoryCode,
+    required Category category,
     required Period period,
   });
 

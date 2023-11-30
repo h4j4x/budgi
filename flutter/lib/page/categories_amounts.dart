@@ -129,7 +129,7 @@ class _CategoriesAmountsPageState extends State<CategoriesAmountsPage> {
       case ItemAction.delete:
         {
           await DI().get<CategoryAmountService>().deleteAmount(
-                categoryCode: item.category.code,
+                category: item.category,
                 period: period,
               );
           break;

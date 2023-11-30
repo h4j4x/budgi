@@ -1,7 +1,7 @@
 enum AuthProvider {
   supabase;
 
-  static AuthProvider fromString(String? value) {
+  static AuthProvider tryParse(String? value) {
     if (value?.isNotEmpty ?? false) {
       for (final authProvider in AuthProvider.values) {
         if (authProvider.name == value) {
@@ -30,7 +30,7 @@ class AppConfig {
     String? authProviderStr,
     this.supabaseUrl,
     this.supabaseToken,
-  }) : authProvider = AuthProvider.fromString(authProviderStr);
+  }) : authProvider = AuthProvider.tryParse(authProviderStr);
 
   bool hasSupabaseAuth() {
     return authProvider == AuthProvider.supabase &&
@@ -39,15 +39,9 @@ class AppConfig {
   }
 
   static AppConfig create() {
-    const authProviderStr = bool.hasEnvironment('AUTH_PROVIDER')
-        ? String.fromEnvironment('AUTH_PROVIDER')
-        : null;
-    const supabaseUrl = bool.hasEnvironment('SUPABASE_URL')
-        ? String.fromEnvironment('SUPABASE_URL')
-        : null;
-    const supabaseToken = bool.hasEnvironment('SUPABASE_TOKEN')
-        ? String.fromEnvironment('SUPABASE_TOKEN')
-        : null;
+    const authProviderStr = bool.hasEnvironment('AUTH_PROVIDER') ? String.fromEnvironment('AUTH_PROVIDER') : null;
+    const supabaseUrl = bool.hasEnvironment('SUPABASE_URL') ? String.fromEnvironment('SUPABASE_URL') : null;
+    const supabaseToken = bool.hasEnvironment('SUPABASE_TOKEN') ? String.fromEnvironment('SUPABASE_TOKEN') : null;
     return AppConfig(
       authProviderStr: authProviderStr,
       supabaseUrl: supabaseUrl,

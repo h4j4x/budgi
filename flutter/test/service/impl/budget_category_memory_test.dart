@@ -44,7 +44,7 @@ void main() {
     final period = Period(from: fromDate, to: toDate);
 
     await service.saveAmount(
-      categoryCode: category1.code,
+      category: category1,
       period: period,
       amount: 1,
     );
@@ -86,7 +86,7 @@ void main() {
 
       final amount = i.toDouble();
       final categoryAmount = await service.saveAmount(
-        categoryCode: category.code,
+        category: category,
         period: period,
         amount: amount,
       );
@@ -101,7 +101,7 @@ void main() {
       expect(list.length, equals(1));
 
       await service.deleteAmount(
-        categoryCode: category.code,
+        category: category,
         period: period,
       );
       list = await service.listAmounts(
@@ -126,7 +126,7 @@ void main() {
       );
 
       final categoryAmount = await service.saveAmount(
-        categoryCode: category.code,
+        category: category,
         period: period,
         amount: random.nextDouble(),
       );
@@ -168,7 +168,7 @@ void main() {
     final period = Period(from: fromDate, to: toDate);
 
     final categoryAmount = await service.saveAmount(
-      categoryCode: category.code,
+      category: category,
       period: period,
       amount: 10.0,
     );
@@ -181,7 +181,7 @@ void main() {
 
     const updatedAmount = 20.0;
     final updated = await service.saveAmount(
-      categoryCode: category.code,
+      category: category,
       period: period,
       amount: updatedAmount,
     );
@@ -210,7 +210,7 @@ void main() {
     expect(periodHasChanged, isFalse);
 
     final categoryAmount = await service.saveAmount(
-      categoryCode: category.code,
+      category: category,
       period: period,
       amount: 10.0,
     );
