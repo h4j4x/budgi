@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:budgi/model/period.dart';
 import 'package:budgi/model/sort.dart';
-import 'package:budgi/service/impl/category_memory.dart';
+import 'package:budgi/service/memory/category_memory.dart';
 import 'package:test/test.dart';
 
 void main() {

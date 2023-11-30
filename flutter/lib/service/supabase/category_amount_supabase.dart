@@ -15,7 +15,7 @@ import '../category.dart';
 import '../category_amount.dart';
 import '../storage.dart';
 import '../validator.dart';
-import '../vendor/supabase.dart';
+import 'supabase.dart';
 import 'category_supabase.dart';
 
 const lastUsedPeriodKey = 'last_used_period';
@@ -43,21 +43,28 @@ class CategoryAmountSupabaseService implements CategoryAmountService {
     final user = _fetchUser();
     final category = await _fetchCategoryByCode(categoryCode);
 
-    final categoryAmount = _CategoryAmount(category: category, period: period, amount: amount);
+    final categoryAmount =
+        _CategoryAmount(category: category, period: period, amount: amount);
     final errors = amountValidator?.validate(categoryAmount);
     if (errors?.isNotEmpty ?? false) {
       throw ValidationError(errors!);
     }
 
-    final categoryAmountExists = await _categoryAmountExistsByCategoryAndPeriod(category, period);
+    final categoryAmountExists =
+        await _categoryAmountExistsByCategoryAndPeriod(category, period);
     if (categoryAmountExists) {
-      await config.supabase.from(categoryAmountTable).update(categoryAmount.toMap(user)).match({
+      await config.supabase
+          .from(categoryAmountTable)
+          .update(categoryAmount.toMap(user))
+          .match({
         categoryIdField: category.id,
         fromDateField: period.from.toIso8601String(),
         toDateField: period.to.toIso8601String(),
       });
     } else {
-      await config.supabase.from(categoryAmountTable).insert(categoryAmount.toMap(user));
+      await config.supabase
+          .from(categoryAmountTable)
+          .insert(categoryAmount.toMap(user));
     }
     return categoryAmount;
   }
@@ -169,7 +176,8 @@ class CategoryAmountSupabaseService implements CategoryAmountService {
     storageService.writeString(lastUsedPeriodKey, period.toString());
   }
 
-  Future<bool> _categoryAmountExistsByCategoryAndPeriod(SupabaseCategory category, Period period) async {
+  Future<bool> _categoryAmountExistsByCategoryAndPeriod(
+      SupabaseCategory category, Period period) async {
     final count = await config.supabase
         .from(categoryAmountTable)
         .select(
@@ -195,7 +203,8 @@ class CategoryAmountSupabaseService implements CategoryAmountService {
   }
 
   Future<SupabaseCategory> _fetchCategoryByCode(String code) async {
-    final category = await DI().get<CategoryService>().fetchCategoryByCode(code);
+    final category =
+        await DI().get<CategoryService>().fetchCategoryByCode(code);
     if (category is SupabaseCategory) {
       return category;
     }
@@ -245,18 +254,27 @@ class _CategoryAmount implements CategoryAmount {
     };
   }
 
-  static Future<_CategoryAmount?> from(dynamic raw, TypedFutureFetcher<SupabaseCategory, int> fetcher) async {
+  static Future<_CategoryAmount?> from(
+      dynamic raw, TypedFutureFetcher<SupabaseCategory, int> fetcher) async {
     if (raw is Map<String, dynamic>) {
       final id = raw[idField] as int?;
       final categoryId = raw[categoryIdField] as int?;
       final fromDate = DateTime.tryParse((raw[fromDateField] as String?) ?? '');
       final toDate = DateTime.tryParse((raw[toDateField] as String?) ?? '');
       final amount = raw[amountField] as num?;
-      if (id != null && categoryId != null && fromDate != null && toDate != null && amount != null) {
+      if (id != null &&
+          categoryId != null &&
+          fromDate != null &&
+          toDate != null &&
+          amount != null) {
         final category = await fetcher(categoryId);
         if (category != null) {
           final period = Period(from: fromDate, to: toDate);
-          return _CategoryAmount(id: id, category: category, period: period, amount: amount.toDouble());
+          return _CategoryAmount(
+              id: id,
+              category: category,
+              period: period,
+              amount: amount.toDouble());
         }
       }
     }
@@ -268,7 +286,9 @@ class _CategoryAmount implements CategoryAmount {
     if (identical(this, other)) {
       return true;
     }
-    return other is _CategoryAmount && runtimeType == other.runtimeType && category == other.category;
+    return other is _CategoryAmount &&
+        runtimeType == other.runtimeType &&
+        category == other.category;
   }
 
   @override
@@ -278,6 +298,7 @@ class _CategoryAmount implements CategoryAmount {
 
   @override
   CategoryAmount copyWith({required Period period}) {
-    return _CategoryAmount(id: id, category: _category, period: period, amount: amount);
+    return _CategoryAmount(
+        id: id, category: _category, period: period, amount: amount);
   }
 }

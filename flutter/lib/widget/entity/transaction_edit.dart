@@ -54,7 +54,8 @@ class _TransactionEditState extends State<TransactionEdit> {
       category = widget.value!.category;
       wallet = widget.value!.wallet;
       transactionType = widget.value!.transactionType;
-      amountController.text = widget.value!.amount.toStringAsFixed(2).toString();
+      amountController.text =
+          widget.value!.amount.toStringAsFixed(2).toString();
       descriptionController.text = widget.value!.description;
       canEdit = Period.currentMonth.contains(widget.value!.dateTime);
     } else {
@@ -232,7 +233,8 @@ class _TransactionEditState extends State<TransactionEdit> {
 
     if (category == null) {
       setState(() {
-        errors[TransactionValidator.category] = TransactionError.invalidCategory;
+        errors[TransactionValidator.category] =
+            TransactionError.invalidCategory;
       });
       return;
     }
@@ -246,7 +248,8 @@ class _TransactionEditState extends State<TransactionEdit> {
 
     if (transactionType == null) {
       setState(() {
-        errors[TransactionValidator.transactionType] = TransactionError.invalidTransactionType;
+        errors[TransactionValidator.transactionType] =
+            TransactionError.invalidTransactionType;
       });
       return;
     }

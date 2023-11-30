@@ -5,20 +5,20 @@ import 'app/info.dart';
 import 'service/auth.dart';
 import 'service/category.dart';
 import 'service/category_amount.dart';
-import 'service/impl/auth_supabase.dart';
-import 'service/impl/category_amount_supabase.dart';
 import 'service/impl/category_amount_validator.dart';
-import 'service/impl/category_memory.dart';
-import 'service/impl/category_supabase.dart';
 import 'service/impl/category_validator.dart';
-import 'service/impl/transaction_memory.dart';
+import 'service/impl/storage.dart';
 import 'service/impl/transaction_validator.dart';
-import 'service/impl/wallet_memory.dart';
 import 'service/impl/wallet_validator.dart';
+import 'service/memory/category_memory.dart';
+import 'service/memory/transaction_memory.dart';
+import 'service/memory/wallet_memory.dart';
 import 'service/storage.dart';
+import 'service/supabase/auth_supabase.dart';
+import 'service/supabase/category_amount_supabase.dart';
+import 'service/supabase/category_supabase.dart';
+import 'service/supabase/supabase.dart';
 import 'service/transaction.dart';
-import 'service/vendor/storage.dart';
-import 'service/vendor/supabase.dart';
 import 'service/wallet.dart';
 
 class DI {
@@ -47,9 +47,11 @@ class DI {
     final categoryAmountValidator = CategoryAmountValidator();
 
     if (config.hasSupabaseAuth()) {
-      final supabaseConfig = SupabaseConfig(url: config.supabaseUrl!, token: config.supabaseToken!);
+      final supabaseConfig = SupabaseConfig(
+          url: config.supabaseUrl!, token: config.supabaseToken!);
       await supabaseConfig.initialize();
-      _getIt.registerSingleton<AuthService>(AuthSupabaseService(config: supabaseConfig));
+      _getIt.registerSingleton<AuthService>(
+          AuthSupabaseService(config: supabaseConfig));
 
       categoryService = CategorySupabaseService(
         config: supabaseConfig,

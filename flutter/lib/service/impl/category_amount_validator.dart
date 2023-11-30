@@ -2,7 +2,8 @@ import '../../model/domain/category_amount.dart';
 import '../../model/error/category.dart';
 import '../validator.dart';
 
-class CategoryAmountValidator implements Validator<CategoryAmount, CategoryError> {
+class CategoryAmountValidator
+    implements Validator<CategoryAmount, CategoryError> {
   static const String category = 'category';
   static const String amount = 'amount';
 

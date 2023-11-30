@@ -59,7 +59,8 @@ class WalletMemoryService implements WalletService {
         );
     final map = <Wallet, double>{};
     for (var transaction in transactions) {
-      map[transaction.wallet] = (map[transaction.wallet] ?? 0) + transaction.signedAmount;
+      map[transaction.wallet] =
+          (map[transaction.wallet] ?? 0) + transaction.signedAmount;
     }
     if (showZeroBalance) {
       for (var wallet in _wallets.values) {
@@ -87,7 +88,9 @@ class _Wallet implements Wallet {
     if (identical(this, other)) {
       return true;
     }
-    return other is _Wallet && runtimeType == other.runtimeType && code == other.code;
+    return other is _Wallet &&
+        runtimeType == other.runtimeType &&
+        code == other.code;
   }
 
   @override

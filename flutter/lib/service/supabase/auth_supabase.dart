@@ -8,7 +8,7 @@ import '../../app/icon.dart';
 import '../../model/domain/user.dart';
 import '../../model/error/sign_in.dart';
 import '../auth.dart';
-import '../vendor/supabase.dart';
+import 'supabase.dart';
 
 class AuthSupabaseService implements AuthService {
   final SupabaseConfig config;
