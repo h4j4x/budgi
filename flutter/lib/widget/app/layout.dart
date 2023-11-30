@@ -6,6 +6,7 @@ import '../../app/router.dart';
 import '../../app/theme.dart';
 import '../../di.dart';
 import '../../l10n/l10n.dart';
+import '../../model/domain/user.dart';
 import '../../page/sign_in.dart';
 import '../../service/auth.dart';
 
@@ -37,9 +38,17 @@ class _AppScaffoldState extends State<AppScaffold> {
     });
   }
 
+  AppUser? get appUser {
+    if (DI().has<AuthService>()) {
+      return DI().get<AuthService>().user();
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final user = DI().get<AuthService>().user();
+    final user = appUser;
+    final extraItemsCount = user != null ? 2 : 1;
     return Scaffold(
       appBar: AppBar(
         title: title(context),
@@ -55,7 +64,7 @@ class _AppScaffoldState extends State<AppScaffold> {
       body: SafeArea(child: widget.child),
       drawer: Drawer(
         child: ListView.separated(
-          itemCount: widget.routes.length + 2,
+          itemCount: widget.routes.length + extraItemsCount,
           itemBuilder: (context, index) {
             if (index < widget.routes.length) {
               return routeWidget(context, widget.routes[index]);
