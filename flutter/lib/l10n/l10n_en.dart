@@ -121,6 +121,12 @@ class L10nEn extends L10n {
   String get invalidUser => 'Invalid user';
 
   @override
+  String get invalidUserAccess => 'Could not access user info.';
+
+  @override
+  String get invalidUserCredentials => 'Invalid credentials.';
+
+  @override
   String get invalidUserEmail => 'Enter a valid email address.';
 
   @override

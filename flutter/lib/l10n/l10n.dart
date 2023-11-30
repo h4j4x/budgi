@@ -289,6 +289,18 @@ abstract class L10n {
   /// **'Invalid user'**
   String get invalidUser;
 
+  /// No description provided for @invalidUserAccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not access user info.'**
+  String get invalidUserAccess;
+
+  /// No description provided for @invalidUserCredentials.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid credentials.'**
+  String get invalidUserCredentials;
+
   /// No description provided for @invalidUserEmail.
   ///
   /// In en, this message translates to:

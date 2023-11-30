@@ -10,6 +10,7 @@ import '../di.dart';
 import '../model/error/sign_in.dart';
 import '../page/home.dart';
 import '../service/auth.dart';
+import '../util/ui.dart';
 
 class SignIn extends StatefulWidget {
   const SignIn({
@@ -38,10 +39,7 @@ class _SignInState extends State<SignIn> {
   void initState() {
     super.initState();
     Future.delayed(Duration.zero, () {
-      authSubscription = DI()
-          .get<AuthService>()
-          .authenticatedStream()
-          .listen((isAuthenticated) {
+      authSubscription = DI().get<AuthService>().authenticatedStream().listen((isAuthenticated) {
         if (isAuthenticated) {
           context.go(HomePage.route);
         }
@@ -164,8 +162,7 @@ class _SignInState extends State<SignIn> {
     final password = passwordController.text;
     if (password.length < AppConfig.passwordMinLength) {
       setState(() {
-        emailError =
-            L10n.of(context).invalidUserPassword(AppConfig.passwordMinLength);
+        emailError = L10n.of(context).invalidUserPassword(AppConfig.passwordMinLength);
       });
       return;
     }
@@ -175,11 +172,11 @@ class _SignInState extends State<SignIn> {
     });
     bool success = false;
     try {
-      success = await DI()
-          .get<AuthService>()
-          .signIn(context, email: email, password: password);
+      success = await DI().get<AuthService>().signIn(context, email: email, password: password);
     } on SignInError catch (_) {
-      // TODO: show error message
+      if (mounted) {
+        context.showError(L10n.of(context).invalidUserCredentials);
+      }
     } finally {
       if (success && mounted) {
         context.go(HomePage.route);
@@ -199,7 +196,9 @@ class _SignInState extends State<SignIn> {
     if (success && mounted) {
       context.go(HomePage.route);
     } else {
-      // TODO: show error message
+      if (mounted) {
+        context.showError(L10n.of(context).invalidUserAccess);
+      }
       setState(() {
         processing = false;
       });

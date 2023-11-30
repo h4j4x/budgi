@@ -78,6 +78,8 @@
   "invalidTransactionType": "Invalid transaction type",
   "invalidTransactionWallet": "Invalid wallet",
   "invalidUser": "Invalid user",
+  "invalidUserAccess": "Could not access user info.",
+  "invalidUserCredentials": "Invalid credentials.",
   "invalidUserEmail": "Enter a valid email address.",
   "invalidUserPassword": "Enter a valid password with no less than {minLength} characters.",
   "@invalidUserPassword": {

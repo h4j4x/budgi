@@ -32,4 +32,20 @@ extension AppContext on BuildContext {
     );
     return value ?? false;
   }
+
+  void showError(String message) {
+    final scaffoldMessenger = ScaffoldMessenger.of(this);
+    scaffoldMessenger.removeCurrentSnackBar();
+    final theme = Theme.of(this);
+    scaffoldMessenger.showSnackBar(SnackBar(
+      content: Text(
+        message,
+        style: TextStyle(
+          color: theme.colorScheme.onError,
+        ),
+      ),
+      backgroundColor: theme.colorScheme.error,
+      showCloseIcon: true,
+    ));
+  }
 }
