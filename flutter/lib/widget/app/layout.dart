@@ -84,7 +84,7 @@ class _AppScaffoldState extends State<AppScaffold> {
 
   Widget? title(BuildContext context) {
     final currentRouteIndex = widget.routes.indexWhere((route) {
-      return route.path == widget.path && route.menuText != null;
+      return route.path == widget.path && route.menuBuilder != null;
     });
     if (currentRouteIndex >= 0) {
       final route = widget.routes[currentRouteIndex];
@@ -93,7 +93,7 @@ class _AppScaffoldState extends State<AppScaffold> {
         children: [
           if (route.icon != null) route.icon!,
           if (route.icon != null) const SizedBox(width: 4),
-          Expanded(child: Text(route.menuText!(context))),
+          Expanded(child: route.menuBuilder!(context)),
         ],
       );
     }
@@ -103,7 +103,7 @@ class _AppScaffoldState extends State<AppScaffold> {
   Widget routeWidget(BuildContext context, AppRoute route) {
     final selected = route.path == widget.path;
     return ListTile(
-      title: Text(route.menuText!(context)),
+      title: route.menuBuilder!(context),
       leading: route.icon,
       selected: selected,
       onTap: !selected

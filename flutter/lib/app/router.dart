@@ -34,8 +34,8 @@ final _routes = <AppRoute>[
   AppRoute(
     path: HomePage.route,
     icon: AppIcon.home,
-    menuText: (context) {
-      return L10n.of(context).home;
+    menuBuilder: (context) {
+      return Text(L10n.of(context).home);
     },
     pageBuilder: (_, __) {
       return const HomePage();
@@ -45,8 +45,8 @@ final _routes = <AppRoute>[
   AppRoute(
     path: CategoriesPage.route,
     icon: AppIcon.category,
-    menuText: (context) {
-      return L10n.of(context).budgetsCategories;
+    menuBuilder: (context) {
+      return Text(L10n.of(context).budgetsCategories);
     },
     pageBuilder: (_, __) {
       return const CategoriesPage();
@@ -63,8 +63,8 @@ final _routes = <AppRoute>[
   AppRoute(
     path: CategoriesAmountsPage.route,
     icon: AppIcon.categoryAmount,
-    menuText: (context) {
-      return L10n.of(context).budgetsAmounts;
+    menuBuilder: (context) {
+      return Text(L10n.of(context).budgetsAmounts);
     },
     pageBuilder: (_, __) {
       return const CategoriesAmountsPage();
@@ -86,8 +86,8 @@ final _routes = <AppRoute>[
   AppRoute(
     path: WalletsPage.route,
     icon: AppIcon.wallet,
-    menuText: (context) {
-      return L10n.of(context).wallets;
+    menuBuilder: (context) {
+      return Text(L10n.of(context).wallets);
     },
     pageBuilder: (_, __) {
       return const WalletsPage();
@@ -104,8 +104,8 @@ final _routes = <AppRoute>[
   AppRoute(
     path: TransactionsPage.route,
     icon: AppIcon.transaction,
-    menuText: (context) {
-      return L10n.of(context).transactions;
+    menuBuilder: (context) {
+      return Text(L10n.of(context).transactions);
     },
     pageBuilder: (_, __) {
       return const TransactionsPage();
@@ -123,7 +123,7 @@ final _routes = <AppRoute>[
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
 final _menuRoutes = _routes.where((route) {
-  return route.menuText != null;
+  return route.menuBuilder != null;
 }).toList();
 final _redirectRoute = _routes.firstWhere((route) => route.anon).path;
 
@@ -179,14 +179,12 @@ final router = GoRouter(
   },
 );
 
-typedef TextBuilder = String Function(BuildContext);
-
 typedef PageWidgetBuilder = Widget Function(BuildContext, GoRouterState state);
 
 class AppRoute {
   final bool anon;
   final String path;
-  final TextBuilder? menuText;
+  final WidgetBuilder? menuBuilder;
   final Widget? icon;
   final PageWidgetBuilder pageBuilder;
 
@@ -194,7 +192,7 @@ class AppRoute {
     this.anon = false,
     required this.path,
     required this.pageBuilder,
-    this.menuText,
+    this.menuBuilder,
     this.icon,
   });
 }
