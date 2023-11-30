@@ -55,6 +55,7 @@ class CategorySupabaseService implements CategoryService {
   Future<List<Category>> listCategories({
     bool withAmount = false,
     Period? period,
+    List<String>? excludingCodes,
   }) async {
     final user = DI().get<AuthService>().user();
     if (user == null) {
@@ -67,6 +68,9 @@ class CategorySupabaseService implements CategoryService {
       query = query.not(idField, 'in', '(${ids.join(',')})');
     } else {
       query = query.eq(userIdField, user.id);
+    }
+    if (excludingCodes?.isNotEmpty ?? false) {
+      query = query.not(codeField, 'in', '(${excludingCodes!.join(',')})');
     }
 
     final data = await query;

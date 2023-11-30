@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../di.dart';
 import '../../model/domain/category.dart';
 import '../../model/domain/category_amount.dart';
+import '../../model/domain/transaction.dart';
 import '../../model/domain/user.dart';
 import '../../model/error/category.dart';
 import '../../model/error/validation.dart';
@@ -14,6 +15,7 @@ import '../auth.dart';
 import '../category.dart';
 import '../category_amount.dart';
 import '../storage.dart';
+import '../transaction.dart';
 import '../validator.dart';
 import 'category_supabase.dart';
 import 'supabase.dart';
@@ -35,7 +37,6 @@ class CategoryAmountSupabaseService implements CategoryAmountService {
   @override
   Future<CategoryAmount> saveAmount({
     required Category category,
-    String? amountCode,
     required Period period,
     required double amount,
   }) async {
@@ -72,6 +73,7 @@ class CategoryAmountSupabaseService implements CategoryAmountService {
   Future<List<CategoryAmount>> listAmounts({
     required Period period,
     Sort? amountSort,
+    bool showZeroAmount = false,
   }) async {
     _saveLastUsed(period);
 
@@ -97,8 +99,22 @@ class CategoryAmountSupabaseService implements CategoryAmountService {
       final futureList = data.map((item) {
         return _CategoryAmount.from(item, fetcher: _fetchCategoryById);
       });
-      final list = await Future.wait(futureList);
-      return list.whereType<CategoryAmount>().toList();
+      final fetchedList = await Future.wait(futureList);
+      final list = fetchedList.whereType<CategoryAmount>().toList();
+
+      if (showZeroAmount) {
+        final includedCategories = list.map((categoryAmount) {
+          return categoryAmount.category.code;
+        });
+        final zeroCategories = await DI().get<CategoryService>().listCategories(
+              excludingCodes: includedCategories.toList(),
+            );
+        list.addAll(zeroCategories.whereType<SupabaseCategory>().map((category) {
+          return _CategoryAmount(category: category, period: period, amount: 0);
+        }));
+      }
+
+      return list;
     }
     return [];
   }
@@ -130,16 +146,15 @@ class CategoryAmountSupabaseService implements CategoryAmountService {
   }
 
   @override
-  Future copyPreviousPeriodAmountsInto(Period period) {
-    // if (_periods.isNotEmpty) {
-    //   final previousPeriodKey = _periods.last;
-    //   final periodKey = period.toString();
-    //   _values[periodKey] = <CategoryAmount>{};
-    //   for (var categoryAmount in _values[previousPeriodKey]!) {
-    //     _values[periodKey]!.add(categoryAmount.copyWith(period: period));
-    //   }
-    // }
-    return Future.value();
+  Future copyPreviousPeriodAmountsInto(Period period) async {
+    final savedKey = await storageService.readString(lastUsedPeriodKey);
+    final lastPeriod = Period.tryParse(savedKey);
+    if (lastPeriod != null && lastPeriod != period) {
+      final lastAmounts = await listAmounts(period: lastPeriod);
+      for (var categoryAmount in lastAmounts) {
+        await saveAmount(category: categoryAmount.category, period: period, amount: categoryAmount.amount);
+      }
+    }
   }
 
   @override
@@ -148,31 +163,31 @@ class CategoryAmountSupabaseService implements CategoryAmountService {
     bool expensesTransactions = true,
     bool showZeroTotal = false,
   }) async {
-    // final transactionTypes = TransactionType.values.where((type) {
-    //   if (expensesTransactions) {
-    //     return !type.isIncome;
-    //   }
-    //   return type.isIncome;
-    // }).toList();
-    // final transactions = await DI().get<TransactionService>().listTransactions(
-    //       transactionTypes: transactionTypes,
-    //       period: period,
-    //       dateTimeSort: Sort.asc,
-    //     );
-    // final map = <CategoryAmount, double>{};
-    // final amounts = _values[period.toString()] ?? {};
-    // for (var transaction in transactions) {
-    //   final categoryAmount = amounts.where((amount) => amount.category == transaction.category).toList();
-    //   if (categoryAmount.length == 1) {
-    //     map[categoryAmount.first] = (map[categoryAmount.first] ?? 0) + transaction.signedAmount;
-    //   }
-    // }
-    // if (showZeroTotal) {
-    //   for (var categoryAmount in amounts) {
-    //     map[categoryAmount] ??= 0;
-    //   }
-    // }
-    return Future.value({});
+    final transactionTypes = TransactionType.values.where((type) {
+      if (expensesTransactions) {
+        return !type.isIncome;
+      }
+      return type.isIncome;
+    }).toList();
+    final transactions = await DI().get<TransactionService>().listTransactions(
+          transactionTypes: transactionTypes,
+          period: period,
+          dateTimeSort: Sort.asc,
+        );
+    final map = <CategoryAmount, double>{};
+    final amounts = await listAmounts(period: period, showZeroAmount: true);
+    for (var transaction in transactions) {
+      final categoryAmount = amounts.where((amount) => amount.category == transaction.category).toList();
+      if (categoryAmount.length == 1) {
+        map[categoryAmount.first] = (map[categoryAmount.first] ?? 0) + transaction.signedAmount;
+      }
+    }
+    if (showZeroTotal) {
+      for (var categoryAmount in amounts) {
+        map[categoryAmount] ??= 0;
+      }
+    }
+    return map;
   }
 
   void _saveLastUsed(Period period) {

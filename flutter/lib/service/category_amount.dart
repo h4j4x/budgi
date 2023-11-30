@@ -10,7 +10,6 @@ abstract class CategoryAmountService {
   /// @throws ValidationError
   Future<CategoryAmount> saveAmount({
     required Category category,
-    String? amountCode,
     required Period period,
     required double amount,
   });
@@ -21,6 +20,7 @@ abstract class CategoryAmountService {
   Future<List<CategoryAmount>> listAmounts({
     required Period period,
     Sort? amountSort,
+    bool showZeroAmount = false,
   });
 
   /// period dates are inclusive.

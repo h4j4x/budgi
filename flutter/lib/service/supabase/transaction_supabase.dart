@@ -63,7 +63,7 @@ class TransactionSupabaseService implements TransactionService {
       transactionType: transactionType,
       amount: amount,
       dateTime: dateTime ?? DateTime.now(),
-      description: description ?? 'TODO',
+      description: description ?? amount.toStringAsFixed(2),
     );
     final errors = transactionValidator?.validate(transaction);
     if (errors?.isNotEmpty ?? false) {

@@ -45,12 +45,16 @@ class CategoryMemoryService implements CategoryService, CategoryAmountService {
   Future<List<Category>> listCategories({
     bool withAmount = false,
     Period? period,
+    List<String>? excludingCodes,
   }) {
     final list = _categories.values.toList();
     if (period != null) {
       final amountsCategories =
           (_values[period.toString()] ?? <CategoryAmount>{}).map((amount) => amount.category.code).toList();
       list.removeWhere((category) {
+        if (excludingCodes != null && excludingCodes.contains(category.code)) {
+          return true;
+        }
         final match = amountsCategories.contains(category.code);
         if (withAmount) {
           return !match;
@@ -72,7 +76,6 @@ class CategoryMemoryService implements CategoryService, CategoryAmountService {
   @override
   Future<CategoryAmount> saveAmount({
     required Category category,
-    String? amountCode,
     required Period period,
     required double amount,
   }) {
@@ -100,10 +103,24 @@ class CategoryMemoryService implements CategoryService, CategoryAmountService {
   Future<List<CategoryAmount>> listAmounts({
     required Period period,
     Sort? amountSort,
+    bool showZeroAmount = false,
   }) {
     _saveLastUsed(period);
 
     final set = _values[period.toString()] ?? {};
+
+    if (showZeroAmount) {
+      final includedCategories = set.map((categoryAmount) {
+        return categoryAmount.category;
+      });
+      final zeroCategories = _categories.values.where((category) {
+        return !includedCategories.contains(category);
+      });
+      set.addAll(zeroCategories.map((category) {
+        return _CategoryAmount(category, period, 0);
+      }));
+    }
+
     return Future.value(set.toList()
       ..sort(
         (value1, value2) {

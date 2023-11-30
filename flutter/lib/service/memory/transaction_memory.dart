@@ -36,7 +36,7 @@ class TransactionMemoryService implements TransactionService {
       wallet,
       transactionType,
       amount,
-      description ?? 'TODO',
+      description ?? amount.toStringAsFixed(2),
       trnDateTime,
     );
     final errors = transactionValidator?.validate(transaction);

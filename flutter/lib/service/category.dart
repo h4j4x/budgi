@@ -21,6 +21,7 @@ abstract class CategoryService {
   Future<List<Category>> listCategories({
     bool withAmount = false,
     Period? period,
+    List<String>? excludingCodes,
   });
 
   Future<void> deleteCategory({
