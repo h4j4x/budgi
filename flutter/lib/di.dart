@@ -18,6 +18,7 @@ import 'service/supabase/auth_supabase.dart';
 import 'service/supabase/category_amount_supabase.dart';
 import 'service/supabase/category_supabase.dart';
 import 'service/supabase/supabase.dart';
+import 'service/supabase/wallet_supabase.dart';
 import 'service/transaction.dart';
 import 'service/wallet.dart';
 
@@ -42,16 +43,19 @@ class DI {
 
     CategoryService categoryService;
     CategoryAmountService categoryAmountService;
+    WalletService walletService;
 
     final categoryValidator = CategoryValidator();
     final categoryAmountValidator = CategoryAmountValidator();
+    final walletValidator = WalletValidator();
 
     if (config.hasSupabaseAuth()) {
       final supabaseConfig = SupabaseConfig(
           url: config.supabaseUrl!, token: config.supabaseToken!);
       await supabaseConfig.initialize();
       _getIt.registerSingleton<AuthService>(
-          AuthSupabaseService(config: supabaseConfig));
+        AuthSupabaseService(config: supabaseConfig),
+      );
 
       categoryService = CategorySupabaseService(
         config: supabaseConfig,
@@ -63,6 +67,10 @@ class DI {
         storageService: storageService,
         amountValidator: categoryAmountValidator,
       );
+      walletService = WalletSupabaseService(
+        config: supabaseConfig,
+        walletValidator: walletValidator,
+      );
     } else {
       categoryService = CategoryMemoryService(
         categoryValidator: categoryValidator,
@@ -72,19 +80,18 @@ class DI {
         categoryValidator: categoryValidator,
         amountValidator: categoryAmountValidator,
       );
+      walletService = WalletMemoryService(
+        walletValidator: walletValidator,
+      );
     }
 
     _getIt.registerSingleton<CategoryService>(categoryService);
     _getIt.registerSingleton<CategoryAmountService>(categoryAmountService);
+    _getIt.registerSingleton<WalletService>(walletService);
 
     final transactionValidator = TransactionValidator();
     _getIt.registerSingleton<TransactionService>(
       TransactionMemoryService(transactionValidator: transactionValidator),
-    );
-
-    final walletValidator = WalletValidator();
-    _getIt.registerSingleton<WalletService>(
-      WalletMemoryService(walletValidator: walletValidator),
     );
   }
 
