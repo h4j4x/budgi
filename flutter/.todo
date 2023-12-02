@@ -1,5 +1,4 @@
 - transactions page filters (period, wallet, category, dateTime sort)
-- provider para eliminar el uso de handlers
 - provider para menu con totales de elementos (eg: Budget Categories (5)), omitir los vacios
 - logo
 - splash with logo

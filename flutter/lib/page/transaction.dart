@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../l10n/l10n.dart';
 import '../model/domain/transaction.dart';
-import '../widget/entity/transaction_edit.dart';
+import '../widget/domain/transaction_edit.dart';
 
 class TransactionPage extends StatelessWidget {
   static const route = '/transaction';

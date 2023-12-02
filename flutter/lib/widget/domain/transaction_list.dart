@@ -1,73 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../app/icon.dart';
-import '../../di.dart';
 import '../../l10n/l10n.dart';
-import '../../util/function.dart';
-import '../../model/item_action.dart';
 import '../../model/domain/transaction.dart';
-import '../../service/transaction.dart';
+import '../../model/item_action.dart';
+import '../../model/state/crud.dart';
+import '../../util/function.dart';
 import '../../util/ui.dart';
 import '../common/sliver_center.dart';
 
-class TransactionList extends StatefulWidget {
-  final CrudHandler<Transaction> crudHandler;
+class TransactionList extends StatelessWidget {
+  final TypedContextItemAction<Transaction> onItemAction;
 
   const TransactionList({
     super.key,
-    required this.crudHandler,
+    required this.onItemAction,
   });
 
-  @override
-  State<StatefulWidget> createState() {
-    return _TransactionListState();
-  }
-}
-
-class _TransactionListState extends State<TransactionList> {
-  final list = <Transaction>[];
-
-  bool loading = false;
-
-  @override
-  void initState() {
-    super.initState();
-    widget.crudHandler.reload = () {
-      Future.delayed(Duration.zero, () {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          loadList();
-        });
-      });
-    };
-    Future.delayed(Duration.zero, loadList);
-  }
-
-  void loadList() async {
-    if (loading) {
-      return;
-    }
-    setState(() {
-      loading = true;
-    });
-    final values = await DI().get<TransactionService>().listTransactions();
-    list.clear();
-    list.addAll(values);
-    setState(() {
-      loading = false;
-    });
+  CrudState<Transaction> _state(BuildContext context) {
+    return context.watch<CrudState<Transaction>>();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (loading) {
+    if (_state(context).loading) {
       return const SliverCenter(
         child: CircularProgressIndicator.adaptive(),
       );
     }
-    return body();
+    return body(context);
   }
 
-  Widget body() {
+  Widget body(BuildContext context) {
+    final list = _state(context).list;
     if (list.isEmpty) {
       return SliverCenter(
         child: Text(L10n.of(context).nothingHere),
@@ -75,7 +41,7 @@ class _TransactionListState extends State<TransactionList> {
     }
     return SliverList.separated(
       itemBuilder: (_, index) {
-        return listItem(list[index]);
+        return listItem(context, list[index]);
       },
       separatorBuilder: (_, __) {
         return const Divider();
@@ -84,7 +50,7 @@ class _TransactionListState extends State<TransactionList> {
     );
   }
 
-  Widget listItem(Transaction item) {
+  Widget listItem(BuildContext context, Transaction item) {
     final transactionType = item.transactionType.l10n(context);
     final amount = item.amount.toStringAsFixed(2);
     return ListTile(
@@ -99,13 +65,13 @@ class _TransactionListState extends State<TransactionList> {
             title: l10n.transactionDelete,
             description: l10n.transactionDeleteConfirm(item.description),
           );
-          if (confirm && mounted) {
-            widget.crudHandler.onItemAction(context, item, ItemAction.delete);
+          if (confirm && context.mounted) {
+            onItemAction(context, item, ItemAction.delete);
           }
         },
       ),
       onTap: () {
-        widget.crudHandler.onItemAction(context, item, ItemAction.select);
+        onItemAction(context, item, ItemAction.select);
       },
     );
   }

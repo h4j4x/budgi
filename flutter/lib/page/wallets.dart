@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../app/icon.dart';
 import '../app/router.dart';
 import '../di.dart';
 import '../l10n/l10n.dart';
-import '../util/function.dart';
-import '../model/item_action.dart';
 import '../model/domain/wallet.dart';
+import '../model/item_action.dart';
+import '../model/state/crud.dart';
 import '../service/wallet.dart';
-import '../widget/entity/wallet_list.dart';
+import '../widget/domain/wallet_list.dart';
 import 'wallet.dart';
 
 class WalletsPage extends StatefulWidget {
@@ -23,30 +24,30 @@ class WalletsPage extends StatefulWidget {
 }
 
 class _WalletsPageState extends State<WalletsPage> {
-  late CrudHandler<Wallet> crudHandler;
+  CrudState<Wallet> get state {
+    return context.watch<CrudState<Wallet>>();
+  }
+
+  Future<List<Wallet>> load() async {
+    return DI().get<WalletService>().listWallets();
+  }
 
   @override
   void initState() {
     super.initState();
-    crudHandler = CrudHandler(onItemAction: onItemAction);
+    Future.delayed(Duration.zero, state.load);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: body(),
-      floatingActionButton: addButton(),
-    );
-  }
-
-  PreferredSizeWidget appBar() {
-    return AppBar(
-      actions: [
-        IconButton(
-          onPressed: crudHandler.reload,
-          icon: AppIcon.reload,
-        ),
-      ],
+    return ChangeNotifierProvider<CrudState<Wallet>>(
+      create: (_) {
+        return CrudState<Wallet>(loader: load);
+      },
+      child: Scaffold(
+        body: body(),
+        floatingActionButton: addButton(),
+      ),
     );
   }
 
@@ -54,9 +55,7 @@ class _WalletsPageState extends State<WalletsPage> {
     return CustomScrollView(
       slivers: [
         toolbar(),
-        WalletList(
-          crudHandler: crudHandler,
-        ),
+        WalletList(onItemAction: onItemAction),
       ],
     );
   }
@@ -65,7 +64,7 @@ class _WalletsPageState extends State<WalletsPage> {
     return SliverAppBar(
       actions: [
         IconButton(
-          onPressed: crudHandler.reload,
+          onPressed: state.load,
           icon: AppIcon.reload,
         ),
       ],
@@ -91,14 +90,14 @@ class _WalletsPageState extends State<WalletsPage> {
           break;
         }
     }
-    crudHandler.reload();
+    state.load();
   }
 
   Widget addButton() {
     return FloatingActionButton(
       onPressed: () async {
         await context.push(WalletPage.route);
-        crudHandler.reload();
+        state.load();
       },
       tooltip: L10n.of(context).addAction,
       child: AppIcon.add,

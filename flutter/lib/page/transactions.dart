@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../app/icon.dart';
 import '../app/router.dart';
 import '../di.dart';
 import '../l10n/l10n.dart';
-import '../util/function.dart';
-import '../model/item_action.dart';
 import '../model/domain/transaction.dart';
+import '../model/item_action.dart';
+import '../model/period.dart';
+import '../model/state/crud.dart';
 import '../service/transaction.dart';
-import '../widget/entity/transaction_list.dart';
+import '../widget/common/month_field.dart';
+import '../widget/domain/transaction_list.dart';
 import 'transaction.dart';
 
 class TransactionsPage extends StatefulWidget {
@@ -22,31 +25,40 @@ class TransactionsPage extends StatefulWidget {
   }
 }
 
+const _periodKey = 'period';
+
 class _TransactionsPageState extends State<TransactionsPage> {
-  late CrudHandler<Transaction> crudHandler;
+  CrudState<Transaction> get state {
+    return context.watch<CrudState<Transaction>>();
+  }
+
+  Period get period {
+    final value = state.filters[_periodKey];
+    return (value as Period?) ?? Period.currentMonth;
+  }
+
+  Future<List<Transaction>> load() async {
+    return DI().get<TransactionService>().listTransactions(period: period);
+  }
 
   @override
   void initState() {
     super.initState();
-    crudHandler = CrudHandler(onItemAction: onItemAction);
+    Future.delayed(Duration.zero, state.load);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: body(),
-      floatingActionButton: addButton(),
-    );
-  }
-
-  PreferredSizeWidget appBar() {
-    return AppBar(
-      actions: [
-        IconButton(
-          onPressed: crudHandler.reload,
-          icon: AppIcon.reload,
-        ),
-      ],
+    return ChangeNotifierProvider<CrudState<Transaction>>(
+      create: (_) {
+        return CrudState<Transaction>(loader: load, filters: {
+          _periodKey: Period.currentMonth,
+        });
+      },
+      child: Scaffold(
+        body: body(),
+        floatingActionButton: addButton(),
+      ),
     );
   }
 
@@ -54,18 +66,26 @@ class _TransactionsPageState extends State<TransactionsPage> {
     return CustomScrollView(
       slivers: [
         toolbar(),
-        TransactionList(
-          crudHandler: crudHandler,
-        ),
+        TransactionList(onItemAction: onItemAction),
       ],
     );
   }
 
   Widget toolbar() {
     return SliverAppBar(
+      toolbarHeight: kToolbarHeight + 16,
+      title: Container(
+        constraints: const BoxConstraints(maxWidth: 200),
+        child: MonthFieldWidget(
+          period: period,
+          onChanged: (value) {
+            state.setFilter(_periodKey, value);
+          },
+        ),
+      ),
       actions: [
         IconButton(
-          onPressed: crudHandler.reload,
+          onPressed: state.load,
           icon: AppIcon.reload,
         ),
       ],
@@ -91,14 +111,14 @@ class _TransactionsPageState extends State<TransactionsPage> {
           break;
         }
     }
-    crudHandler.reload();
+    state.load();
   }
 
   Widget addButton() {
     return FloatingActionButton(
       onPressed: () async {
         await context.push(TransactionPage.route);
-        crudHandler.reload();
+        state.load();
       },
       tooltip: L10n.of(context).addAction,
       child: AppIcon.add,

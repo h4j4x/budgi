@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../l10n/l10n.dart';
 import '../model/domain/category.dart';
-import '../widget/entity/category_edit.dart';
+import '../widget/domain/category_edit.dart';
 
 class CategoryPage extends StatelessWidget {
   static const route = '/category';

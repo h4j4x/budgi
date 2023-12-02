@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../app/icon.dart';
 import '../app/router.dart';
@@ -7,10 +8,10 @@ import '../l10n/l10n.dart';
 import '../model/domain/category_amount.dart';
 import '../model/item_action.dart';
 import '../model/period.dart';
+import '../model/state/crud.dart';
 import '../service/category_amount.dart';
-import '../util/function.dart';
 import '../widget/common/month_field.dart';
-import '../widget/entity/category_amount_list.dart';
+import '../widget/domain/category_amount_list.dart';
 import 'category_amount.dart';
 
 class CategoriesAmountsPage extends StatefulWidget {
@@ -24,19 +25,32 @@ class CategoriesAmountsPage extends StatefulWidget {
   }
 }
 
+const _periodKey = 'period';
+
 class _CategoriesAmountsPageState extends State<CategoriesAmountsPage> {
-  final period = Period.currentMonth;
-
-  late CrudHandler<CategoryAmount> crudHandler;
-
   bool loading = true;
   String? loadingMessage;
+
+  CrudState<CategoryAmount> get state {
+    return context.watch<CrudState<CategoryAmount>>();
+  }
+
+  Period get period {
+    final value = state.filters[_periodKey];
+    return (value as Period?) ?? Period.currentMonth;
+  }
+
+  Future<List<CategoryAmount>> load() async {
+    return DI().get<CategoryAmountService>().listAmounts(period: period);
+  }
 
   @override
   void initState() {
     super.initState();
-    crudHandler = CrudHandler(onItemAction: onItemAction);
-    Future.delayed(Duration.zero, checkPreviousPeriod);
+    Future.delayed(Duration.zero, () {
+      state.load();
+      checkPreviousPeriod();
+    });
   }
 
   void checkPreviousPeriod() async {
@@ -56,23 +70,27 @@ class _CategoriesAmountsPageState extends State<CategoriesAmountsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: body(),
-      floatingActionButton: addButton(),
+    return ChangeNotifierProvider<CrudState<CategoryAmount>>(
+      create: (_) {
+        return CrudState<CategoryAmount>(loader: load, filters: {
+          _periodKey: Period.currentMonth,
+        });
+      },
+      child: Scaffold(
+        body: body(),
+        floatingActionButton: addButton(),
+      ),
     );
   }
 
   Widget body() {
-    if (loading) {
+    if (loading || state.loading) {
       return loadingBody();
     }
     return CustomScrollView(
       slivers: [
         toolbar(),
-        CategoryAmountList(
-          crudHandler: crudHandler,
-          period: period,
-        ),
+        CategoryAmountList(onItemAction: onItemAction),
       ],
     );
   }
@@ -86,7 +104,7 @@ class _CategoriesAmountsPageState extends State<CategoriesAmountsPage> {
       ),
       actions: [
         IconButton(
-          onPressed: crudHandler.reload,
+          onPressed: state.load,
           icon: AppIcon.reload,
         ),
       ],
@@ -135,7 +153,7 @@ class _CategoriesAmountsPageState extends State<CategoriesAmountsPage> {
           break;
         }
     }
-    crudHandler.reload();
+    state.load();
   }
 
   Widget addButton() {
@@ -147,7 +165,7 @@ class _CategoriesAmountsPageState extends State<CategoriesAmountsPage> {
             period: period,
           ),
         );
-        crudHandler.reload();
+        state.load();
       },
       tooltip: L10n.of(context).addAction,
       child: AppIcon.add,

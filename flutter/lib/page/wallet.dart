@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../l10n/l10n.dart';
 import '../model/domain/wallet.dart';
-import '../widget/entity/wallet_edit.dart';
+import '../widget/domain/wallet_edit.dart';
 
 class WalletPage extends StatelessWidget {
   static const route = '/wallet';
