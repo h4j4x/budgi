@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../app/icon.dart';
 import '../app/router.dart';
@@ -7,55 +6,71 @@ import '../di.dart';
 import '../l10n/l10n.dart';
 import '../model/domain/category.dart';
 import '../model/item_action.dart';
-import '../model/state/crud.dart';
 import '../service/category.dart';
 import '../widget/domain/category_list.dart';
 import 'category.dart';
 
-class CategoriesPage extends StatelessWidget {
+class CategoriesPage extends StatefulWidget {
   static const route = '/categories';
 
   const CategoriesPage({super.key});
 
-  void loadList(BuildContext context) {
-    context.read<CrudState<Category>>().load();
+  @override
+  State<CategoriesPage> createState() => _CategoriesPageState();
+}
+
+class _CategoriesPageState extends State<CategoriesPage> {
+  final list = <Category>[];
+
+  bool loading = false;
+
+  @override
+  initState() {
+    super.initState();
+    Future.delayed(Duration.zero, loadList);
   }
 
-  Future<List<Category>> load() async {
-    return DI().get<CategoryService>().listCategories();
+  void loadList() async {
+    if (loading) {
+      return;
+    }
+    setState(() {
+      loading = true;
+    });
+    final newList = await DI().get<CategoryService>().listCategories();
+    list.clear();
+    list.addAll(newList);
+    setState(() {
+      loading = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<CrudState<Category>>(
-      create: (_) {
-        return CrudState<Category>(loader: load);
-      },
-      builder: (context, child) {
-        return Scaffold(
-          body: body(context),
-          floatingActionButton: addButton(context),
-        );
-      },
+    return Scaffold(
+      body: body(),
+      floatingActionButton: addButton(),
     );
   }
 
-  Widget body(BuildContext context) {
+  Widget body() {
     return CustomScrollView(
       slivers: [
-        toolbar(context),
-        CategoryList(onItemAction: onItemAction),
+        toolbar(),
+        CategoryList(
+          list: list,
+          enabled: !loading,
+          onItemAction: onItemAction,
+        ),
       ],
     );
   }
 
-  Widget toolbar(BuildContext context) {
+  Widget toolbar() {
     return SliverAppBar(
       actions: [
         IconButton(
-          onPressed: () {
-            loadList(context);
-          },
+          onPressed: loadList,
           icon: AppIcon.reload,
         ),
       ],
@@ -81,17 +96,17 @@ class CategoriesPage extends StatelessWidget {
           break;
         }
     }
-    if (context.mounted) {
-      loadList(context);
+    if (mounted) {
+      loadList();
     }
   }
 
-  Widget addButton(BuildContext context) {
+  Widget addButton() {
     return FloatingActionButton(
       onPressed: () async {
         await context.push(CategoryPage.route);
-        if (context.mounted) {
-          loadList(context);
+        if (mounted) {
+          loadList();
         }
       },
       tooltip: L10n.of(context).addAction,

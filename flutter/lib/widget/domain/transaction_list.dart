@@ -1,30 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../../app/icon.dart';
 import '../../l10n/l10n.dart';
 import '../../model/domain/transaction.dart';
 import '../../model/item_action.dart';
-import '../../model/state/crud.dart';
 import '../../util/function.dart';
 import '../../util/ui.dart';
 import '../common/sliver_center.dart';
 
 class TransactionList extends StatelessWidget {
+  final List<Transaction> list;
+  final bool enabled;
   final TypedContextItemAction<Transaction> onItemAction;
 
   const TransactionList({
     super.key,
+    required this.list,
+    required this.enabled,
     required this.onItemAction,
   });
 
-  CrudState<Transaction> _state(BuildContext context) {
-    return context.watch<CrudState<Transaction>>();
-  }
-
   @override
   Widget build(BuildContext context) {
-    if (_state(context).loading) {
+    if (!enabled) {
       return const SliverCenter(
         child: CircularProgressIndicator.adaptive(),
       );
@@ -33,7 +31,6 @@ class TransactionList extends StatelessWidget {
   }
 
   Widget body(BuildContext context) {
-    final list = _state(context).list;
     if (list.isEmpty) {
       return SliverCenter(
         child: Text(L10n.of(context).nothingHere),

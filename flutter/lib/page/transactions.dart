@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../app/icon.dart';
 import '../app/router.dart';
@@ -8,7 +7,6 @@ import '../l10n/l10n.dart';
 import '../model/domain/transaction.dart';
 import '../model/item_action.dart';
 import '../model/period.dart';
-import '../model/state/crud.dart';
 import '../service/transaction.dart';
 import '../widget/common/month_field.dart';
 import '../widget/domain/transaction_list.dart';
@@ -25,40 +23,39 @@ class TransactionsPage extends StatefulWidget {
   }
 }
 
-const _periodKey = 'period';
-
 class _TransactionsPageState extends State<TransactionsPage> {
-  CrudState<Transaction> get state {
-    return context.watch<CrudState<Transaction>>();
-  }
+  final list = <Transaction>[];
 
-  Period get period {
-    final value = state.filters[_periodKey];
-    return (value as Period?) ?? Period.currentMonth;
-  }
-
-  Future<List<Transaction>> load() async {
-    return DI().get<TransactionService>().listTransactions(period: period);
-  }
+  bool loading = false;
+  Period period = Period.currentMonth;
 
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration.zero, state.load);
+    Future.delayed(Duration.zero, loadList);
+  }
+
+  void loadList() async {
+    if (loading) {
+      return;
+    }
+    setState(() {
+      loading = true;
+    });
+    final newList =
+        await DI().get<TransactionService>().listTransactions(period: period);
+    list.clear();
+    list.addAll(newList);
+    setState(() {
+      loading = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<CrudState<Transaction>>(
-      create: (_) {
-        return CrudState<Transaction>(loader: load, filters: {
-          _periodKey: Period.currentMonth,
-        });
-      },
-      child: Scaffold(
-        body: body(),
-        floatingActionButton: addButton(),
-      ),
+    return Scaffold(
+      body: body(),
+      floatingActionButton: addButton(),
     );
   }
 
@@ -66,7 +63,11 @@ class _TransactionsPageState extends State<TransactionsPage> {
     return CustomScrollView(
       slivers: [
         toolbar(),
-        TransactionList(onItemAction: onItemAction),
+        TransactionList(
+          list: list,
+          enabled: !loading,
+          onItemAction: onItemAction,
+        ),
       ],
     );
   }
@@ -79,13 +80,16 @@ class _TransactionsPageState extends State<TransactionsPage> {
         child: MonthFieldWidget(
           period: period,
           onChanged: (value) {
-            state.setFilter(_periodKey, value);
+            setState(() {
+              period = value;
+            });
+            loadList();
           },
         ),
       ),
       actions: [
         IconButton(
-          onPressed: state.load,
+          onPressed: loadList,
           icon: AppIcon.reload,
         ),
       ],
@@ -111,14 +115,14 @@ class _TransactionsPageState extends State<TransactionsPage> {
           break;
         }
     }
-    state.load();
+    loadList();
   }
 
   Widget addButton() {
     return FloatingActionButton(
       onPressed: () async {
         await context.push(TransactionPage.route);
-        state.load();
+        loadList();
       },
       tooltip: L10n.of(context).addAction,
       child: AppIcon.add,
