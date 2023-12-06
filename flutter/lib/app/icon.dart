@@ -27,6 +27,10 @@ class AppIcon {
     return const FaIcon(FontAwesomeIcons.calendar);
   }
 
+  static Widget get clear {
+    return const FaIcon(FontAwesomeIcons.ban);
+  }
+
   static Widget delete(BuildContext context) {
     final color = Theme.of(context).colorScheme.error;
     return FaIcon(FontAwesomeIcons.trash, color: color);

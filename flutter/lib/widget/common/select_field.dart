@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../app/icon.dart';
 import '../../util/function.dart';
 
 typedef TypedWidgetBuilder<T> = Widget Function(BuildContext context, T item);
@@ -8,6 +9,7 @@ class SelectField<T> extends StatelessWidget {
   final List<T> items;
   final TypedWidgetBuilder<T> itemBuilder;
   final TypedCallback<T>? onChanged;
+  final VoidCallback? onClear;
   final T? selectedValue;
   final Widget? icon;
   final TypedWidgetBuilder<T>? iconBuilder;
@@ -19,6 +21,7 @@ class SelectField<T> extends StatelessWidget {
     required this.items,
     required this.itemBuilder,
     this.onChanged,
+    this.onClear,
     this.selectedValue,
     this.icon,
     this.iconBuilder,
@@ -42,6 +45,13 @@ class SelectField<T> extends StatelessWidget {
         icon: _icon(context),
         hintText: hintText,
         errorText: errorText,
+        suffix: selectedValue != null && onClear != null
+            ? IconButton(
+                onPressed: () {
+                  onClear!();
+                },
+                icon: AppIcon.clear)
+            : null,
       ),
       isExpanded: true,
       onChanged: onChanged != null
