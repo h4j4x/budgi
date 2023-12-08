@@ -14,6 +14,7 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.2
   flex_color_scheme: ^7.3.1
+  flutter_native_splash: ^2.3.8
   flutter_secure_storage: ^9.0.0
   font_awesome_flutter: ^10.6.0
   get_it: ^7.6.4
@@ -56,3 +57,9 @@ flutter_launcher_icons:
   macos:
     generate: true
     image_path: "icon/icon-1024x1024.png"
+
+flutter_native_splash:
+  color: "#f8fcfa"
+  image: "icon/icon-foreground-432x432.png"
+  color_dark: "#282828"
+  image_dark: "icon/icon-foreground-invert-432x432.png"
