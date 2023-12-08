@@ -69,6 +69,7 @@ class _SignInState extends State<SignIn> {
     }
     return Center(
       child: Container(
+        margin: const EdgeInsets.all(10),
         constraints: const BoxConstraints(maxWidth: 800),
         child: ListView.separated(
           itemBuilder: (_, index) {
