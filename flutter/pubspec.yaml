@@ -27,6 +27,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.13.1
   flutter_lints: ^3.0.1
   test: any
 
@@ -35,3 +36,23 @@ flutter:
     - fonts/Open_Sans/
   generate: true
   uses-material-design: true
+
+flutter_launcher_icons:
+  android: true
+  image_path_android: "icon/icon-710x599.png"
+  adaptive_icon_background: "#f8fcfa"
+  adaptive_icon_foreground: "icon/icon-foreground-432x432.png"
+  ios: true
+  image_path_ios: "icon/icon-1024x1024.png"
+  remove_alpha_ios: true
+  background_color_ios: "#f8fcfa"
+  web:
+    generate: true
+    image_path: "icon/icon-1024x1024.png"
+    background_color: "#f8fcfa"
+  windows:
+    generate: true
+    image_path: "icon/icon-1024x1024.png"
+  macos:
+    generate: true
+    image_path: "icon/icon-1024x1024.png"

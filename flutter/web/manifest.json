@@ -1,11 +1,11 @@
 {
-    "name": "budgi",
-    "short_name": "budgi",
+    "name": "Budgi",
+    "short_name": "Budgi",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
+    "background_color": "#f8fcfa",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Budgi app.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
