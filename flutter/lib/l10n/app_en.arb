@@ -119,6 +119,7 @@
   "signOut": "Sign out",
   "sortAsc": "Sort asc",
   "sortByAmount": "Sort by amount",
+  "sortByDateTime": "Sort by datetime",
   "sortDesc": "Sort desc",
   "toDate": "To date",
   "transaction": "Transaction",

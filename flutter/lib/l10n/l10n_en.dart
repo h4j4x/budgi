@@ -178,6 +178,9 @@ class L10nEn extends L10n {
   String get sortByAmount => 'Sort by amount';
 
   @override
+  String get sortByDateTime => 'Sort by datetime';
+
+  @override
   String get sortDesc => 'Sort desc';
 
   @override

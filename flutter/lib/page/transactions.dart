@@ -9,11 +9,14 @@ import '../model/domain/transaction.dart';
 import '../model/domain/wallet.dart';
 import '../model/item_action.dart';
 import '../model/period.dart';
+import '../model/sort.dart';
 import '../service/category.dart';
 import '../service/transaction.dart';
 import '../service/wallet.dart';
 import '../widget/common/month_field.dart';
+import '../widget/common/responsive.dart';
 import '../widget/common/select_field.dart';
+import '../widget/common/sort_field.dart';
 import '../widget/domain/transaction_list.dart';
 import 'transaction.dart';
 
@@ -40,6 +43,8 @@ class _TransactionsPageState extends State<TransactionsPage> {
   List<Category>? categories;
   Category? category;
 
+  Sort dateTimeSort = Sort.desc;
+
   @override
   void initState() {
     super.initState();
@@ -61,6 +66,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
           period: period,
           wallet: wallet,
           category: category,
+          dateTimeSort: dateTimeSort,
         );
     list.clear();
     list.addAll(newList);
@@ -86,15 +92,15 @@ class _TransactionsPageState extends State<TransactionsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: body(),
+      body: ResponsiveWidget(mobile: body(true), desktop: body(false)),
       floatingActionButton: addButton(),
     );
   }
 
-  Widget body() {
+  Widget body(bool mobileSize) {
     return CustomScrollView(
       slivers: [
-        toolbar(),
+        toolbar(mobileSize),
         TransactionList(
           list: list,
           enabled: !loading,
@@ -104,7 +110,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
     );
   }
 
-  Widget toolbar() {
+  Widget toolbar(bool mobileSize) {
     return SliverAppBar(
       toolbarHeight: kToolbarHeight + 16,
       title: Container(
@@ -129,6 +135,20 @@ class _TransactionsPageState extends State<TransactionsPage> {
           constraints: const BoxConstraints(maxWidth: 200),
           padding: const EdgeInsets.only(right: 4),
           child: categoryField(),
+        ),
+        Container(
+          constraints: const BoxConstraints(maxWidth: 200),
+          padding: const EdgeInsets.only(right: 4),
+          child: SortField(
+              mobileSize: mobileSize,
+              title: L10n.of(context).sortByDateTime,
+              value: dateTimeSort,
+              onChanged: !loading && list.isNotEmpty
+                  ? (value) {
+                      dateTimeSort = value;
+                      loadList();
+                    }
+                  : null),
         ),
         IconButton(
           onPressed: loadList,

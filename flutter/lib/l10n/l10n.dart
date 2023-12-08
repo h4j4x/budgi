@@ -385,6 +385,12 @@ abstract class L10n {
   /// **'Sort by amount'**
   String get sortByAmount;
 
+  /// No description provided for @sortByDateTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort by datetime'**
+  String get sortByDateTime;
+
   /// No description provided for @sortDesc.
   ///
   /// In en, this message translates to:
