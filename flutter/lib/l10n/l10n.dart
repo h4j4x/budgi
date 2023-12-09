@@ -343,6 +343,12 @@ abstract class L10n {
   /// **'Nothing here :('**
   String get nothingHere;
 
+  /// No description provided for @okAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Ok'**
+  String get okAction;
+
   /// No description provided for @prefixWithDate.
   ///
   /// In en, this message translates to:
@@ -456,6 +462,12 @@ abstract class L10n {
   /// In en, this message translates to:
   /// **'Transactions'**
   String get transactions;
+
+  /// No description provided for @transactionsFilters.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter transactions'**
+  String get transactionsFilters;
 
   /// No description provided for @transactionTypeIncome.
   ///

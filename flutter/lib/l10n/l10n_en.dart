@@ -152,6 +152,9 @@ class L10nEn extends L10n {
   String get nothingHere => 'Nothing here :(';
 
   @override
+  String get okAction => 'Ok';
+
+  @override
   String prefixWithDate(String prefix, DateTime date) {
     final intl.DateFormat dateDateFormat = intl.DateFormat.yMMMd(localeName);
     final String dateString = dateDateFormat.format(date);
@@ -214,6 +217,9 @@ class L10nEn extends L10n {
 
   @override
   String get transactions => 'Transactions';
+
+  @override
+  String get transactionsFilters => 'Filter transactions';
 
   @override
   String get transactionTypeIncome => 'Income';

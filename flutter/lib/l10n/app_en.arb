@@ -101,6 +101,7 @@
   "invalidWalletType": "Invalid wallet type.",
   "no": "No",
   "nothingHere": "Nothing here :(",
+  "okAction": "Ok",
   "prefixWithDate": "{prefix}{date}",
   "@prefixWithDate": {
     "placeholders": {
@@ -138,6 +139,7 @@
   "transactionDescription": "Transaction description",
   "transactionDescriptionHint": "Enter transaction description...",
   "transactions": "Transactions",
+  "transactionsFilters": "Filter transactions",
   "transactionTypeIncome": "Income",
   "transactionTypeIncomeTransfer": "Income transfer",
   "transactionTypeExpense": "Expense",

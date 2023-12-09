@@ -33,17 +33,11 @@ class TransactionsPage extends StatefulWidget {
 
 class _TransactionsPageState extends State<TransactionsPage> {
   final list = <Transaction>[];
+  final filter = _Filter();
 
   bool loading = false;
-  Period period = Period.currentMonth;
-
   List<Wallet>? wallets;
-  Wallet? wallet;
-
   List<Category>? categories;
-  Category? category;
-
-  Sort dateTimeSort = Sort.desc;
 
   @override
   void initState() {
@@ -63,10 +57,10 @@ class _TransactionsPageState extends State<TransactionsPage> {
       loading = true;
     });
     final newList = await DI().get<TransactionService>().listTransactions(
-          period: period,
-          wallet: wallet,
-          category: category,
-          dateTimeSort: dateTimeSort,
+          period: filter.period,
+          wallet: filter.wallet,
+          category: filter.category,
+          dateTimeSort: filter.dateTimeSort,
         );
     list.clear();
     list.addAll(newList);
@@ -116,40 +110,29 @@ class _TransactionsPageState extends State<TransactionsPage> {
       title: Container(
         constraints: const BoxConstraints(maxWidth: 200),
         child: MonthFieldWidget(
-          period: period,
+          period: filter.period,
           onChanged: (value) {
             setState(() {
-              period = value;
+              filter.period = value;
             });
             loadList();
           },
         ),
       ),
       actions: [
-        Container(
-          constraints: const BoxConstraints(maxWidth: 200),
-          padding: const EdgeInsets.only(right: 4),
-          child: walletField(),
-        ),
-        Container(
-          constraints: const BoxConstraints(maxWidth: 200),
-          padding: const EdgeInsets.only(right: 4),
-          child: categoryField(),
-        ),
-        Container(
-          constraints: const BoxConstraints(maxWidth: 200),
-          padding: const EdgeInsets.only(right: 4),
-          child: SortField(
-              mobileSize: mobileSize,
-              title: L10n.of(context).sortByDateTime,
-              value: dateTimeSort,
-              onChanged: !loading && list.isNotEmpty
-                  ? (value) {
-                      dateTimeSort = value;
-                      loadList();
-                    }
-                  : null),
-        ),
+        if (!mobileSize)
+          toolbarItem(
+            child: walletField(),
+          ),
+        if (!mobileSize)
+          toolbarItem(
+            child: categoryField(),
+          ),
+        if (!mobileSize)
+          toolbarItem(
+            child: sortItem(mobileSize),
+          ),
+        if (mobileSize) filterButton(),
         IconButton(
           onPressed: loadList,
           icon: AppIcon.reload,
@@ -169,17 +152,17 @@ class _TransactionsPageState extends State<TransactionsPage> {
       },
       onClear: !loading
           ? () {
-              wallet = null;
+              filter.wallet = null;
               loadList();
             }
           : null,
       onChanged: !loading
           ? (value) {
-              wallet = value;
+              filter.wallet = value;
               loadList();
             }
           : null,
-      selectedValue: wallet,
+      selectedValue: filter.wallet,
       icon: wallets == null ? AppIcon.loading : AppIcon.wallet,
       iconBuilder: (context, value) {
         return value.walletType.icon();
@@ -199,19 +182,96 @@ class _TransactionsPageState extends State<TransactionsPage> {
       },
       onClear: !loading
           ? () {
-              category = null;
+              filter.category = null;
               loadList();
             }
           : null,
       onChanged: !loading
           ? (value) {
-              category = value;
+              filter.category = value;
               loadList();
             }
           : null,
-      selectedValue: category,
+      selectedValue: filter.category,
       icon: categories == null ? AppIcon.loading : AppIcon.category,
       hintText: L10n.of(context).transactionCategoryHint,
+    );
+  }
+
+  Widget sortItem(bool mobileSize) {
+    return SortField(
+        mobileSize: mobileSize,
+        title: L10n.of(context).sortByDateTime,
+        value: filter.dateTimeSort,
+        onChanged: !loading && list.isNotEmpty
+            ? (value) {
+                filter.dateTimeSort = value;
+                loadList();
+              }
+            : null);
+  }
+
+  Widget filterButton() {
+    return IconButton(
+      onPressed: () async {
+        final currentFilter = _Filter();
+        currentFilter.copyFrom(filter);
+        final value = await showModalBottomSheet<bool>(
+          context: context,
+          builder: (context) {
+            final l10n = L10n.of(context);
+            final items = <Widget>[
+              Text(
+                l10n.transactionsFilters,
+                textAlign: TextAlign.center,
+                textScaler: const TextScaler.linear(1.25),
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+              walletField(),
+              categoryField(),
+              sortItem(false),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      context.pop(true);
+                    },
+                    child: Text(l10n.okAction),
+                  ),
+                  TextButton(
+                    onPressed: context.pop,
+                    child: Text(l10n.cancelAction),
+                  ),
+                ],
+              )
+            ];
+            return Container(
+              height: 300,
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Column(
+                children: items.map((item) {
+                  return Padding(padding: const EdgeInsets.only(top: 8), child: item);
+                }).toList(),
+              ),
+            );
+          },
+        );
+        if (!(value ?? false)) {
+          filter.copyFrom(currentFilter);
+        } else {
+          setState(() {});
+        }
+      },
+      icon: AppIcon.filter,
+    );
+  }
+
+  Widget toolbarItem({required Widget child}) {
+    return Container(
+      constraints: const BoxConstraints(maxWidth: 200),
+      padding: const EdgeInsets.only(right: 4),
+      child: child,
     );
   }
 
@@ -246,5 +306,21 @@ class _TransactionsPageState extends State<TransactionsPage> {
       tooltip: L10n.of(context).addAction,
       child: AppIcon.add,
     );
+  }
+}
+
+class _Filter {
+  Period period = Period.currentMonth;
+  Wallet? wallet;
+  Category? category;
+  Sort dateTimeSort = Sort.desc;
+
+  _Filter();
+
+  void copyFrom(_Filter filter) {
+    period = filter.period;
+    wallet = filter.wallet;
+    category = filter.category;
+    dateTimeSort = filter.dateTimeSort;
   }
 }

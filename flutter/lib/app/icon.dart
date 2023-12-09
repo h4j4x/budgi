@@ -36,6 +36,10 @@ class AppIcon {
     return FaIcon(FontAwesomeIcons.trash, color: color);
   }
 
+  static Widget get filter {
+    return const FaIcon(FontAwesomeIcons.filter);
+  }
+
   static Widget get home {
     return const FaIcon(FontAwesomeIcons.house);
   }
