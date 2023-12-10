@@ -58,6 +58,10 @@ class AppIcon {
     );
   }
 
+  static Widget get menu {
+    return const Icon(Icons.menu);
+  }
+
   static Widget get reload {
     return const FaIcon(FontAwesomeIcons.rotate);
   }

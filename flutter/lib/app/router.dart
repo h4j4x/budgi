@@ -34,8 +34,8 @@ final _routes = <AppRoute>[
   AppRoute(
     path: HomePage.route,
     icon: AppIcon.home,
-    menuBuilder: (context) {
-      return Text(L10n.of(context).home);
+    menuTextBuilder: (context) {
+      return L10n.of(context).home;
     },
     pageBuilder: (_, __) {
       return const HomePage();
@@ -45,8 +45,8 @@ final _routes = <AppRoute>[
   AppRoute(
     path: CategoriesPage.route,
     icon: AppIcon.category,
-    menuBuilder: (context) {
-      return Text(L10n.of(context).budgetsCategories);
+    menuTextBuilder: (context) {
+      return L10n.of(context).budgetsCategories;
     },
     pageBuilder: (_, __) {
       return const CategoriesPage();
@@ -63,8 +63,8 @@ final _routes = <AppRoute>[
   AppRoute(
     path: CategoriesAmountsPage.route,
     icon: AppIcon.categoryAmount,
-    menuBuilder: (context) {
-      return Text(L10n.of(context).budgetsAmounts);
+    menuTextBuilder: (context) {
+      return L10n.of(context).budgetsAmounts;
     },
     pageBuilder: (_, __) {
       return const CategoriesAmountsPage();
@@ -86,8 +86,8 @@ final _routes = <AppRoute>[
   AppRoute(
     path: WalletsPage.route,
     icon: AppIcon.wallet,
-    menuBuilder: (context) {
-      return Text(L10n.of(context).wallets);
+    menuTextBuilder: (context) {
+      return L10n.of(context).wallets;
     },
     pageBuilder: (_, __) {
       return const WalletsPage();
@@ -104,8 +104,8 @@ final _routes = <AppRoute>[
   AppRoute(
     path: TransactionsPage.route,
     icon: AppIcon.transaction,
-    menuBuilder: (context) {
-      return Text(L10n.of(context).transactions);
+    menuTextBuilder: (context) {
+      return L10n.of(context).transactions;
     },
     pageBuilder: (_, __) {
       return const TransactionsPage();
@@ -123,7 +123,7 @@ final _routes = <AppRoute>[
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
 final _menuRoutes = _routes.where((route) {
-  return route.menuBuilder != null;
+  return route.hasMenu;
 }).toList();
 final _redirectRoute = _routes.firstWhere((route) => route.anon).path;
 
@@ -180,11 +180,13 @@ final router = GoRouter(
 );
 
 typedef PageWidgetBuilder = Widget Function(BuildContext, GoRouterState state);
+typedef StringBuilder = String Function(BuildContext context);
 
 class AppRoute {
   final bool anon;
   final String path;
-  final WidgetBuilder? menuBuilder;
+  final WidgetBuilder? menuWidgetBuilder;
+  final StringBuilder? menuTextBuilder;
   final Widget? icon;
   final PageWidgetBuilder pageBuilder;
 
@@ -192,9 +194,24 @@ class AppRoute {
     this.anon = false,
     required this.path,
     required this.pageBuilder,
-    this.menuBuilder,
+    this.menuWidgetBuilder,
+    this.menuTextBuilder,
     this.icon,
   });
+
+  bool get hasMenu {
+    return menuWidgetBuilder != null || menuTextBuilder != null;
+  }
+
+  Widget menuBuilder(BuildContext context) {
+    if (menuWidgetBuilder != null) {
+      return menuWidgetBuilder!(context);
+    }
+    if (menuTextBuilder != null) {
+      return Text(menuTextBuilder!(context));
+    }
+    return Container();
+  }
 }
 
 extension RouterContext on BuildContext {
@@ -207,6 +224,9 @@ extension RouterContext on BuildContext {
   }
 
   void pop<T extends Object?>([T? result]) {
-    return GoRouter.of(this).pop(result);
+    final router = GoRouter.of(this);
+    if (router.canPop()) {
+      return router.pop(result);
+    }
   }
 }

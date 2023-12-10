@@ -9,6 +9,8 @@ import '../../l10n/l10n.dart';
 import '../../model/domain/user.dart';
 import '../../page/sign_in.dart';
 import '../../service/auth.dart';
+import '../common/responsive.dart';
+import '../common/side_collapsible.dart';
 
 class AppScaffold extends StatefulWidget {
   final String path;
@@ -28,6 +30,7 @@ class AppScaffold extends StatefulWidget {
 
 class _AppScaffoldState extends State<AppScaffold> {
   String version = '';
+  bool menuCollapsed = false;
 
   @override
   void initState() {
@@ -49,42 +52,54 @@ class _AppScaffoldState extends State<AppScaffold> {
   Widget build(BuildContext context) {
     final user = appUser;
     final extraItemsCount = user != null ? 2 : 1;
-    return Scaffold(
-      appBar: AppBar(
-        title: title(context),
-        actions: [
-          if (user != null)
-            TextButton.icon(
-              onPressed: () {},
-              icon: user.icon,
-              label: Text(user.usernameOrEmail),
-            ),
-        ],
+    return ResponsiveWidget(
+      mobile: Scaffold(
+        appBar: appBar(user, false),
+        body: SafeArea(child: widget.child),
+        drawer: Drawer(
+          child: menu(extraItemsCount),
+        ),
       ),
-      body: SafeArea(child: widget.child),
-      drawer: Drawer(
-        child: ListView.separated(
-          itemCount: widget.routes.length + extraItemsCount,
-          itemBuilder: (context, index) {
-            if (index < widget.routes.length) {
-              return routeWidget(context, widget.routes[index]);
-            }
-            if (index == widget.routes.length) {
-              return aboutWidget(context);
-            }
-            return signOutWidget(context);
-          },
-          separatorBuilder: (_, __) {
-            return const Divider();
-          },
+      desktop: Scaffold(
+        appBar: appBar(user, true),
+        body: SafeArea(
+          child: SideCollapsibleWidget(
+            sideCollapsed: menuCollapsed,
+            side: menu(extraItemsCount),
+            child: widget.child,
+          ),
         ),
       ),
     );
   }
 
+  PreferredSizeWidget appBar(AppUser? user, bool canCollapse) {
+    return AppBar(
+      leading: canCollapse
+          ? IconButton(
+              icon: AppIcon.menu,
+              onPressed: () {
+                setState(() {
+                  menuCollapsed = !menuCollapsed;
+                });
+              },
+            )
+          : null,
+      title: title(context),
+      actions: [
+        if (user != null)
+          TextButton.icon(
+            onPressed: () {},
+            icon: user.icon,
+            label: Text(user.usernameOrEmail),
+          ),
+      ],
+    );
+  }
+
   Widget? title(BuildContext context) {
     final currentRouteIndex = widget.routes.indexWhere((route) {
-      return route.path == widget.path && route.menuBuilder != null;
+      return route.path == widget.path;
     });
     if (currentRouteIndex >= 0) {
       final route = widget.routes[currentRouteIndex];
@@ -93,37 +108,80 @@ class _AppScaffoldState extends State<AppScaffold> {
         children: [
           if (route.icon != null) route.icon!,
           if (route.icon != null) const SizedBox(width: 4),
-          Expanded(child: route.menuBuilder!(context)),
+          Expanded(child: route.menuBuilder(context)),
         ],
       );
     }
     return null;
   }
 
+  Widget menu(int extraItemsCount) {
+    return ListView.separated(
+      itemCount: widget.routes.length + extraItemsCount,
+      itemBuilder: (context, index) {
+        if (index < widget.routes.length) {
+          return routeWidget(context, widget.routes[index]);
+        }
+        if (index == widget.routes.length) {
+          return aboutWidget(context);
+        }
+        return signOutWidget(context);
+      },
+      separatorBuilder: (_, __) {
+        return const Divider();
+      },
+    );
+  }
+
   Widget routeWidget(BuildContext context, AppRoute route) {
     final selected = route.path == widget.path;
+    final onTap = !selected
+        ? () {
+            context.go(route.path);
+            context.pop();
+          }
+        : null;
+    if (menuCollapsed) {
+      return IconButton(
+        onPressed: onTap,
+        icon: route.icon ?? Container(),
+        tooltip: route.menuTextBuilder != null
+            ? route.menuTextBuilder!(context)
+            : null,
+      );
+    }
     return ListTile(
-      title: route.menuBuilder!(context),
+      title: route.menuBuilder(context),
       leading: route.icon,
       selected: selected,
-      onTap: !selected
-          ? () {
-              context.go(route.path);
-              context.pop();
-            }
-          : null,
+      onTap: onTap,
     );
   }
 
   Widget aboutWidget(BuildContext context) {
+    final aboutText = L10n.of(context).appAbout(version, DateTime.now().year);
+    if (menuCollapsed) {
+      return IconButton(
+        onPressed: null,
+        icon: AppIcon.about,
+        tooltip: aboutText,
+      );
+    }
     return ListTile(
       enabled: false,
-      title: Text(L10n.of(context).appAbout(version, DateTime.now().year)),
+      title: !menuCollapsed ? Text(aboutText) : null,
       leading: AppIcon.about,
     );
   }
 
   Widget signOutWidget(BuildContext context) {
+    if (menuCollapsed) {
+      return IconButton(
+        onPressed: onSignOut,
+        icon: AppIcon.signOut(context),
+        tooltip: L10n.of(context).signOut,
+      );
+    }
     return ListTile(
       title: Text(
         L10n.of(context).signOut,
@@ -132,12 +190,14 @@ class _AppScaffoldState extends State<AppScaffold> {
         ),
       ),
       leading: AppIcon.signOut(context),
-      onTap: () async {
-        await DI().get<AuthService>().signOut();
-        if (mounted) {
-          context.go(SignInPage.route);
-        }
-      },
+      onTap: onSignOut,
     );
+  }
+
+  void onSignOut() async {
+    await DI().get<AuthService>().signOut();
+    if (mounted) {
+      context.go(SignInPage.route);
+    }
   }
 }
