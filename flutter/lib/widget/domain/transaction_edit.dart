@@ -17,6 +17,8 @@ import '../../service/transaction.dart';
 import '../../service/wallet.dart';
 import '../common/form_toolbar.dart';
 import '../common/select_field.dart';
+import 'category_select.dart';
+import 'wallet_select.dart';
 
 class TransactionEdit extends StatefulWidget {
   final Transaction? value;
@@ -109,44 +111,30 @@ class _TransactionEditState extends State<TransactionEdit> {
   }
 
   Widget categoryField() {
-    return SelectField<Category>(
-      items: categories ?? [],
-      itemBuilder: (context, value) {
-        return Text(value.name);
+    return CategorySelect(
+      list: categories,
+      value: category,
+      enabled: widget.value == null,
+      onChanged: (value) {
+        setState(() {
+          errors.remove(TransactionValidator.category);
+          category = value;
+        });
       },
-      onChanged: canEdit
-          ? (value) {
-              setState(() {
-                errors.remove(TransactionValidator.category);
-                category = value;
-              });
-            }
-          : null,
-      selectedValue: category,
-      icon: categories == null ? AppIcon.loading : AppIcon.category,
-      hintText: L10n.of(context).transactionCategoryHint,
+      hintText: L10n.of(context).budgetAmountCategoryHint,
       errorText: errors[TransactionValidator.category]?.l10n(context),
     );
   }
 
   Widget walletField() {
-    return SelectField<Wallet>(
-      items: wallets ?? [],
-      itemBuilder: (context, value) {
-        return Text(value.name);
-      },
-      onChanged: canEdit
-          ? (value) {
-              setState(() {
-                errors.remove(TransactionValidator.wallet);
-                wallet = value;
-              });
-            }
-          : null,
-      selectedValue: wallet,
-      icon: wallets == null ? AppIcon.loading : AppIcon.wallet,
-      iconBuilder: (context, value) {
-        return value.walletType.icon();
+    return WalletSelect(
+      list: wallets,
+      value: wallet,
+      onChanged: (value) {
+        setState(() {
+          errors.remove(TransactionValidator.wallet);
+          wallet = value;
+        });
       },
       hintText: L10n.of(context).transactionWalletHint,
       errorText: errors[TransactionValidator.wallet]?.l10n(context),

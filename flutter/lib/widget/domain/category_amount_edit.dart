@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../app/icon.dart';
 import '../../app/router.dart';
 import '../../di.dart';
 import '../../l10n/l10n.dart';
@@ -13,7 +12,7 @@ import '../../service/category.dart';
 import '../../service/category_amount.dart';
 import '../../service/impl/category_amount_validator.dart';
 import '../common/form_toolbar.dart';
-import '../common/select_field.dart';
+import 'category_select.dart';
 
 class CategoryAmountEdit extends StatefulWidget {
   final CategoryAmount? value;
@@ -87,21 +86,16 @@ class _CategoryAmountEditState extends State<CategoryAmountEdit> {
   }
 
   Widget categoryField() {
-    return SelectField<Category>(
-      items: categories ?? [],
-      itemBuilder: (context, value) {
-        return Text(value.name);
+    return CategorySelect(
+      list: categories,
+      value: category,
+      enabled: widget.value == null,
+      onChanged: (value) {
+        setState(() {
+          errors.remove(CategoryAmountValidator.category);
+          category = value;
+        });
       },
-      onChanged: widget.value == null
-          ? (value) {
-              setState(() {
-                errors.remove(CategoryAmountValidator.category);
-                category = value;
-              });
-            }
-          : null,
-      selectedValue: category,
-      icon: categories == null ? AppIcon.loading : AppIcon.category,
       hintText: L10n.of(context).budgetAmountCategoryHint,
       errorText: errors[CategoryAmountValidator.category]?.l10n(context),
     );

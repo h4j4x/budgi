@@ -15,9 +15,10 @@ import '../service/transaction.dart';
 import '../service/wallet.dart';
 import '../widget/common/month_field.dart';
 import '../widget/common/responsive.dart';
-import '../widget/common/select_field.dart';
 import '../widget/common/sort_field.dart';
+import '../widget/domain/category_select.dart';
 import '../widget/domain/transaction_list.dart';
+import '../widget/domain/wallet_select.dart';
 import 'transaction.dart';
 
 class TransactionsPage extends StatefulWidget {
@@ -141,81 +142,64 @@ class _TransactionsPageState extends State<TransactionsPage> {
     );
   }
 
-  Widget walletField() {
-    if (wallets == null) {
-      return Container();
-    }
-    return SelectField<Wallet>(
-      items: wallets!,
-      itemBuilder: (context, value) {
-        return Text(value.name);
-      },
-      onClear: !loading
-          ? () {
-              filter.wallet = null;
-              loadList();
-            }
-          : null,
-      onChanged: !loading
-          ? (value) {
-              filter.wallet = value;
-              loadList();
-            }
-          : null,
-      selectedValue: filter.wallet,
-      icon: wallets == null ? AppIcon.loading : AppIcon.wallet,
-      iconBuilder: (context, value) {
-        return value.walletType.icon();
-      },
+  Widget walletField([Wallet? value, Function(Wallet?)? onChanged]) {
+    return WalletSelect(
+      list: wallets,
+      value: value ?? filter.wallet,
+      enabled: !loading,
+      onChanged: onChanged ??
+          (value) {
+            filter.wallet = value;
+            loadList();
+          },
       hintText: L10n.of(context).transactionWalletHint,
     );
   }
 
-  Widget categoryField() {
-    if (categories == null) {
-      return Container();
-    }
-    return SelectField<Category>(
-      items: categories!,
-      itemBuilder: (context, value) {
-        return Text(value.name);
-      },
-      onClear: !loading
-          ? () {
-              filter.category = null;
-              loadList();
-            }
-          : null,
-      onChanged: !loading
-          ? (value) {
-              filter.category = value;
-              loadList();
-            }
-          : null,
-      selectedValue: filter.category,
-      icon: categories == null ? AppIcon.loading : AppIcon.category,
+  Widget categoryField([Category? value, Function(Category?)? onChanged]) {
+    return CategorySelect(
+      list: categories,
+      value: value ?? filter.category,
+      onChanged: onChanged ??
+          (value) {
+            filter.category = value;
+            loadList();
+          },
       hintText: L10n.of(context).transactionCategoryHint,
+      enabled: !loading,
     );
   }
 
-  Widget sortItem(bool mobileSize) {
+  Widget sortItem(bool mobileSize, [Sort? value, Function(Sort?)? onChanged]) {
     return SortField(
         mobileSize: mobileSize,
         title: L10n.of(context).sortByDateTime,
-        value: filter.dateTimeSort,
+        value: value ?? filter.dateTimeSort,
         onChanged: !loading && list.isNotEmpty
-            ? (value) {
-                filter.dateTimeSort = value;
-                loadList();
-              }
+            ? onChanged ??
+                (value) {
+                  filter.dateTimeSort = value;
+                  loadList();
+                }
             : null);
   }
 
   Widget filterButton() {
-    final items = <Widget>[
-      AppIcon.tiny(filter.dateTimeSort.icon()),
-    ];
     const textScaler = TextScaler.linear(0.6);
+    final items = <Widget>[
+      Row(
+        children: [
+          AppIcon.tiny(filter.dateTimeSort.icon()),
+          Padding(
+            padding: const EdgeInsets.only(left: 4),
+            child: Text(
+              filter.dateTimeSort.l10n(context),
+              textScaler: textScaler,
+            ),
+          ),
+        ],
+      ),
+    ];
     final l10n = L10n.of(context);
     if (filter.category != null) {
       items.insert(
@@ -247,8 +231,8 @@ class _TransactionsPageState extends State<TransactionsPage> {
   }
 
   void onFilter() async {
-    final currentFilter = _Filter();
-    currentFilter.copyFrom(filter);
+    final newFilter = _Filter();
+    newFilter.copyFrom(filter);
     final value = await showModalBottomSheet<bool>(
       context: context,
       builder: (context) {
@@ -260,9 +244,15 @@ class _TransactionsPageState extends State<TransactionsPage> {
             textScaler: const TextScaler.linear(1.25),
             style: const TextStyle(fontWeight: FontWeight.w600),
           ),
-          walletField(),
-          categoryField(),
-          sortItem(false),
+          walletField(filter.wallet, (value) {
+            newFilter.wallet = value;
+          }),
+          categoryField(filter.category, (value) {
+            newFilter.category = value;
+          }),
+          sortItem(false, filter.dateTimeSort, (value) {
+            newFilter.dateTimeSort = value ?? Sort.desc;
+          }),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -280,20 +270,21 @@ class _TransactionsPageState extends State<TransactionsPage> {
           )
         ];
         return Container(
-          height: 300,
+          height: 350,
           padding: const EdgeInsets.symmetric(horizontal: 8),
           child: Column(
             children: items.map((item) {
               return Padding(
-                  padding: const EdgeInsets.only(top: 8), child: item);
+                padding: const EdgeInsets.only(top: 8),
+                child: item,
+              );
             }).toList(),
           ),
         );
       },
     );
-    if (!(value ?? false)) {
-      filter.copyFrom(currentFilter);
-    } else {
+    if (value ?? false) {
+      filter.copyFrom(newFilter);
       setState(() {});
     }
   }
