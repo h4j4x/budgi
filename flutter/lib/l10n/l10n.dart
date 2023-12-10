@@ -193,6 +193,12 @@ abstract class L10n {
   /// **'Categories expenses'**
   String get categoriesExpenses;
 
+  /// No description provided for @category.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get category;
+
   /// No description provided for @categoryName.
   ///
   /// In en, this message translates to:

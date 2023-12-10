@@ -212,59 +212,90 @@ class _TransactionsPageState extends State<TransactionsPage> {
   }
 
   Widget filterButton() {
-    return IconButton(
-      onPressed: () async {
-        final currentFilter = _Filter();
-        currentFilter.copyFrom(filter);
-        final value = await showModalBottomSheet<bool>(
-          context: context,
-          builder: (context) {
-            final l10n = L10n.of(context);
-            final items = <Widget>[
-              Text(
-                l10n.transactionsFilters,
-                textAlign: TextAlign.center,
-                textScaler: const TextScaler.linear(1.25),
-                style: const TextStyle(fontWeight: FontWeight.w600),
-              ),
-              walletField(),
-              categoryField(),
-              sortItem(false),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      context.pop(true);
-                    },
-                    child: Text(l10n.okAction),
-                  ),
-                  TextButton(
-                    onPressed: context.pop,
-                    child: Text(l10n.cancelAction),
-                  ),
-                ],
-              )
-            ];
-            return Container(
-              height: 300,
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Column(
-                children: items.map((item) {
-                  return Padding(padding: const EdgeInsets.only(top: 8), child: item);
-                }).toList(),
-              ),
-            );
-          },
-        );
-        if (!(value ?? false)) {
-          filter.copyFrom(currentFilter);
-        } else {
-          setState(() {});
-        }
-      },
-      icon: AppIcon.filter,
+    final items = <Widget>[
+      AppIcon.tiny(filter.dateTimeSort.icon()),
+    ];
+    const textScaler = TextScaler.linear(0.6);
+    final l10n = L10n.of(context);
+    if (filter.category != null) {
+      items.insert(
+        0,
+        Text(
+          '${l10n.category}: ${filter.category!.name}',
+          textScaler: textScaler,
+        ),
+      );
+    }
+    if (filter.wallet != null) {
+      items.insert(
+        0,
+        Text(
+          '${l10n.wallet}: ${filter.wallet!.name}',
+          textScaler: textScaler,
+        ),
+      );
+    }
+    return TextButton.icon(
+      onPressed: onFilter,
+      label: AppIcon.filter,
+      icon: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: items,
+      ),
     );
+  }
+
+  void onFilter() async {
+    final currentFilter = _Filter();
+    currentFilter.copyFrom(filter);
+    final value = await showModalBottomSheet<bool>(
+      context: context,
+      builder: (context) {
+        final l10n = L10n.of(context);
+        final items = <Widget>[
+          Text(
+            l10n.transactionsFilters,
+            textAlign: TextAlign.center,
+            textScaler: const TextScaler.linear(1.25),
+            style: const TextStyle(fontWeight: FontWeight.w600),
+          ),
+          walletField(),
+          categoryField(),
+          sortItem(false),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              TextButton(
+                onPressed: () {
+                  context.pop(true);
+                },
+                child: Text(l10n.okAction),
+              ),
+              TextButton(
+                onPressed: context.pop,
+                child: Text(l10n.cancelAction),
+              ),
+            ],
+          )
+        ];
+        return Container(
+          height: 300,
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Column(
+            children: items.map((item) {
+              return Padding(
+                  padding: const EdgeInsets.only(top: 8), child: item);
+            }).toList(),
+          ),
+        );
+      },
+    );
+    if (!(value ?? false)) {
+      filter.copyFrom(currentFilter);
+    } else {
+      setState(() {});
+    }
   }
 
   Widget toolbarItem({required Widget child}) {

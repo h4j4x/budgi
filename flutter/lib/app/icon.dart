@@ -126,4 +126,20 @@ class AppIcon {
   static Widget get walletDebitCard {
     return const FaIcon(FontAwesomeIcons.solidCreditCard);
   }
+
+  static Widget tiny(Widget icon) {
+    if (icon is FaIcon) {
+      return FaIcon(
+        icon.icon,
+        size: 8,
+      );
+    }
+    if (icon is Icon) {
+      return Icon(
+        icon.icon,
+        size: 8,
+      );
+    }
+    return icon;
+  }
 }

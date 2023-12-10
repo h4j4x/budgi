@@ -64,6 +64,9 @@ class L10nEn extends L10n {
   String get categoriesExpenses => 'Categories expenses';
 
   @override
+  String get category => 'Category';
+
+  @override
   String get categoryName => 'Category name';
 
   @override
