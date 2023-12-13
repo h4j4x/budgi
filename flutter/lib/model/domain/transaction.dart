@@ -7,9 +7,8 @@ import 'wallet.dart';
 
 enum TransactionType {
   income(true),
-  incomeTransfer(true),
   expense(false),
-  expenseTransfer(false);
+  walletTransfer(true);
 
   final bool isIncome;
 
@@ -19,18 +18,16 @@ enum TransactionType {
     final l10n = L10n.of(context);
     return switch (this) {
       income => l10n.transactionTypeIncome,
-      incomeTransfer => l10n.transactionTypeIncomeTransfer,
       expense => l10n.transactionTypeExpense,
-      expenseTransfer => l10n.transactionTypeExpenseTransfer,
+      walletTransfer => l10n.transactionTypeWalletTransfer,
     };
   }
 
   Widget icon(BuildContext context) {
     return switch (this) {
       income => AppIcon.transactionIncome(context),
-      incomeTransfer => AppIcon.transactionIncomeTransfer(context),
       expense => AppIcon.transactionExpense(context),
-      expenseTransfer => AppIcon.transactionExpenseTransfer(context),
+      walletTransfer => AppIcon.transactionTransfer(context),
     };
   }
 

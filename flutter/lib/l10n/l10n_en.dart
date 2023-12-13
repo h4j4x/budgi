@@ -121,6 +121,9 @@ class L10nEn extends L10n {
   String get invalidTransactionWallet => 'Invalid wallet';
 
   @override
+  String get invalidTransactionTargetWallet => 'Invalid target wallet';
+
+  @override
   String get invalidUser => 'Invalid user';
 
   @override
@@ -228,19 +231,22 @@ class L10nEn extends L10n {
   String get transactionTypeIncome => 'Income';
 
   @override
-  String get transactionTypeIncomeTransfer => 'Income transfer';
-
-  @override
   String get transactionTypeExpense => 'Expense';
-
-  @override
-  String get transactionTypeExpenseTransfer => 'Expense transfer';
 
   @override
   String get transactionTypeHint => 'Select transaction type';
 
   @override
+  String get transactionTypeWalletTransfer => ' Wallet transfer';
+
+  @override
   String get transactionWalletHint => 'Select transaction wallet';
+
+  @override
+  String get transactionWalletSourceHint => 'Select source transaction wallet';
+
+  @override
+  String get transactionWalletTargetHint => 'Select target transaction wallet';
 
   @override
   String get userEmail => 'Email';

@@ -289,6 +289,12 @@ abstract class L10n {
   /// **'Invalid wallet'**
   String get invalidTransactionWallet;
 
+  /// No description provided for @invalidTransactionTargetWallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid target wallet'**
+  String get invalidTransactionTargetWallet;
+
   /// No description provided for @invalidUser.
   ///
   /// In en, this message translates to:
@@ -481,23 +487,11 @@ abstract class L10n {
   /// **'Income'**
   String get transactionTypeIncome;
 
-  /// No description provided for @transactionTypeIncomeTransfer.
-  ///
-  /// In en, this message translates to:
-  /// **'Income transfer'**
-  String get transactionTypeIncomeTransfer;
-
   /// No description provided for @transactionTypeExpense.
   ///
   /// In en, this message translates to:
   /// **'Expense'**
   String get transactionTypeExpense;
-
-  /// No description provided for @transactionTypeExpenseTransfer.
-  ///
-  /// In en, this message translates to:
-  /// **'Expense transfer'**
-  String get transactionTypeExpenseTransfer;
 
   /// No description provided for @transactionTypeHint.
   ///
@@ -505,11 +499,29 @@ abstract class L10n {
   /// **'Select transaction type'**
   String get transactionTypeHint;
 
+  /// No description provided for @transactionTypeWalletTransfer.
+  ///
+  /// In en, this message translates to:
+  /// **' Wallet transfer'**
+  String get transactionTypeWalletTransfer;
+
   /// No description provided for @transactionWalletHint.
   ///
   /// In en, this message translates to:
   /// **'Select transaction wallet'**
   String get transactionWalletHint;
+
+  /// No description provided for @transactionWalletSourceHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select source transaction wallet'**
+  String get transactionWalletSourceHint;
+
+  /// No description provided for @transactionWalletTargetHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select target transaction wallet'**
+  String get transactionWalletTargetHint;
 
   /// No description provided for @userEmail.
   ///

@@ -1,1 +1,3 @@
 - transfers between accounts
+- load last transaction type used (default expense)
+- on delete transaction of type walletTransfer, delete associate transactions

@@ -92,7 +92,7 @@ class AppIcon {
     return FaIcon(FontAwesomeIcons.moneyCheck, color: color);
   }
 
-  static Widget transactionExpenseTransfer(BuildContext context) {
+  static Widget transactionTransfer(BuildContext context) {
     final color = Theme.of(context).colorScheme.warning;
     return FaIcon(FontAwesomeIcons.moneyBillTransfer, color: color);
   }
@@ -100,11 +100,6 @@ class AppIcon {
   static Widget transactionIncome(BuildContext context) {
     final color = Theme.of(context).colorScheme.success;
     return FaIcon(FontAwesomeIcons.moneyCheckDollar, color: color);
-  }
-
-  static Widget transactionIncomeTransfer(BuildContext context) {
-    final color = Theme.of(context).colorScheme.success;
-    return FaIcon(FontAwesomeIcons.moneyBillTransfer, color: color);
   }
 
   static Widget get user {

@@ -44,10 +44,20 @@ class _TransactionEditState extends State<TransactionEdit> {
   bool canEdit = false;
   bool saving = false;
   List<Category>? categories;
-  Category? category;
   List<Wallet>? wallets;
-  Wallet? wallet;
+
   TransactionType? transactionType;
+  Category? category;
+  Wallet? wallet;
+  Wallet? walletTarget;
+
+  bool get isWalletTransfer {
+    return transactionType == TransactionType.walletTransfer;
+  }
+
+  bool get isNotWalletTransfer {
+    return transactionType != TransactionType.walletTransfer;
+  }
 
   @override
   void initState() {
@@ -62,7 +72,9 @@ class _TransactionEditState extends State<TransactionEdit> {
       canEdit = Period.currentMonth.contains(widget.value!.dateTime);
     } else {
       canEdit = true;
+      // todo: load last transactionType used
     }
+    transactionType ??= TransactionType.expense;
     Future.delayed(Duration.zero, () {
       loadCategories();
       loadWallets();
@@ -86,9 +98,10 @@ class _TransactionEditState extends State<TransactionEdit> {
   @override
   Widget build(BuildContext context) {
     final items = <Widget>[
-      categoryField(),
-      walletField(),
       transactionTypeField(),
+      if (isNotWalletTransfer) categoryField(),
+      walletField(),
+      if (isWalletTransfer) walletTargetField(),
       amountField(),
       descriptionField(),
       const SizedBox(height: 24),
@@ -107,6 +120,31 @@ class _TransactionEditState extends State<TransactionEdit> {
           itemCount: items.length,
         ),
       ),
+    );
+  }
+
+  Widget transactionTypeField() {
+    return SelectField<TransactionType>(
+      items: TransactionType.values,
+      itemBuilder: (context, value) {
+        return Text(value.l10n(context));
+      },
+      onChanged: canEdit
+          ? (value) {
+              setState(() {
+                errors.remove(TransactionValidator.transactionType);
+                transactionType = value;
+              });
+              amountFocus.requestFocus();
+            }
+          : null,
+      selectedValue: transactionType,
+      icon: AppIcon.transaction,
+      iconBuilder: (context, value) {
+        return value.icon(context);
+      },
+      hintText: L10n.of(context).transactionTypeHint,
+      errorText: errors[TransactionValidator.description]?.l10n(context),
     );
   }
 
@@ -136,33 +174,25 @@ class _TransactionEditState extends State<TransactionEdit> {
           wallet = value;
         });
       },
-      hintText: L10n.of(context).transactionWalletHint,
+      hintText: isNotWalletTransfer
+          ? L10n.of(context).transactionWalletHint
+          : L10n.of(context).transactionWalletSourceHint,
       errorText: errors[TransactionValidator.wallet]?.l10n(context),
     );
   }
 
-  Widget transactionTypeField() {
-    return SelectField<TransactionType>(
-      items: TransactionType.values,
-      itemBuilder: (context, value) {
-        return Text(value.l10n(context));
+  Widget walletTargetField() {
+    return WalletSelect(
+      list: wallets,
+      value: walletTarget,
+      onChanged: (value) {
+        setState(() {
+          errors.remove(TransactionValidator.walletTarget);
+          walletTarget = value;
+        });
       },
-      onChanged: canEdit
-          ? (value) {
-              setState(() {
-                errors.remove(TransactionValidator.transactionType);
-                transactionType = value;
-              });
-              amountFocus.requestFocus();
-            }
-          : null,
-      selectedValue: transactionType,
-      icon: AppIcon.transaction,
-      iconBuilder: (context, value) {
-        return value.icon(context);
-      },
-      hintText: L10n.of(context).transactionTypeHint,
-      errorText: errors[TransactionValidator.description]?.l10n(context),
+      hintText: L10n.of(context).transactionWalletTargetHint,
+      errorText: errors[TransactionValidator.walletTarget]?.l10n(context),
     );
   }
 
@@ -219,31 +249,32 @@ class _TransactionEditState extends State<TransactionEdit> {
       return;
     }
 
-    if (category == null) {
-      setState(() {
-        errors[TransactionValidator.category] =
-            TransactionError.invalidCategory;
-      });
-      return;
+    errors.clear();
+
+    if (transactionType == null) {
+      errors[TransactionValidator.transactionType] =
+          TransactionError.invalidTransactionType;
+    }
+
+    if (isNotWalletTransfer && category == null) {
+      errors[TransactionValidator.category] = TransactionError.invalidCategory;
     }
 
     if (wallet == null) {
-      setState(() {
-        errors[TransactionValidator.wallet] = TransactionError.invalidWallet;
-      });
-      return;
+      errors[TransactionValidator.wallet] = TransactionError.invalidWallet;
     }
 
-    if (transactionType == null) {
-      setState(() {
-        errors[TransactionValidator.transactionType] =
-            TransactionError.invalidTransactionType;
-      });
+    if (isWalletTransfer && walletTarget == null) {
+      errors[TransactionValidator.walletTarget] =
+          TransactionError.invalidWalletTarget;
+    }
+
+    if (errors.isNotEmpty) {
+      setState(() {});
       return;
     }
 
     setState(() {
-      errors.clear();
       saving = true;
     });
     try {

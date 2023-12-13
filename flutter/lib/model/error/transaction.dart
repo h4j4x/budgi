@@ -7,6 +7,7 @@ enum TransactionError {
   invalidUser,
   invalidTransactionType,
   invalidWallet,
+  invalidWalletTarget,
   invalidCategory,
   invalidAmount,
   invalidDescription;
@@ -17,6 +18,7 @@ enum TransactionError {
       invalidUser => l10n.invalidUser,
       invalidTransactionType => l10n.invalidTransactionType,
       invalidWallet => l10n.invalidTransactionWallet,
+      invalidWalletTarget => l10n.invalidTransactionTargetWallet,
       invalidCategory => l10n.invalidBudgetCategory,
       invalidAmount => l10n.invalidTransactionAmount,
       invalidDescription =>
