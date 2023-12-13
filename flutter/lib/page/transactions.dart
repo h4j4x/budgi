@@ -34,11 +34,15 @@ class TransactionsPage extends StatefulWidget {
 
 class _TransactionsPageState extends State<TransactionsPage> {
   final list = <Transaction>[];
-  final filter = _Filter();
 
   bool loading = false;
   List<Wallet>? wallets;
   List<Category>? categories;
+
+  Period period = Period.currentMonth;
+  Wallet? wallet;
+  Category? category;
+  Sort dateTimeSort = Sort.desc;
 
   @override
   void initState() {
@@ -58,10 +62,10 @@ class _TransactionsPageState extends State<TransactionsPage> {
       loading = true;
     });
     final newList = await DI().get<TransactionService>().listTransactions(
-          period: filter.period,
-          wallet: filter.wallet,
-          category: filter.category,
-          dateTimeSort: filter.dateTimeSort,
+          period: period,
+          wallet: wallet,
+          category: category,
+          dateTimeSort: dateTimeSort,
         );
     list.clear();
     list.addAll(newList);
@@ -111,10 +115,10 @@ class _TransactionsPageState extends State<TransactionsPage> {
       title: Container(
         constraints: const BoxConstraints(maxWidth: 200),
         child: MonthFieldWidget(
-          period: filter.period,
+          period: period,
           onChanged: (value) {
             setState(() {
-              filter.period = value;
+              period = value;
             });
             loadList();
           },
@@ -145,11 +149,11 @@ class _TransactionsPageState extends State<TransactionsPage> {
   Widget walletField([Wallet? value, Function(Wallet?)? onChanged]) {
     return WalletSelect(
       list: wallets,
-      value: value ?? filter.wallet,
+      value: value ?? wallet,
       enabled: !loading,
       onChanged: onChanged ??
           (value) {
-            filter.wallet = value;
+            wallet = value;
             loadList();
           },
       hintText: L10n.of(context).transactionWalletHint,
@@ -159,10 +163,10 @@ class _TransactionsPageState extends State<TransactionsPage> {
   Widget categoryField([Category? value, Function(Category?)? onChanged]) {
     return CategorySelect(
       list: categories,
-      value: value ?? filter.category,
+      value: value ?? category,
       onChanged: onChanged ??
           (value) {
-            filter.category = value;
+            category = value;
             loadList();
           },
       hintText: L10n.of(context).transactionCategoryHint,
@@ -174,11 +178,11 @@ class _TransactionsPageState extends State<TransactionsPage> {
     return SortField(
         mobileSize: mobileSize,
         title: L10n.of(context).sortByDateTime,
-        value: value ?? filter.dateTimeSort,
+        value: value ?? dateTimeSort,
         onChanged: !loading && list.isNotEmpty
             ? onChanged ??
                 (value) {
-                  filter.dateTimeSort = value;
+                  dateTimeSort = value;
                   loadList();
                 }
             : null);
@@ -189,11 +193,11 @@ class _TransactionsPageState extends State<TransactionsPage> {
     final items = <Widget>[
       Row(
         children: [
-          AppIcon.tiny(filter.dateTimeSort.icon()),
+          AppIcon.tiny(dateTimeSort.icon()),
           Padding(
             padding: const EdgeInsets.only(left: 4),
             child: Text(
-              filter.dateTimeSort.l10n(context),
+              dateTimeSort.l10n(context),
               textScaler: textScaler,
             ),
           ),
@@ -201,20 +205,20 @@ class _TransactionsPageState extends State<TransactionsPage> {
       ),
     ];
     final l10n = L10n.of(context);
-    if (filter.category != null) {
+    if (category != null) {
       items.insert(
         0,
         Text(
-          '${l10n.category}: ${filter.category!.name}',
+          '${l10n.category}: ${category!.name}',
           textScaler: textScaler,
         ),
       );
     }
-    if (filter.wallet != null) {
+    if (wallet != null) {
       items.insert(
         0,
         Text(
-          '${l10n.wallet}: ${filter.wallet!.name}',
+          '${l10n.wallet}: ${wallet!.name}',
           textScaler: textScaler,
         ),
       );
@@ -231,8 +235,9 @@ class _TransactionsPageState extends State<TransactionsPage> {
   }
 
   void onFilter() async {
-    final newFilter = _Filter();
-    newFilter.copyFrom(filter);
+    Wallet? newWallet = wallet;
+    Category? newCategory = category;
+    Sort newDateTimeSort = dateTimeSort;
     final value = await showModalBottomSheet<bool>(
       context: context,
       builder: (context) {
@@ -244,14 +249,14 @@ class _TransactionsPageState extends State<TransactionsPage> {
             textScaler: const TextScaler.linear(1.25),
             style: const TextStyle(fontWeight: FontWeight.w600),
           ),
-          walletField(filter.wallet, (value) {
-            newFilter.wallet = value;
+          walletField(wallet, (value) {
+            newWallet = value;
           }),
-          categoryField(filter.category, (value) {
-            newFilter.category = value;
+          categoryField(category, (value) {
+            newCategory = value;
           }),
-          sortItem(false, filter.dateTimeSort, (value) {
-            newFilter.dateTimeSort = value ?? Sort.desc;
+          sortItem(false, dateTimeSort, (value) {
+            newDateTimeSort = value ?? Sort.desc;
           }),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -284,8 +289,11 @@ class _TransactionsPageState extends State<TransactionsPage> {
       },
     );
     if (value ?? false) {
-      filter.copyFrom(newFilter);
-      setState(() {});
+      setState(() {
+        wallet = newWallet;
+        category = newCategory;
+        dateTimeSort = newDateTimeSort;
+      });
     }
   }
 
@@ -328,21 +336,5 @@ class _TransactionsPageState extends State<TransactionsPage> {
       tooltip: L10n.of(context).addAction,
       child: AppIcon.add,
     );
-  }
-}
-
-class _Filter {
-  Period period = Period.currentMonth;
-  Wallet? wallet;
-  Category? category;
-  Sort dateTimeSort = Sort.desc;
-
-  _Filter();
-
-  void copyFrom(_Filter filter) {
-    period = filter.period;
-    wallet = filter.wallet;
-    category = filter.category;
-    dateTimeSort = filter.dateTimeSort;
   }
 }
