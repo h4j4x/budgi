@@ -39,9 +39,8 @@ class AuthSupabaseService extends AuthService {
   @override
   Future<bool> signInWithGithub(BuildContext context) {
     return config.supabase.auth.signInWithOAuth(
-      Provider.github,
+      OAuthProvider.github,
       redirectTo: kIsWeb ? null : 'com.sp1ke.budgi.flutter://sign-in-callback/',
-      context: context,
       authScreenLaunchMode: LaunchMode.platformDefault,
     );
   }
@@ -95,10 +94,8 @@ class _User implements AppUser {
   @override
   String get name {
     if (user.userMetadata != null &&
-        (user.userMetadata!['full_name'] is String ||
-            user.userMetadata!['name'] is String)) {
-      return user.userMetadata!['full_name'] as String? ??
-          user.userMetadata!['name'] as String;
+        (user.userMetadata!['full_name'] is String || user.userMetadata!['name'] is String)) {
+      return user.userMetadata!['full_name'] as String? ?? user.userMetadata!['name'] as String;
     }
     return '-';
   }
@@ -106,10 +103,8 @@ class _User implements AppUser {
   @override
   String get username {
     if (user.userMetadata != null &&
-        (user.userMetadata!['preferred_username'] is String ||
-            user.userMetadata!['user_name'] is String)) {
-      return user.userMetadata!['preferred_username'] as String? ??
-          user.userMetadata!['user_name'] as String;
+        (user.userMetadata!['preferred_username'] is String || user.userMetadata!['user_name'] is String)) {
+      return user.userMetadata!['preferred_username'] as String? ?? user.userMetadata!['user_name'] as String;
     }
     return name;
   }

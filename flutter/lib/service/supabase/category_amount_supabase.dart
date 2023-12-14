@@ -197,16 +197,12 @@ class CategoryAmountSupabaseService implements CategoryAmountService {
   Future<bool> _categoryAmountExistsByCategoryAndPeriod(SupabaseCategory category, Period period) async {
     final count = await config.supabase
         .from(categoryAmountTable)
-        .select(
-          idField,
-          const FetchOptions(
-            count: CountOption.exact,
-          ),
-        )
+        .select(idField)
         .eq(categoryIdField, category.id)
         .eq(fromDateField, period.from.toIso8601String())
-        .eq(toDateField, period.to.toIso8601String());
-    return count.count != null && count.count! > 0;
+        .eq(toDateField, period.to.toIso8601String())
+        .count(CountOption.exact);
+    return count.count > 0;
   }
 
   Future<SupabaseCategory?> _fetchCategoryById(int id) async {

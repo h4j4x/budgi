@@ -33,9 +33,7 @@ class CategorySupabaseService implements CategoryService {
     String? code,
     required String name,
   }) async {
-    final user = DI()
-        .get<AuthService>()
-        .fetchUser(errorIfMissing: CategoryError.invalidUser);
+    final user = DI().get<AuthService>().fetchUser(errorIfMissing: CategoryError.invalidUser);
 
     final categoryCode = code ?? randomString(6);
     final category = SupabaseCategory(code: categoryCode, name: name);
@@ -46,10 +44,7 @@ class CategorySupabaseService implements CategoryService {
 
     final categoryExists = await _categoryExistsByCode(categoryCode);
     if (categoryExists) {
-      await config.supabase
-          .from(categoryTable)
-          .update(category.toMap(user))
-          .match({codeField: categoryCode});
+      await config.supabase.from(categoryTable).update(category.toMap(user)).match({codeField: categoryCode});
     } else {
       await config.supabase.from(categoryTable).insert(category.toMap(user));
     }
@@ -79,10 +74,7 @@ class CategorySupabaseService implements CategoryService {
     }
 
     final data = await query;
-    if (data is List) {
-      return data.map(SupabaseCategory.from).whereType<Category>().toList();
-    }
-    return [];
+    return data.map(SupabaseCategory.from).whereType<Category>().toList();
   }
 
   @override
@@ -94,8 +86,7 @@ class CategorySupabaseService implements CategoryService {
 
   @override
   Future<Category> fetchCategoryByCode(String code) async {
-    final categoryData =
-        await config.supabase.from(categoryTable).select().eq(codeField, code);
+    final categoryData = await config.supabase.from(categoryTable).select().eq(codeField, code);
     final category = SupabaseCategory.from(categoryData);
     if (category != null) {
       return category;
@@ -107,13 +98,11 @@ class CategorySupabaseService implements CategoryService {
 
   @override
   Future<Category?> fetchCategoryById(int id) async {
-    final categoryData =
-        await config.supabase.from(categoryTable).select().eq(idField, id);
+    final categoryData = await config.supabase.from(categoryTable).select().eq(idField, id);
     return SupabaseCategory.from(categoryData);
   }
 
-  Future<List<int>> _fetchCategoriesIdsOfAmounts(
-      String userId, Period period) async {
+  Future<List<int>> _fetchCategoriesIdsOfAmounts(String userId, Period period) async {
     final data = await config.supabase
         .from(categoryAmountTable)
         .select(categoryIdField)
@@ -121,30 +110,19 @@ class CategorySupabaseService implements CategoryService {
         .eq(fromDateField, period.from.toIso8601String())
         .eq(toDateField, period.to.toIso8601String());
     final list = <int>[];
-    if (data is List) {
-      for (var item in data) {
-        if (item is Map<String, dynamic>) {
-          final categoryId = item[categoryIdField] as int?;
-          if (categoryId != null) {
-            list.add(categoryId);
-          }
-        }
+    for (var item in data) {
+      final categoryId = item[categoryIdField] as int?;
+      if (categoryId != null) {
+        list.add(categoryId);
       }
     }
     return list;
   }
 
   Future<bool> _categoryExistsByCode(String code) async {
-    final count = await config.supabase
-        .from(categoryTable)
-        .select(
-          idField,
-          const FetchOptions(
-            count: CountOption.exact,
-          ),
-        )
-        .eq(codeField, code);
-    return count.count != null && count.count! > 0;
+    final count =
+        await config.supabase.from(categoryTable).select(idField).eq(codeField, code).count(CountOption.exact);
+    return count.count > 0;
   }
 }
 
@@ -194,9 +172,7 @@ class SupabaseCategory implements Category {
     if (identical(this, other)) {
       return true;
     }
-    return other is SupabaseCategory &&
-        runtimeType == other.runtimeType &&
-        code == other.code;
+    return other is SupabaseCategory && runtimeType == other.runtimeType && code == other.code;
   }
 
   @override

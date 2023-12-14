@@ -96,7 +96,7 @@ class TransactionSupabaseService extends TransactionService {
 
     var query = config.supabase.from(transactionTable).select().eq(userIdField, user.id);
     if (transactionTypes?.isNotEmpty ?? false) {
-      query = query.in_(
+      query = query.inFilter(
           transactionTypeField,
           transactionTypes!.map((transactionType) {
             return transactionType.name;
@@ -139,16 +139,9 @@ class TransactionSupabaseService extends TransactionService {
   }
 
   Future<bool> _transactionExistsByCode(String code) async {
-    final count = await config.supabase
-        .from(transactionTable)
-        .select(
-          idField,
-          const FetchOptions(
-            count: CountOption.exact,
-          ),
-        )
-        .eq(codeField, code);
-    return count.count != null && count.count! > 0;
+    final count =
+        await config.supabase.from(transactionTable).select(idField).eq(codeField, code).count(CountOption.exact);
+    return count.count > 0;
   }
 
   Future<SupabaseCategory?> _fetchCategoryById(int id) async {
