@@ -66,8 +66,7 @@ class _TransactionEditState extends State<TransactionEdit> {
       category = widget.value!.category;
       wallet = widget.value!.wallet;
       transactionType = widget.value!.transactionType;
-      amountController.text =
-          widget.value!.amount.toStringAsFixed(2).toString();
+      amountController.text = widget.value!.amount.toStringAsFixed(2).toString();
       descriptionController.text = widget.value!.description;
       canEdit = Period.currentMonth.contains(widget.value!.dateTime);
     } else {
@@ -99,7 +98,7 @@ class _TransactionEditState extends State<TransactionEdit> {
   Widget build(BuildContext context) {
     final items = <Widget>[
       transactionTypeField(),
-      if (isNotWalletTransfer) categoryField(),
+      categoryField(),
       walletField(),
       if (isWalletTransfer) walletTargetField(),
       amountField(),
@@ -166,7 +165,7 @@ class _TransactionEditState extends State<TransactionEdit> {
 
   Widget walletField() {
     return WalletSelect(
-      list: wallets,
+      list: (wallets ?? []).where((item) => item != walletTarget).toList(),
       value: wallet,
       onChanged: (value) {
         setState(() {
@@ -174,16 +173,15 @@ class _TransactionEditState extends State<TransactionEdit> {
           wallet = value;
         });
       },
-      hintText: isNotWalletTransfer
-          ? L10n.of(context).transactionWalletHint
-          : L10n.of(context).transactionWalletSourceHint,
+      hintText:
+          isNotWalletTransfer ? L10n.of(context).transactionWalletHint : L10n.of(context).transactionWalletSourceHint,
       errorText: errors[TransactionValidator.wallet]?.l10n(context),
     );
   }
 
   Widget walletTargetField() {
     return WalletSelect(
-      list: wallets,
+      list: (wallets ?? []).where((item) => item != wallet).toList(),
       value: walletTarget,
       onChanged: (value) {
         setState(() {
@@ -252,11 +250,10 @@ class _TransactionEditState extends State<TransactionEdit> {
     errors.clear();
 
     if (transactionType == null) {
-      errors[TransactionValidator.transactionType] =
-          TransactionError.invalidTransactionType;
+      errors[TransactionValidator.transactionType] = TransactionError.invalidTransactionType;
     }
 
-    if (isNotWalletTransfer && category == null) {
+    if (category == null) {
       errors[TransactionValidator.category] = TransactionError.invalidCategory;
     }
 
@@ -265,8 +262,7 @@ class _TransactionEditState extends State<TransactionEdit> {
     }
 
     if (isWalletTransfer && walletTarget == null) {
-      errors[TransactionValidator.walletTarget] =
-          TransactionError.invalidWalletTarget;
+      errors[TransactionValidator.walletTarget] = TransactionError.invalidWalletTarget;
     }
 
     if (errors.isNotEmpty) {
@@ -279,14 +275,29 @@ class _TransactionEditState extends State<TransactionEdit> {
     });
     try {
       final amount = double.tryParse(amountController.text) ?? -1;
-      await DI().get<TransactionService>().saveTransaction(
-            code: widget.value?.code,
-            category: category!,
-            wallet: wallet!,
-            transactionType: transactionType!,
-            description: descriptionController.text,
-            amount: amount,
-          );
+      String? description;
+      if (descriptionController.text.isNotEmpty) {
+        description = descriptionController.text;
+      }
+      if (isWalletTransfer) {
+        await DI().get<TransactionService>().saveWalletTransfer(
+              category: category!,
+              sourceWallet: wallet!,
+              targetWallet: walletTarget!,
+              sourceDescription: description ?? L10n.of(context).transferTo(walletTarget!.name),
+              targetDescription: description ?? L10n.of(context).transferFrom(wallet!.name),
+              amount: amount,
+            );
+      } else {
+        await DI().get<TransactionService>().saveTransaction(
+              code: widget.value?.code,
+              category: category!,
+              wallet: wallet!,
+              transactionType: transactionType!,
+              description: descriptionController.text,
+              amount: amount,
+            );
+      }
       if (mounted) {
         context.pop();
       }

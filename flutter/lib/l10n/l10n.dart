@@ -523,6 +523,18 @@ abstract class L10n {
   /// **'Select target transaction wallet'**
   String get transactionWalletTargetHint;
 
+  /// No description provided for @transferFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer from {source}.'**
+  String transferFrom(String source);
+
+  /// No description provided for @transferTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer to {target}.'**
+  String transferTo(String target);
+
   /// No description provided for @userEmail.
   ///
   /// In en, this message translates to:

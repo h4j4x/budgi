@@ -149,6 +149,22 @@
   "transactionWalletHint": "Select transaction wallet",
   "transactionWalletSourceHint": "Select source transaction wallet",
   "transactionWalletTargetHint": "Select target transaction wallet",
+  "transferFrom": "Transfer from {source}.",
+  "@transferFrom": {
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "transferTo": "Transfer to {target}.",
+  "@transferTo": {
+    "placeholders": {
+      "target": {
+        "type": "String"
+      }
+    }
+  },
   "userEmail": "Email",
   "userEmailHint": "Enter email...",
   "userPassword": "Password",

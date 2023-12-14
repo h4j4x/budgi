@@ -9,7 +9,7 @@ import '../../util/string.dart';
 import '../transaction.dart';
 import '../validator.dart';
 
-class TransactionMemoryService implements TransactionService {
+class TransactionMemoryService extends TransactionService {
   final Validator<Transaction, TransactionError>? transactionValidator;
 
   final _transactions = <String, Transaction>{};
@@ -57,8 +57,7 @@ class TransactionMemoryService implements TransactionService {
     Sort? dateTimeSort,
   }) {
     final list = _transactions.values.toList().where((transaction) {
-      if (transactionTypes != null &&
-          !transactionTypes.contains(transaction.transactionType)) {
+      if (transactionTypes != null && !transactionTypes.contains(transaction.transactionType)) {
         return false;
       }
       if (category != null && transaction.category != category) {
@@ -132,9 +131,7 @@ class _Transaction extends Transaction {
     if (identical(this, other)) {
       return true;
     }
-    return other is _Transaction &&
-        runtimeType == other.runtimeType &&
-        code == other.code;
+    return other is _Transaction && runtimeType == other.runtimeType && code == other.code;
   }
 
   @override

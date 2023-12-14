@@ -9,6 +9,6 @@
     "migrations-apply": "npx supabase migrations up"
   },
   "devDependencies": {
-    "supabase": "^1.115.5"
+    "supabase": "^1.123.4"
   }
 }

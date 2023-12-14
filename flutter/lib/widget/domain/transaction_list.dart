@@ -56,20 +56,24 @@ class TransactionList extends StatelessWidget {
       subtitle: Text('${item.wallet.name}. ${item.description}'),
       trailing: IconButton(
         icon: AppIcon.delete(context),
-        onPressed: () async {
-          final l10n = L10n.of(context);
-          final confirm = await context.confirm(
-            title: l10n.transactionDelete,
-            description: l10n.transactionDeleteConfirm(item.description),
-          );
-          if (confirm && context.mounted) {
-            onItemAction(context, item, ItemAction.delete);
-          }
-        },
+        onPressed: enabled
+            ? () async {
+                final l10n = L10n.of(context);
+                final confirm = await context.confirm(
+                  title: l10n.transactionDelete,
+                  description: l10n.transactionDeleteConfirm(item.description),
+                );
+                if (confirm && context.mounted) {
+                  onItemAction(context, item, ItemAction.delete);
+                }
+              }
+            : null,
       ),
-      onTap: () {
-        onItemAction(context, item, ItemAction.select);
-      },
+      onTap: enabled
+          ? () {
+              onItemAction(context, item, ItemAction.select);
+            }
+          : null,
     );
   }
 }

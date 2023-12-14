@@ -249,6 +249,16 @@ class L10nEn extends L10n {
   String get transactionWalletTargetHint => 'Select target transaction wallet';
 
   @override
+  String transferFrom(String source) {
+    return 'Transfer from $source.';
+  }
+
+  @override
+  String transferTo(String target) {
+    return 'Transfer to $target.';
+  }
+
+  @override
   String get userEmail => 'Email';
 
   @override
