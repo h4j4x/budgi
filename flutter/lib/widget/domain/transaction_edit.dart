@@ -13,6 +13,7 @@ import '../../model/error/validation.dart';
 import '../../model/period.dart';
 import '../../service/category.dart';
 import '../../service/impl/transaction_validator.dart';
+import '../../service/storage.dart';
 import '../../service/transaction.dart';
 import '../../service/wallet.dart';
 import '../common/form_toolbar.dart';
@@ -33,6 +34,8 @@ class TransactionEdit extends StatefulWidget {
     return _TransactionEditState();
   }
 }
+
+const lastTransactionTypeKey = 'last_transaction_type_key';
 
 class _TransactionEditState extends State<TransactionEdit> {
   final amountController = TextEditingController();
@@ -71,12 +74,11 @@ class _TransactionEditState extends State<TransactionEdit> {
       canEdit = Period.currentMonth.contains(widget.value!.dateTime);
     } else {
       canEdit = true;
-      // todo: load last transactionType used
     }
-    transactionType ??= TransactionType.expense;
     Future.delayed(Duration.zero, () {
       loadCategories();
       loadWallets();
+      loadLastTransactionType();
     });
   }
 
@@ -92,6 +94,15 @@ class _TransactionEditState extends State<TransactionEdit> {
     setState(() {
       wallets = list;
     });
+  }
+
+  void loadLastTransactionType() async {
+    final lastTransactionType = await DI().get<StorageService>().readString(lastTransactionTypeKey);
+    if (transactionType == null && lastTransactionType != null) {
+      setState(() {
+        transactionType = TransactionType.tryParse(lastTransactionType);
+      });
+    }
   }
 
   @override
@@ -135,6 +146,7 @@ class _TransactionEditState extends State<TransactionEdit> {
                 transactionType = value;
               });
               amountFocus.requestFocus();
+              DI().get<StorageService>().writeString(lastTransactionTypeKey, value.name);
             }
           : null,
       selectedValue: transactionType,
