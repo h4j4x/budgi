@@ -36,6 +36,7 @@ class TransactionSupabaseService extends TransactionService {
   Future<Transaction> saveTransaction({
     String? code,
     required TransactionType transactionType,
+    required TransactionStatus transactionStatus,
     required Category category,
     required Wallet wallet,
     required double amount,
@@ -61,6 +62,7 @@ class TransactionSupabaseService extends TransactionService {
       wallet: wallet,
       code: transactionCode,
       transactionType: transactionType,
+      transactionStatus: transactionStatus,
       amount: amount,
       dateTime: dateTime ?? DateTime.now(),
       description: description ?? amount.toStringAsFixed(2),
@@ -84,6 +86,7 @@ class TransactionSupabaseService extends TransactionService {
   @override
   Future<List<Transaction>> listTransactions({
     List<TransactionType>? transactionTypes,
+    List<TransactionStatus>? transactionStatuses,
     Category? category,
     Wallet? wallet,
     Period? period,
@@ -100,6 +103,13 @@ class TransactionSupabaseService extends TransactionService {
           transactionTypeField,
           transactionTypes!.map((transactionType) {
             return transactionType.name;
+          }).toList());
+    }
+    if (transactionStatuses?.isNotEmpty ?? false) {
+      query = query.inFilter(
+          transactionStatusField,
+          transactionStatuses!.map((transactionStatus) {
+            return transactionStatus.name;
           }).toList());
     }
     if (category is SupabaseCategory) {
@@ -172,6 +182,7 @@ class _Transaction extends Transaction {
     required SupabaseWallet wallet,
     required this.code,
     required this.transactionType,
+    required this.transactionStatus,
     required this.amount,
     required this.dateTime,
     required this.description,
@@ -195,6 +206,9 @@ class _Transaction extends Transaction {
   TransactionType transactionType;
 
   @override
+  TransactionStatus transactionStatus;
+
+  @override
   double amount;
 
   @override
@@ -210,6 +224,7 @@ class _Transaction extends Transaction {
       walletIdField: _wallet.id,
       codeField: code,
       transactionTypeField: transactionType.name,
+      transactionStatusField: transactionStatus.name,
       amountField: amount,
       dateTimeField: dateTime.toIso8601String(),
       descriptionField: description,
@@ -227,6 +242,7 @@ class _Transaction extends Transaction {
       final walletId = raw[walletIdField] as int?;
       final code = raw[codeField] as String?;
       final transactionType = TransactionType.tryParse(raw[transactionTypeField] as String?);
+      final transactionStatus = TransactionStatus.tryParse(raw[transactionStatusField] as String?);
       final amount = raw[amountField] as num?;
       final dateTime = DateTime.tryParse((raw[dateTimeField] as String?) ?? '');
       final description = raw[descriptionField] as String?;
@@ -235,6 +251,7 @@ class _Transaction extends Transaction {
           walletId != null &&
           code != null &&
           transactionType != null &&
+          transactionStatus != null &&
           amount != null &&
           dateTime != null &&
           description != null) {
@@ -247,6 +264,7 @@ class _Transaction extends Transaction {
             wallet: wallet,
             code: code,
             transactionType: transactionType,
+            transactionStatus: transactionStatus,
             amount: amount.toDouble(),
             dateTime: dateTime,
             description: description,

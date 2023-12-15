@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../app/config.dart';
-import '../../app/icon.dart';
 import '../../app/router.dart';
 import '../../di.dart';
 import '../../l10n/l10n.dart';
@@ -17,8 +16,9 @@ import '../../service/storage.dart';
 import '../../service/transaction.dart';
 import '../../service/wallet.dart';
 import '../common/form_toolbar.dart';
-import '../common/select_field.dart';
 import 'category_select.dart';
+import 'transaction_status_select.dart';
+import 'transaction_type_select.dart';
 import 'wallet_select.dart';
 
 class TransactionEdit extends StatefulWidget {
@@ -50,6 +50,7 @@ class _TransactionEditState extends State<TransactionEdit> {
   List<Wallet>? wallets;
 
   TransactionType? transactionType;
+  TransactionStatus transactionStatus = TransactionStatus.completed;
   Category? category;
   Wallet? wallet;
   Wallet? walletTarget;
@@ -69,6 +70,7 @@ class _TransactionEditState extends State<TransactionEdit> {
       category = widget.value!.category;
       wallet = widget.value!.wallet;
       transactionType = widget.value!.transactionType;
+      transactionStatus = widget.value!.transactionStatus;
       amountController.text = widget.value!.amount.toStringAsFixed(2).toString();
       descriptionController.text = widget.value!.description;
       canEdit = Period.currentMonth.contains(widget.value!.dateTime);
@@ -109,6 +111,7 @@ class _TransactionEditState extends State<TransactionEdit> {
   Widget build(BuildContext context) {
     final items = <Widget>[
       transactionTypeField(),
+      transactionStatusField(),
       categoryField(),
       walletField(),
       if (isWalletTransfer) walletTargetField(),
@@ -134,28 +137,34 @@ class _TransactionEditState extends State<TransactionEdit> {
   }
 
   Widget transactionTypeField() {
-    return SelectField<TransactionType>(
-      items: TransactionType.values,
-      itemBuilder: (context, value) {
-        return Text(value.l10n(context));
+    return TransactionTypeSelect(
+      enabled: canEdit,
+      allowClear: false,
+      onChanged: (value) {
+        setState(() {
+          errors.remove(TransactionValidator.transactionType);
+          transactionType = value;
+        });
+        amountFocus.requestFocus();
+        DI().get<StorageService>().writeString(lastTransactionTypeKey, value!.name);
       },
-      onChanged: canEdit
-          ? (value) {
-              setState(() {
-                errors.remove(TransactionValidator.transactionType);
-                transactionType = value;
-              });
-              amountFocus.requestFocus();
-              DI().get<StorageService>().writeString(lastTransactionTypeKey, value.name);
-            }
-          : null,
-      selectedValue: transactionType,
-      icon: AppIcon.transaction,
-      iconBuilder: (context, value) {
-        return value.icon(context);
-      },
+      value: transactionType,
       hintText: L10n.of(context).transactionTypeHint,
       errorText: errors[TransactionValidator.description]?.l10n(context),
+    );
+  }
+
+  Widget transactionStatusField() {
+    return TransactionStatusSelect(
+      enabled: canEdit,
+      allowClear: false,
+      onChanged: (value) {
+        setState(() {
+          transactionStatus = value!;
+        });
+        amountFocus.requestFocus();
+      },
+      value: transactionStatus,
     );
   }
 
@@ -306,6 +315,7 @@ class _TransactionEditState extends State<TransactionEdit> {
               category: category!,
               wallet: wallet!,
               transactionType: transactionType!,
+              transactionStatus: transactionStatus,
               description: descriptionController.text,
               amount: amount,
             );

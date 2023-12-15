@@ -16,5 +16,6 @@ const walletTypeField = 'wallet_type';
 /// transaction
 const walletIdField = 'wallet_id';
 const transactionTypeField = 'transaction_type';
+const transactionStatusField = 'transaction_status';
 const dateTimeField = 'date_time';
 const descriptionField = 'description';

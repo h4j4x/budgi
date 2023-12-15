@@ -228,10 +228,31 @@ class L10nEn extends L10n {
   String get transactionsFilters => 'Filter transactions';
 
   @override
+  String get transactionStatus => 'Transaction status';
+
+  @override
+  String get transactionStatusCompleted => 'Completed';
+
+  @override
+  String get transactionStatusHint => 'Select transaction status';
+
+  @override
+  String get transactionStatusPendent => 'Pendent';
+
+  @override
+  String get transactionType => 'Transaction type';
+
+  @override
   String get transactionTypeIncome => 'Income';
 
   @override
+  String get transactionTypeIncomeTransfer => 'Transfer income';
+
+  @override
   String get transactionTypeExpense => 'Expense';
+
+  @override
+  String get transactionTypeExpenseTransfer => 'Transfer expense';
 
   @override
   String get transactionTypeHint => 'Select transaction type';

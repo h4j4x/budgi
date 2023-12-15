@@ -481,17 +481,59 @@ abstract class L10n {
   /// **'Filter transactions'**
   String get transactionsFilters;
 
+  /// No description provided for @transactionStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction status'**
+  String get transactionStatus;
+
+  /// No description provided for @transactionStatusCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get transactionStatusCompleted;
+
+  /// No description provided for @transactionStatusHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select transaction status'**
+  String get transactionStatusHint;
+
+  /// No description provided for @transactionStatusPendent.
+  ///
+  /// In en, this message translates to:
+  /// **'Pendent'**
+  String get transactionStatusPendent;
+
+  /// No description provided for @transactionType.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction type'**
+  String get transactionType;
+
   /// No description provided for @transactionTypeIncome.
   ///
   /// In en, this message translates to:
   /// **'Income'**
   String get transactionTypeIncome;
 
+  /// No description provided for @transactionTypeIncomeTransfer.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer income'**
+  String get transactionTypeIncomeTransfer;
+
   /// No description provided for @transactionTypeExpense.
   ///
   /// In en, this message translates to:
   /// **'Expense'**
   String get transactionTypeExpense;
+
+  /// No description provided for @transactionTypeExpenseTransfer.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer expense'**
+  String get transactionTypeExpenseTransfer;
 
   /// No description provided for @transactionTypeHint.
   ///

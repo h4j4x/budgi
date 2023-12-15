@@ -22,6 +22,7 @@ class TransactionMemoryService extends TransactionService {
   Future<Transaction> saveTransaction({
     String? code,
     required TransactionType transactionType,
+    required TransactionStatus transactionStatus,
     required Category category,
     required Wallet wallet,
     required double amount,
@@ -35,6 +36,7 @@ class TransactionMemoryService extends TransactionService {
       category,
       wallet,
       transactionType,
+      transactionStatus,
       amount,
       description ?? amount.toStringAsFixed(2),
       trnDateTime,
@@ -51,6 +53,7 @@ class TransactionMemoryService extends TransactionService {
   @override
   Future<List<Transaction>> listTransactions({
     List<TransactionType>? transactionTypes,
+    List<TransactionStatus>? transactionStatuses,
     Category? category,
     Wallet? wallet,
     Period? period,
@@ -58,6 +61,9 @@ class TransactionMemoryService extends TransactionService {
   }) {
     final list = _transactions.values.toList().where((transaction) {
       if (transactionTypes != null && !transactionTypes.contains(transaction.transactionType)) {
+        return false;
+      }
+      if (transactionStatuses != null && !transactionStatuses.contains(transaction.transactionStatus)) {
         return false;
       }
       if (category != null && transaction.category != category) {
@@ -100,6 +106,7 @@ class _Transaction extends Transaction {
     this.category,
     this.wallet,
     this.transactionType,
+    this.transactionStatus,
     this.amount,
     this.description,
     DateTime? dateTime,
@@ -119,6 +126,9 @@ class _Transaction extends Transaction {
 
   @override
   TransactionType transactionType;
+
+  @override
+  TransactionStatus transactionStatus;
 
   @override
   double amount;

@@ -5,9 +5,34 @@ import '../../l10n/l10n.dart';
 import 'category.dart';
 import 'wallet.dart';
 
+abstract class Transaction {
+  String get code;
+
+  DateTime get dateTime;
+
+  TransactionType get transactionType;
+
+  TransactionStatus get transactionStatus;
+
+  Wallet get wallet;
+
+  Category get category;
+
+  double get amount;
+
+  String get description;
+
+  double get signedAmount {
+    final sign = transactionType.isIncome ? 1 : -1;
+    return amount * sign;
+  }
+}
+
 enum TransactionType {
   income(true),
+  incomeTransfer(true),
   expense(false),
+  expenseTransfer(false),
   walletTransfer(true);
 
   final bool isIncome;
@@ -18,7 +43,9 @@ enum TransactionType {
     final l10n = L10n.of(context);
     return switch (this) {
       income => l10n.transactionTypeIncome,
+      incomeTransfer => l10n.transactionTypeIncomeTransfer,
       expense => l10n.transactionTypeExpense,
+      expenseTransfer => l10n.transactionTypeExpenseTransfer,
       walletTransfer => l10n.transactionTypeWalletTransfer,
     };
   }
@@ -26,7 +53,9 @@ enum TransactionType {
   Widget icon(BuildContext context) {
     return switch (this) {
       income => AppIcon.transactionIncome(context),
+      incomeTransfer => AppIcon.transactionIncomeTransfer(context),
       expense => AppIcon.transactionExpense(context),
+      expenseTransfer => AppIcon.transactionExpenseTransfer(context),
       walletTransfer => AppIcon.transactionTransfer(context),
     };
   }
@@ -44,23 +73,34 @@ enum TransactionType {
   }
 }
 
-abstract class Transaction {
-  String get code;
+enum TransactionStatus {
+  pendent,
+  completed;
 
-  DateTime get dateTime;
+  String l10n(BuildContext context) {
+    final l10n = L10n.of(context);
+    return switch (this) {
+      pendent => l10n.transactionStatusPendent,
+      completed => l10n.transactionStatusCompleted,
+    };
+  }
 
-  TransactionType get transactionType;
+  Widget icon(BuildContext context) {
+    return switch (this) {
+      pendent => AppIcon.transactionPendent(context),
+      completed => AppIcon.transactionCompleted(context),
+    };
+  }
 
-  Wallet get wallet;
-
-  Category get category;
-
-  double get amount;
-
-  String get description;
-
-  double get signedAmount {
-    final sign = transactionType.isIncome ? 1 : -1;
-    return amount * sign;
+  static TransactionStatus? tryParse(String? value) {
+    if (value != null) {
+      final theValue = value.trim();
+      for (var transactionStatus in values) {
+        if (theValue == transactionStatus.name) {
+          return transactionStatus;
+        }
+      }
+    }
+    return null;
   }
 }

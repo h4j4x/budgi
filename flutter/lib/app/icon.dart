@@ -83,13 +83,32 @@ class AppIcon {
     return const FaIcon(FontAwesomeIcons.arrowDownWideShort);
   }
 
+  static Widget get status {
+    return const FaIcon(FontAwesomeIcons.star);
+  }
+
   static Widget get transaction {
     return const FaIcon(FontAwesomeIcons.moneyBillTrendUp);
+  }
+
+  static Widget transactionCompleted(BuildContext context) {
+    final color = Theme.of(context).colorScheme.success;
+    return FaIcon(FontAwesomeIcons.checkDouble, color: color);
   }
 
   static Widget transactionExpense(BuildContext context) {
     final color = Theme.of(context).colorScheme.warning;
     return FaIcon(FontAwesomeIcons.moneyCheck, color: color);
+  }
+
+  static Widget transactionExpenseTransfer(BuildContext context) {
+    final color = Theme.of(context).colorScheme.warning;
+    return FaIcon(FontAwesomeIcons.moneyBillTransfer, color: color);
+  }
+
+  static Widget transactionPendent(BuildContext context) {
+    final color = Theme.of(context).colorScheme.warning;
+    return FaIcon(FontAwesomeIcons.barsProgress, color: color);
   }
 
   static Widget transactionTransfer(BuildContext context) {
@@ -100,6 +119,11 @@ class AppIcon {
   static Widget transactionIncome(BuildContext context) {
     final color = Theme.of(context).colorScheme.success;
     return FaIcon(FontAwesomeIcons.moneyCheckDollar, color: color);
+  }
+
+  static Widget transactionIncomeTransfer(BuildContext context) {
+    final color = Theme.of(context).colorScheme.success;
+    return FaIcon(FontAwesomeIcons.moneyBillTransfer, color: color);
   }
 
   static Widget get user {

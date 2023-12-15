@@ -51,7 +51,16 @@ class TransactionList extends StatelessWidget {
     final transactionType = item.transactionType.l10n(context);
     final amount = item.amount.toStringAsFixed(2);
     return ListTile(
-      leading: item.transactionType.icon(context),
+      leading: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          item.transactionType.icon(context),
+          Padding(
+            padding: const EdgeInsets.only(left: 4),
+            child: item.transactionStatus.icon(context),
+          ),
+        ],
+      ),
       title: Text('${item.category.name}. $transactionType \$$amount'),
       subtitle: Text('${item.wallet.name}. ${item.description}'),
       trailing: IconButton(

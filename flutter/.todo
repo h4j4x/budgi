@@ -1,0 +1,3 @@
+- Create transactions states (pendent, completed) with filters, to allow register debts (in & out).
+- Save (& recover) last used wallet in category
+- Save (& recover) last used wallet in transactions

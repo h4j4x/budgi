@@ -10,6 +10,7 @@ abstract class TransactionService {
   Future<Transaction> saveTransaction({
     String? code,
     required TransactionType transactionType,
+    required TransactionStatus transactionStatus,
     required Category category,
     required Wallet wallet,
     required double amount,
@@ -33,7 +34,8 @@ abstract class TransactionService {
     final sourceTransactionCode = 'source_$transactionCode';
     await saveTransaction(
       code: sourceTransactionCode,
-      transactionType: TransactionType.expense,
+      transactionType: TransactionType.expenseTransfer,
+      transactionStatus: TransactionStatus.completed,
       category: category,
       wallet: sourceWallet,
       amount: amount,
@@ -44,7 +46,8 @@ abstract class TransactionService {
     try {
       await saveTransaction(
         code: 'target_$transactionCode',
-        transactionType: TransactionType.income,
+        transactionType: TransactionType.incomeTransfer,
+        transactionStatus: TransactionStatus.completed,
         category: category,
         wallet: targetWallet,
         amount: amount,
@@ -59,6 +62,7 @@ abstract class TransactionService {
 
   Future<List<Transaction>> listTransactions({
     List<TransactionType>? transactionTypes,
+    List<TransactionStatus>? transactionStatuses,
     Category? category,
     Wallet? wallet,
     Period? period,
