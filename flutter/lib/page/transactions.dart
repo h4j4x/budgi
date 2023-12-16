@@ -14,12 +14,8 @@ import '../service/category.dart';
 import '../service/transaction.dart';
 import '../service/wallet.dart';
 import '../widget/common/month_field.dart';
-import '../widget/common/sort_field.dart';
-import '../widget/domain/category_select.dart';
+import '../widget/domain/transaction_filter_button.dart';
 import '../widget/domain/transaction_list.dart';
-import '../widget/domain/transaction_status_select.dart';
-import '../widget/domain/transaction_type_select.dart';
-import '../widget/domain/wallet_select.dart';
 import 'transaction.dart';
 
 class TransactionsPage extends StatefulWidget {
@@ -140,209 +136,27 @@ class _TransactionsPageState extends State<TransactionsPage> {
   }
 
   Widget filterButton() {
-    const textScaler = TextScaler.linear(0.5);
-    final items = <Widget>[
-      Row(
-        children: [
-          AppIcon.tiny(dateTimeSort.icon()),
-          Padding(
-            padding: const EdgeInsets.only(left: 4),
-            child: Text(
-              dateTimeSort.l10n(context),
-              textScaler: textScaler,
-            ),
-          ),
-        ],
-      ),
-    ];
-    final l10n = L10n.of(context);
-    if (category != null) {
-      items.insert(
-        0,
-        Text(
-          '${l10n.category}: ${category!.name}',
-          textScaler: textScaler,
-        ),
-      );
-    }
-    if (wallet != null) {
-      items.insert(
-        0,
-        Text(
-          '${l10n.wallet}: ${wallet!.name}',
-          textScaler: textScaler,
-        ),
-      );
-    }
-    if (transactionType != null) {
-      items.insert(
-        0,
-        Text(
-          '${l10n.transactionType}: ${transactionType!.name}',
-          textScaler: textScaler,
-        ),
-      );
-    }
-    if (transactionStatus != null) {
-      items.insert(
-        0,
-        Text(
-          '${l10n.transactionStatus}: ${transactionStatus!.name}',
-          textScaler: textScaler,
-        ),
-      );
-    }
-    return TextButton.icon(
-      onPressed: onFilter,
-      label: AppIcon.filter,
-      icon: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: items,
-      ),
+    final filter = TransactionFilter(
+      wallet: wallet,
+      category: category,
+      transactionType: transactionType,
+      transactionStatus: transactionStatus,
+      dateTimeSort: dateTimeSort,
     );
-  }
-
-  void onFilter() async {
-    Wallet? newWallet = wallet;
-    Category? newCategory = category;
-    TransactionType? newTransactionType = transactionType;
-    TransactionStatus? newTransactionStatus = transactionStatus;
-    Sort newDateTimeSort = dateTimeSort;
-    final value = await showModalBottomSheet<bool>(
-      context: context,
-      builder: (context) {
-        final l10n = L10n.of(context);
-        final items = <Widget>[
-          Text(
-            l10n.transactionsFilters,
-            textAlign: TextAlign.center,
-            textScaler: const TextScaler.linear(1.25),
-            style: const TextStyle(fontWeight: FontWeight.w600),
-          ),
-          walletField(newWallet, (value) {
-            newWallet = value;
-          }),
-          categoryField(newCategory, (value) {
-            newCategory = value;
-          }),
-          transactionTypeField(newTransactionType, (value) {
-            newTransactionType = value;
-          }),
-          transactionStatusField(newTransactionStatus, (value) {
-            newTransactionStatus = value;
-          }),
-          sortItem(false, dateTimeSort, (value) {
-            newDateTimeSort = value ?? Sort.desc;
-          }),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              TextButton(
-                onPressed: () {
-                  context.pop(true);
-                },
-                child: Text(l10n.okAction),
-              ),
-              TextButton(
-                onPressed: context.pop,
-                child: Text(l10n.cancelAction),
-              ),
-            ],
-          )
-        ];
-        return Container(
-          height: 650,
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Column(
-            children: items.map((item) {
-              return Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: item,
-              );
-            }).toList(),
-          ),
-        );
+    return TransactionFilterButton(
+      filter: filter,
+      wallets: wallets ?? [],
+      categories: categories ?? [],
+      onFiltered: (newFilter) {
+        setState(() {
+          wallet = newFilter.wallet;
+          category = newFilter.category;
+          transactionType = newFilter.transactionType;
+          transactionStatus = newFilter.transactionStatus;
+          dateTimeSort = newFilter.dateTimeSort;
+        });
       },
     );
-    if (value ?? false) {
-      setState(() {
-        wallet = newWallet;
-        category = newCategory;
-        transactionType = newTransactionType;
-        transactionStatus = newTransactionStatus;
-        category = newCategory;
-        dateTimeSort = newDateTimeSort;
-      });
-    }
-  }
-
-  Widget walletField([Wallet? value, Function(Wallet?)? onChanged]) {
-    return WalletSelect(
-      list: wallets,
-      value: value ?? wallet,
-      enabled: !loading,
-      onChanged: onChanged ??
-          (value) {
-            wallet = value;
-            loadList();
-          },
-      hintText: L10n.of(context).transactionWalletHint,
-    );
-  }
-
-  Widget categoryField([Category? value, Function(Category?)? onChanged]) {
-    return CategorySelect(
-      list: categories,
-      value: value ?? category,
-      onChanged: onChanged ??
-          (value) {
-            category = value;
-            loadList();
-          },
-      hintText: L10n.of(context).transactionCategoryHint,
-      enabled: !loading,
-    );
-  }
-
-  Widget transactionTypeField([TransactionType? value, Function(TransactionType?)? onChanged]) {
-    return TransactionTypeSelect(
-      value: value ?? transactionType,
-      onChanged: onChanged ??
-          (value) {
-            transactionType = value;
-            loadList();
-          },
-      hintText: L10n.of(context).transactionTypeHint,
-      enabled: !loading,
-    );
-  }
-
-  Widget transactionStatusField([TransactionStatus? value, Function(TransactionStatus?)? onChanged]) {
-    return TransactionStatusSelect(
-      value: value ?? transactionStatus,
-      onChanged: onChanged ??
-          (value) {
-            transactionStatus = value;
-            loadList();
-          },
-      hintText: L10n.of(context).transactionStatusHint,
-      enabled: !loading,
-    );
-  }
-
-  Widget sortItem(bool mobileSize, [Sort? value, Function(Sort?)? onChanged]) {
-    return SortField(
-        mobileSize: mobileSize,
-        title: L10n.of(context).sortByDateTime,
-        value: value ?? dateTimeSort,
-        onChanged: !loading && list.isNotEmpty
-            ? onChanged ??
-                (value) {
-                  dateTimeSort = value;
-                  loadList();
-                }
-            : null);
   }
 
   void onItemAction(
