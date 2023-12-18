@@ -1,2 +1,5 @@
 - Save (& recover) last used wallet in category
 - Save (& recover) last used wallet in transactions
+- Help dialog on transactions explained:
+  - All transactions have payment status completed except with CreditCard (pendent). [Should show disabled inputs].
+  - Transfers to Credit Cards mark older pendent transactions as completed. Remaining amount should create income transaction.

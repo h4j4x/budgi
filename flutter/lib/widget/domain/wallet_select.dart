@@ -10,6 +10,7 @@ class WalletSelect extends StatelessWidget {
   final Function(Wallet?) onChanged;
   final String? hintText;
   final String? errorText;
+  final bool allowClear;
   final bool enabled;
 
   const WalletSelect({
@@ -19,6 +20,7 @@ class WalletSelect extends StatelessWidget {
     required this.onChanged,
     this.hintText,
     this.errorText,
+    this.allowClear = false,
     this.enabled = true,
   });
 
@@ -29,7 +31,7 @@ class WalletSelect extends StatelessWidget {
       itemBuilder: (context, value) {
         return Text(value.name);
       },
-      onClear: enabled
+      onClear: allowClear && enabled
           ? () {
               onChanged(null);
             }

@@ -9,7 +9,7 @@ import '../model/domain/transaction.dart';
 import '../model/domain/wallet.dart';
 import '../model/item_action.dart';
 import '../model/period.dart';
-import '../model/sort.dart';
+import '../model/transaction_filter.dart';
 import '../service/category.dart';
 import '../service/transaction.dart';
 import '../service/wallet.dart';
@@ -37,11 +37,7 @@ class _TransactionsPageState extends State<TransactionsPage> {
   List<Category>? categories;
 
   Period period = Period.currentMonth;
-  Wallet? wallet;
-  Category? category;
-  TransactionType? transactionType;
-  TransactionStatus? transactionStatus;
-  Sort dateTimeSort = Sort.desc;
+  TransactionFilter filter = TransactionFilter.empty();
 
   @override
   void initState() {
@@ -62,11 +58,11 @@ class _TransactionsPageState extends State<TransactionsPage> {
     });
     final newList = await DI().get<TransactionService>().listTransactions(
           period: period,
-          wallet: wallet,
-          category: category,
-          transactionTypes: transactionType != null ? [transactionType!] : [],
-          transactionStatuses: transactionStatus != null ? [transactionStatus!] : [],
-          dateTimeSort: dateTimeSort,
+          wallet: filter.wallet,
+          category: filter.category,
+          transactionTypes: filter.transactionType != null ? [filter.transactionType!] : [],
+          transactionStatuses: filter.transactionStatus != null ? [filter.transactionStatus!] : [],
+          dateTimeSort: filter.dateTimeSort,
         );
     list.clear();
     list.addAll(newList);
@@ -126,36 +122,20 @@ class _TransactionsPageState extends State<TransactionsPage> {
         ),
       ),
       actions: [
-        filterButton(),
+        TransactionFilterButton(
+          filter: filter,
+          wallets: wallets ?? [],
+          categories: categories ?? [],
+          onFiltered: (newFilter) {
+            filter = newFilter.copy();
+            loadList();
+          },
+        ),
         IconButton(
           onPressed: loadList,
           icon: AppIcon.reload,
         ),
       ],
-    );
-  }
-
-  Widget filterButton() {
-    final filter = TransactionFilter(
-      wallet: wallet,
-      category: category,
-      transactionType: transactionType,
-      transactionStatus: transactionStatus,
-      dateTimeSort: dateTimeSort,
-    );
-    return TransactionFilterButton(
-      filter: filter,
-      wallets: wallets ?? [],
-      categories: categories ?? [],
-      onFiltered: (newFilter) {
-        setState(() {
-          wallet = newFilter.wallet;
-          category = newFilter.category;
-          transactionType = newFilter.transactionType;
-          transactionStatus = newFilter.transactionStatus;
-          dateTimeSort = newFilter.dateTimeSort;
-        });
-      },
     );
   }
 

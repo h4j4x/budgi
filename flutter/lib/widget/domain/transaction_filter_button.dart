@@ -4,9 +4,8 @@ import '../../app/icon.dart';
 import '../../app/router.dart';
 import '../../l10n/l10n.dart';
 import '../../model/domain/category.dart';
-import '../../model/domain/transaction.dart';
 import '../../model/domain/wallet.dart';
-import '../../model/sort.dart';
+import '../../model/transaction_filter.dart';
 import '../common/sort_field.dart';
 import 'category_select.dart';
 import 'transaction_status_select.dart';
@@ -95,135 +94,130 @@ class TransactionFilterButton extends StatelessWidget {
   }
 
   void onFilter(BuildContext context) async {
-    final newFilter = filter.copy();
-    final value = await showModalBottomSheet<bool>(
+    final value = await showDialog<TransactionFilter>(
       context: context,
       builder: (context) {
-        final l10n = L10n.of(context);
-        final items = <Widget>[
-          Text(
-            l10n.transactionsFilters,
-            textAlign: TextAlign.center,
-            textScaler: const TextScaler.linear(1.25),
-            style: const TextStyle(fontWeight: FontWeight.w600),
-          ),
-          walletField(context, newFilter.wallet, (value) {
-            newFilter.wallet = value;
-          }),
-          categoryField(context, newFilter.category, (value) {
-            newFilter.category = value;
-          }),
-          transactionTypeField(context, newFilter.transactionType, (value) {
-            newFilter.transactionType = value;
-          }),
-          transactionStatusField(context, newFilter.transactionStatus, (value) {
-            newFilter.transactionStatus = value;
-          }),
-          sortItem(context, newFilter.dateTimeSort, (value) {
-            newFilter.dateTimeSort = value;
-          }),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              TextButton(
-                onPressed: () {
-                  context.pop(true);
-                },
-                child: Text(l10n.okAction),
-              ),
-              TextButton(
-                onPressed: context.pop,
-                child: Text(l10n.cancelAction),
-              ),
-            ],
-          )
-        ];
-        return Container(
-          height: 650,
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Column(
-            children: items.map((item) {
-              return Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: item,
-              );
-            }).toList(),
-          ),
+        return _FilterDialog(
+          filter: filter,
+          categories: categories,
+          wallets: wallets,
         );
       },
     );
-    if (value ?? false) {
-      onFiltered(newFilter);
+    if (value != null) {
+      onFiltered(value);
     }
-  }
-
-  Widget walletField(BuildContext context, Wallet? value, Function(Wallet?) onChanged) {
-    return WalletSelect(
-      list: wallets,
-      value: value,
-      onChanged: onChanged,
-      hintText: L10n.of(context).transactionWalletHint,
-    );
-  }
-
-  Widget categoryField(BuildContext context, Category? value, Function(Category?) onChanged) {
-    return CategorySelect(
-      list: categories,
-      value: value ?? filter.category,
-      onChanged: onChanged,
-      hintText: L10n.of(context).transactionCategoryHint,
-    );
-  }
-
-  Widget transactionTypeField(BuildContext context, TransactionType? value, Function(TransactionType?) onChanged) {
-    return TransactionTypeSelect(
-      value: value ?? filter.transactionType,
-      onChanged: onChanged,
-      hintText: L10n.of(context).transactionTypeHint,
-    );
-  }
-
-  Widget transactionStatusField(
-      BuildContext context, TransactionStatus? value, Function(TransactionStatus?) onChanged) {
-    return TransactionStatusSelect(
-      value: value ?? filter.transactionStatus,
-      onChanged: onChanged,
-      hintText: L10n.of(context).transactionStatusHint,
-    );
-  }
-
-  Widget sortItem(BuildContext context, Sort value, Function(Sort) onChanged) {
-    return SortField(
-      mobileSize: false,
-      title: L10n.of(context).sortByDateTime,
-      value: value,
-      onChanged: onChanged,
-    );
   }
 }
 
-class TransactionFilter {
-  Wallet? wallet;
-  Category? category;
-  TransactionType? transactionType;
-  TransactionStatus? transactionStatus;
-  Sort dateTimeSort;
+class _FilterDialog extends StatefulWidget {
+  final TransactionFilter filter;
+  final List<Wallet> wallets;
+  final List<Category> categories;
 
-  TransactionFilter({
-    required this.wallet,
-    required this.category,
-    required this.transactionType,
-    required this.transactionStatus,
-    required this.dateTimeSort,
+  const _FilterDialog({
+    required this.filter,
+    required this.wallets,
+    required this.categories,
   });
 
-  TransactionFilter copy() {
-    return TransactionFilter(
-      wallet: wallet,
-      category: category,
-      transactionType: transactionType,
-      transactionStatus: transactionStatus,
-      dateTimeSort: dateTimeSort,
+  @override
+  State<StatefulWidget> createState() {
+    return _FilterDialogState();
+  }
+}
+
+class _FilterDialogState extends State<_FilterDialog> {
+  late TransactionFilter filter;
+
+  @override
+  void initState() {
+    super.initState();
+    filter = widget.filter.copy();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = L10n.of(context);
+    return AlertDialog(
+      title: Text(l10n.transactionsFilters),
+      content: Column(
+        children: filterItems().map((item) {
+          return Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: item,
+          );
+        }).toList(),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            context.pop(filter);
+          },
+          child: Text(l10n.okAction),
+        ),
+        TextButton(
+          onPressed: context.pop,
+          child: Text(l10n.cancelAction),
+        ),
+      ],
     );
+  }
+
+  List<Widget> filterItems() {
+    return <Widget>[
+      WalletSelect(
+        list: widget.wallets,
+        value: filter.wallet,
+        allowClear: true,
+        onChanged: (value) {
+          setState(() {
+            filter.wallet = value;
+          });
+        },
+        hintText: L10n.of(context).transactionWalletHint,
+      ),
+      CategorySelect(
+        list: widget.categories,
+        value: filter.category,
+        allowClear: true,
+        onChanged: (value) {
+          setState(() {
+            filter.category = value;
+          });
+        },
+        hintText: L10n.of(context).transactionCategoryHint,
+      ),
+      TransactionTypeSelect(
+        value: filter.transactionType,
+        allowClear: true,
+        onChanged: (value) {
+          setState(() {
+            filter.transactionType = value;
+          });
+        },
+        hintText: L10n.of(context).transactionTypeHint,
+      ),
+      TransactionStatusSelect(
+        value: filter.transactionStatus,
+        allowClear: true,
+        onChanged: (value) {
+          setState(() {
+            filter.transactionStatus = value;
+          });
+        },
+        hintText: L10n.of(context).transactionStatusHint,
+      ),
+      SortField(
+        mobileSize: false,
+        title: L10n.of(context).sortByDateTime,
+        value: filter.dateTimeSort,
+        onChanged: (value) {
+          setState(() {
+            filter.dateTimeSort = value;
+          });
+        },
+      )
+    ];
   }
 }

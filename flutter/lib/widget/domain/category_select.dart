@@ -10,6 +10,7 @@ class CategorySelect extends StatelessWidget {
   final Function(Category?) onChanged;
   final String? hintText;
   final String? errorText;
+  final bool allowClear;
   final bool enabled;
 
   const CategorySelect({
@@ -19,6 +20,7 @@ class CategorySelect extends StatelessWidget {
     required this.onChanged,
     this.hintText,
     this.errorText,
+    this.allowClear = false,
     this.enabled = true,
   });
 
