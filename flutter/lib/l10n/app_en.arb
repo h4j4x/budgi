@@ -145,7 +145,7 @@
   "transactionStatus": "Transaction status",
   "transactionStatusCompleted": "Completed",
   "transactionStatusHint": "Select transaction status",
-  "transactionStatusPendent": "Pendent",
+  "transactionStatusPending": "Pending",
   "transactionType": "Transaction type",
   "transactionTypeIncome": "Income",
   "transactionTypeIncomeTransfer": "Transfer income",

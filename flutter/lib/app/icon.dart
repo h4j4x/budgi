@@ -106,7 +106,7 @@ class AppIcon {
     return FaIcon(FontAwesomeIcons.moneyBillTransfer, color: color);
   }
 
-  static Widget transactionPendent(BuildContext context) {
+  static Widget transactionPending(BuildContext context) {
     final color = Theme.of(context).colorScheme.warning;
     return FaIcon(FontAwesomeIcons.barsProgress, color: color);
   }

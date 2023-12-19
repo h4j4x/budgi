@@ -74,20 +74,20 @@ enum TransactionType {
 }
 
 enum TransactionStatus {
-  pendent,
+  pending,
   completed;
 
   String l10n(BuildContext context) {
     final l10n = L10n.of(context);
     return switch (this) {
-      pendent => l10n.transactionStatusPendent,
+      pending => l10n.transactionStatusPending,
       completed => l10n.transactionStatusCompleted,
     };
   }
 
   Widget icon(BuildContext context) {
     return switch (this) {
-      pendent => AppIcon.transactionPendent(context),
+      pending => AppIcon.transactionPending(context),
       completed => AppIcon.transactionCompleted(context),
     };
   }

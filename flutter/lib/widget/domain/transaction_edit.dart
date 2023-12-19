@@ -232,9 +232,9 @@ class _TransactionEditState extends State<TransactionEdit> {
   }
 
   void updateTransactionStatus() {
-    transactionStatus = TransactionStatus.pendent;
+    transactionStatus = TransactionStatus.pending;
     if (!isWalletTransfer && wallet?.walletType == WalletType.creditCard) {
-      transactionStatus = TransactionStatus.pendent;
+      transactionStatus = TransactionStatus.pending;
     }
   }
 

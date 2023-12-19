@@ -237,7 +237,7 @@ class L10nEn extends L10n {
   String get transactionStatusHint => 'Select transaction status';
 
   @override
-  String get transactionStatusPendent => 'Pendent';
+  String get transactionStatusPending => 'Pending';
 
   @override
   String get transactionType => 'Transaction type';

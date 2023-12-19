@@ -499,11 +499,11 @@ abstract class L10n {
   /// **'Select transaction status'**
   String get transactionStatusHint;
 
-  /// No description provided for @transactionStatusPendent.
+  /// No description provided for @transactionStatusPending.
   ///
   /// In en, this message translates to:
-  /// **'Pendent'**
-  String get transactionStatusPendent;
+  /// **'Pending'**
+  String get transactionStatusPending;
 
   /// No description provided for @transactionType.
   ///
