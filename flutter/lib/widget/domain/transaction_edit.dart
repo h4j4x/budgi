@@ -35,7 +35,9 @@ class TransactionEdit extends StatefulWidget {
   }
 }
 
-const lastTransactionTypeKey = 'last_transaction_type_key';
+const _lastTransactionTypeKey = 'last_transaction_type_key';
+const _lastCategoryKey = 'last_category_key';
+const _lastWalletKey = 'last_wallet_key';
 
 class _TransactionEditState extends State<TransactionEdit> {
   final amountController = TextEditingController();
@@ -85,21 +87,29 @@ class _TransactionEditState extends State<TransactionEdit> {
   }
 
   void loadCategories() async {
+    final lastCategory = await DI().get<StorageService>().readString(_lastCategoryKey);
     final list = await DI().get<CategoryService>().listCategories();
+    if (category == null && lastCategory != null) {
+      category = list.where((item) => item.code == lastCategory).firstOrNull;
+    }
     setState(() {
       categories = list;
     });
   }
 
   void loadWallets() async {
+    final lastWallet = await DI().get<StorageService>().readString(_lastWalletKey);
     final list = await DI().get<WalletService>().listWallets();
+    if (wallet == null && lastWallet != null) {
+      wallet = list.where((item) => item.code == lastWallet).firstOrNull;
+    }
     setState(() {
       wallets = list;
     });
   }
 
   void loadLastTransactionType() async {
-    final lastTransactionType = await DI().get<StorageService>().readString(lastTransactionTypeKey);
+    final lastTransactionType = await DI().get<StorageService>().readString(_lastTransactionTypeKey);
     if (transactionType == null && lastTransactionType != null) {
       setState(() {
         transactionType = TransactionType.tryParse(lastTransactionType);
@@ -146,7 +156,7 @@ class _TransactionEditState extends State<TransactionEdit> {
           transactionType = value;
         });
         amountFocus.requestFocus();
-        DI().get<StorageService>().writeString(lastTransactionTypeKey, value!.name);
+        DI().get<StorageService>().writeString(_lastTransactionTypeKey, value!.name);
       },
       value: transactionType,
       hintText: L10n.of(context).transactionTypeHint,
@@ -172,12 +182,14 @@ class _TransactionEditState extends State<TransactionEdit> {
     return CategorySelect(
       list: categories,
       value: category,
+      allowClear: false,
       enabled: widget.value == null,
       onChanged: (value) {
         setState(() {
           errors.remove(TransactionValidator.category);
           category = value;
         });
+        DI().get<StorageService>().writeString(_lastCategoryKey, value!.code);
       },
       hintText: L10n.of(context).budgetAmountCategoryHint,
       errorText: errors[TransactionValidator.category]?.l10n(context),
@@ -188,11 +200,13 @@ class _TransactionEditState extends State<TransactionEdit> {
     return WalletSelect(
       list: (wallets ?? []).where((item) => item != walletTarget).toList(),
       value: wallet,
+      allowClear: false,
       onChanged: (value) {
         setState(() {
           errors.remove(TransactionValidator.wallet);
           wallet = value;
         });
+        DI().get<StorageService>().writeString(_lastWalletKey, value!.code);
       },
       hintText:
           isNotWalletTransfer ? L10n.of(context).transactionWalletHint : L10n.of(context).transactionWalletSourceHint,
