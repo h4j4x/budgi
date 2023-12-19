@@ -25,7 +25,7 @@ class TransactionTypeSelect extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SelectField<TransactionType>(
-      items: TransactionType.values,
+      items: TransactionType.values.where((value) => value.canSelect).toList(),
       itemBuilder: (context, value) {
         return Text(value.l10n(context));
       },

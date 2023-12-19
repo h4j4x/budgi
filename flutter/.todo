@@ -1,4 +1,5 @@
-- Add transaction credit card defer months [Matching transfers should fill defers].
 - Help dialog on transactions explained:
-  - All transactions have payment status completed except with CreditCard.
-  - Transfers to Credit Cards mark older pending transactions as completed. Remaining amount should create income transaction.
+  x All transactions have payment status completed except with CreditCard.
+  x Deferred transactions will create multiple transactions.
+  - Transfers to Credit Cards mark older pending transactions as completed.
+    Remaining amount should create completed income transaction.

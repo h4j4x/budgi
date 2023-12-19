@@ -16,6 +16,7 @@ abstract class TransactionService {
     required double amount,
     DateTime? dateTime,
     String? description,
+    int? deferredMonths,
   });
 
   /// @throws ValidationError

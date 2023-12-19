@@ -42,6 +42,7 @@ const _lastWalletKey = 'last_wallet_key';
 class _TransactionEditState extends State<TransactionEdit> {
   final amountController = TextEditingController();
   final amountFocus = FocusNode();
+  final deferredMonthsController = TextEditingController(text: '1');
   final descriptionController = TextEditingController();
   final descriptionFocus = FocusNode();
   final errors = <String, TransactionError>{};
@@ -63,6 +64,12 @@ class _TransactionEditState extends State<TransactionEdit> {
 
   bool get isNotWalletTransfer {
     return transactionType != TransactionType.walletTransfer;
+  }
+
+  bool get isCreditCardExpense {
+    return isNotWalletTransfer &&
+        wallet?.walletType == WalletType.creditCard &&
+        transactionType == TransactionType.expense;
   }
 
   @override
@@ -126,6 +133,7 @@ class _TransactionEditState extends State<TransactionEdit> {
       walletField(),
       if (isWalletTransfer) walletTargetField(),
       amountField(),
+      if (isCreditCardExpense) deferredMonthsField(),
       descriptionField(),
       const SizedBox(height: 24),
       FormToolbar(enabled: !saving, onSave: onSave),
@@ -155,6 +163,7 @@ class _TransactionEditState extends State<TransactionEdit> {
           errors.remove(TransactionValidator.transactionType);
           transactionType = value;
         });
+        updateTransactionStatus();
         amountFocus.requestFocus();
         DI().get<StorageService>().writeString(_lastTransactionTypeKey, value!.name);
       },
@@ -202,11 +211,11 @@ class _TransactionEditState extends State<TransactionEdit> {
       value: wallet,
       allowClear: false,
       onChanged: (value) {
-        updateTransactionStatus();
         setState(() {
           errors.remove(TransactionValidator.wallet);
           wallet = value;
         });
+        updateTransactionStatus();
         DI().get<StorageService>().writeString(_lastWalletKey, value!.code);
       },
       hintText:
@@ -232,10 +241,11 @@ class _TransactionEditState extends State<TransactionEdit> {
   }
 
   void updateTransactionStatus() {
-    transactionStatus = TransactionStatus.pending;
-    if (!isWalletTransfer && wallet?.walletType == WalletType.creditCard) {
+    transactionStatus = TransactionStatus.completed;
+    if (isCreditCardExpense) {
       transactionStatus = TransactionStatus.pending;
     }
+    setState(() {});
   }
 
   Widget amountField() {
@@ -246,6 +256,7 @@ class _TransactionEditState extends State<TransactionEdit> {
       enabled: !saving,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
       focusNode: amountFocus,
+      textAlign: TextAlign.end,
       decoration: InputDecoration(
         labelText: l10n.transactionAmount,
         hintText: l10n.transactionAmountHint,
@@ -256,6 +267,24 @@ class _TransactionEditState extends State<TransactionEdit> {
           errors.remove(TransactionValidator.amount);
         });
       },
+      onSubmitted: (_) {
+        descriptionFocus.requestFocus();
+      },
+    );
+  }
+
+  Widget deferredMonthsField() {
+    final l10n = L10n.of(context);
+    return TextField(
+      controller: deferredMonthsController,
+      textInputAction: TextInputAction.next,
+      enabled: canEdit && !saving,
+      keyboardType: const TextInputType.numberWithOptions(),
+      textAlign: TextAlign.end,
+      decoration: InputDecoration(
+        labelText: l10n.transactionDeferredMonths,
+        hintText: l10n.transactionDeferredMonthsHint,
+      ),
       onSubmitted: (_) {
         descriptionFocus.requestFocus();
       },
@@ -320,8 +349,8 @@ class _TransactionEditState extends State<TransactionEdit> {
     try {
       final amount = double.tryParse(amountController.text) ?? -1;
       String? description;
-      if (descriptionController.text.isNotEmpty) {
-        description = descriptionController.text;
+      if (descriptionController.text.trim().isNotEmpty) {
+        description = descriptionController.text.trim();
       }
       if (isWalletTransfer) {
         await DI().get<TransactionService>().saveWalletTransfer(
@@ -333,14 +362,16 @@ class _TransactionEditState extends State<TransactionEdit> {
               amount: amount,
             );
       } else {
+        final deferredMonths = int.tryParse(deferredMonthsController.text);
         await DI().get<TransactionService>().saveTransaction(
               code: widget.value?.code,
               category: category!,
               wallet: wallet!,
               transactionType: transactionType!,
               transactionStatus: transactionStatus,
-              description: descriptionController.text,
+              description: description,
               amount: amount,
+              deferredMonths: deferredMonths,
             );
       }
       if (mounted) {

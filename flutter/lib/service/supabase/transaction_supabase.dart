@@ -10,6 +10,7 @@ import '../../model/error/validation.dart';
 import '../../model/fields.dart';
 import '../../model/period.dart';
 import '../../model/sort.dart';
+import '../../util/datetime.dart';
 import '../../util/function.dart';
 import '../../util/string.dart';
 import '../auth.dart';
@@ -42,6 +43,7 @@ class TransactionSupabaseService extends TransactionService {
     required double amount,
     DateTime? dateTime,
     String? description,
+    int? deferredMonths,
   }) async {
     if (category is! SupabaseCategory) {
       throw ValidationError({
@@ -54,33 +56,49 @@ class TransactionSupabaseService extends TransactionService {
       });
     }
 
-    final user = DI().get<AuthService>().fetchUser(errorIfMissing: TransactionError.invalidUser);
     final transactionCode = code ?? randomString(6);
-
-    final transaction = _Transaction(
-      category: category,
-      wallet: wallet,
-      code: transactionCode,
-      transactionType: transactionType,
-      transactionStatus: transactionStatus,
-      amount: amount,
-      dateTime: dateTime ?? DateTime.now(),
-      description: description ?? amount.toStringAsFixed(2),
-    );
-    final errors = transactionValidator?.validate(transaction);
-    if (errors?.isNotEmpty ?? false) {
-      throw ValidationError(errors!);
-    }
-
     final transactionExists = await _transactionExistsByCode(transactionCode);
-    if (transactionExists) {
-      await config.supabase.from(transactionTable).update(transaction.toMap(user)).match({
-        codeField: transactionCode,
+    final months = deferredMonths != null && deferredMonths > 1 ? deferredMonths : 1;
+    if (transactionExists && months > 1) {
+      throw ValidationError({
+        'months': TransactionError.invalidTransactionDeferredMonths,
       });
-    } else {
-      await config.supabase.from(transactionTable).insert(transaction.toMap(user));
     }
-    return transaction;
+
+    final user = DI().get<AuthService>().fetchUser(errorIfMissing: TransactionError.invalidUser);
+    final trnDateTime = dateTime ?? DateTime.now();
+
+    Transaction? firstTransaction;
+    final theAmount = amount / months;
+    for (int i = 0; i < months; i++) {
+      final theTransactionCode = i > 0 ? '$transactionCode-${i + 1}' : transactionCode;
+      final transaction = _Transaction(
+        category: category,
+        wallet: wallet,
+        code: theTransactionCode,
+        transactionType: transactionType,
+        transactionStatus: transactionStatus,
+        amount: theAmount,
+        dateTime: trnDateTime.plusMonths(i),
+        description: description ?? theAmount.toStringAsFixed(2),
+      );
+      final errors = transactionValidator?.validate(transaction);
+      if (errors?.isNotEmpty ?? false) {
+        throw ValidationError(errors!);
+      }
+
+      firstTransaction ??= transaction;
+
+      if (transactionExists) {
+        await config.supabase.from(transactionTable).update(transaction.toMap(user)).match({
+          codeField: transactionCode,
+        });
+      } else {
+        await config.supabase.from(transactionTable).insert(transaction.toMap(user));
+      }
+    }
+
+    return firstTransaction!;
   }
 
   @override

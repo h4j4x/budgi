@@ -5,6 +5,7 @@ import '../../model/error/transaction.dart';
 import '../../model/error/validation.dart';
 import '../../model/period.dart';
 import '../../model/sort.dart';
+import '../../util/datetime.dart';
 import '../../util/string.dart';
 import '../transaction.dart';
 import '../validator.dart';
@@ -28,26 +29,33 @@ class TransactionMemoryService extends TransactionService {
     required double amount,
     DateTime? dateTime,
     String? description,
+    int? deferredMonths,
   }) {
     final transactionCode = code ?? randomString(6);
-    final trnDateTime = dateTime ?? _transactions[transactionCode]?.dateTime;
-    final transaction = _Transaction(
-      transactionCode,
-      category,
-      wallet,
-      transactionType,
-      transactionStatus,
-      amount,
-      description ?? amount.toStringAsFixed(2),
-      trnDateTime,
-    );
-    final errors = transactionValidator?.validate(transaction);
-    if (errors?.isNotEmpty ?? false) {
-      throw ValidationError(errors!);
+    final trnDateTime = dateTime ?? _transactions[transactionCode]?.dateTime ?? DateTime.now();
+    final months = deferredMonths != null && deferredMonths > 1 ? deferredMonths : 1;
+    Transaction? firstTransaction;
+    final theAmount = amount / months;
+    for (int i = 0; i < months; i++) {
+      final theTransactionCode = '$transactionCode-${i + 1}';
+      final transaction = _Transaction(
+        theTransactionCode,
+        category,
+        wallet,
+        transactionType,
+        transactionStatus,
+        theAmount,
+        description ?? theAmount.toStringAsFixed(2),
+        trnDateTime.plusMonths(i),
+      );
+      final errors = transactionValidator?.validate(transaction);
+      if (errors?.isNotEmpty ?? false) {
+        throw ValidationError(errors!);
+      }
+      firstTransaction ??= transaction;
+      _transactions[theTransactionCode] = transaction;
     }
-
-    _transactions[transactionCode] = transaction;
-    return Future.value(transaction);
+    return Future.value(firstTransaction);
   }
 
   @override

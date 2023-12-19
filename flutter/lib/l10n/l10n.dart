@@ -271,6 +271,12 @@ abstract class L10n {
   /// **'Invalid transaction amount. Enter a non negative number for amount.'**
   String get invalidTransactionAmount;
 
+  /// No description provided for @invalidTransactionDeferredMonths.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid transaction deferred months.'**
+  String get invalidTransactionDeferredMonths;
+
   /// No description provided for @invalidTransactionDescription.
   ///
   /// In en, this message translates to:
@@ -444,6 +450,18 @@ abstract class L10n {
   /// In en, this message translates to:
   /// **'Select transaction category'**
   String get transactionCategoryHint;
+
+  /// No description provided for @transactionDeferredMonths.
+  ///
+  /// In en, this message translates to:
+  /// **'Deferred months'**
+  String get transactionDeferredMonths;
+
+  /// No description provided for @transactionDeferredMonthsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter deferred months...'**
+  String get transactionDeferredMonthsHint;
 
   /// No description provided for @transactionDelete.
   ///

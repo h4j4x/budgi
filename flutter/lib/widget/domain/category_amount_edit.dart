@@ -109,6 +109,7 @@ class _CategoryAmountEditState extends State<CategoryAmountEdit> {
       enabled: !saving,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
       focusNode: amountFocus,
+      textAlign: TextAlign.end,
       decoration: InputDecoration(
         labelText: l10n.budgetAmount,
         hintText: l10n.budgetAmountHint,

@@ -68,6 +68,7 @@
     }
   },
   "invalidTransactionAmount": "Invalid transaction amount. Enter a non negative number for amount.",
+  "invalidTransactionDeferredMonths": "Invalid transaction deferred months.",
   "invalidTransactionDescription": "Invalid transaction description. Enter an optional description with no more than {maxLength} characters.",
   "@invalidTransactionDescription": {
     "placeholders": {
@@ -129,6 +130,8 @@
   "transactionAmount": "Transaction amount",
   "transactionAmountHint": "Enter transaction amount...",
   "transactionCategoryHint": "Select transaction category",
+  "transactionDeferredMonths": "Deferred months",
+  "transactionDeferredMonthsHint": "Enter deferred months...",
   "transactionDelete": "Delete transaction",
   "transactionDeleteConfirm": "Confirm to delete transaction {description}.",
   "@transactionDeleteConfirm": {

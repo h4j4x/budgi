@@ -110,6 +110,9 @@ class L10nEn extends L10n {
   String get invalidTransactionAmount => 'Invalid transaction amount. Enter a non negative number for amount.';
 
   @override
+  String get invalidTransactionDeferredMonths => 'Invalid transaction deferred months.';
+
+  @override
   String invalidTransactionDescription(int maxLength) {
     return 'Invalid transaction description. Enter an optional description with no more than $maxLength characters.';
   }
@@ -206,6 +209,12 @@ class L10nEn extends L10n {
 
   @override
   String get transactionCategoryHint => 'Select transaction category';
+
+  @override
+  String get transactionDeferredMonths => 'Deferred months';
+
+  @override
+  String get transactionDeferredMonthsHint => 'Enter deferred months...';
 
   @override
   String get transactionDelete => 'Delete transaction';
