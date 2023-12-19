@@ -166,7 +166,7 @@ class _TransactionEditState extends State<TransactionEdit> {
 
   Widget transactionStatusField() {
     return TransactionStatusSelect(
-      enabled: canEdit,
+      enabled: false,
       allowClear: false,
       onChanged: (value) {
         setState(() {
@@ -202,6 +202,7 @@ class _TransactionEditState extends State<TransactionEdit> {
       value: wallet,
       allowClear: false,
       onChanged: (value) {
+        updateTransactionStatus();
         setState(() {
           errors.remove(TransactionValidator.wallet);
           wallet = value;
@@ -218,6 +219,7 @@ class _TransactionEditState extends State<TransactionEdit> {
     return WalletSelect(
       list: (wallets ?? []).where((item) => item != wallet).toList(),
       value: walletTarget,
+      allowClear: false,
       onChanged: (value) {
         setState(() {
           errors.remove(TransactionValidator.walletTarget);
@@ -227,6 +229,13 @@ class _TransactionEditState extends State<TransactionEdit> {
       hintText: L10n.of(context).transactionWalletTargetHint,
       errorText: errors[TransactionValidator.walletTarget]?.l10n(context),
     );
+  }
+
+  void updateTransactionStatus() {
+    transactionStatus = TransactionStatus.pendent;
+    if (!isWalletTransfer && wallet?.walletType == WalletType.creditCard) {
+      transactionStatus = TransactionStatus.pendent;
+    }
   }
 
   Widget amountField() {
