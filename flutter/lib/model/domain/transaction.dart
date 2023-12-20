@@ -31,16 +31,15 @@ abstract class Transaction {
 }
 
 enum TransactionType {
-  income(true, true),
-  incomeTransfer(true, false),
-  expense(false, true),
-  expenseTransfer(false, false),
-  walletTransfer(true, true);
+  income(true),
+  incomeTransfer(true),
+  expense(false),
+  expenseTransfer(false),
+  walletTransfer(false);
 
   final bool isIncome;
-  final bool canSelect;
 
-  const TransactionType(this.isIncome, this.canSelect);
+  const TransactionType(this.isIncome);
 
   String l10n(BuildContext context) {
     final l10n = L10n.of(context);

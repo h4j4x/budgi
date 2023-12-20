@@ -167,6 +167,9 @@ class _TransactionEditState extends State<TransactionEdit> {
         amountFocus.requestFocus();
         DI().get<StorageService>().writeString(_lastTransactionTypeKey, value!.name);
       },
+      list: TransactionType.values.where((value) {
+        return value != TransactionType.incomeTransfer && value != TransactionType.expenseTransfer;
+      }).toList(),
       value: transactionType,
       hintText: L10n.of(context).transactionTypeHint,
       errorText: errors[TransactionValidator.description]?.l10n(context),

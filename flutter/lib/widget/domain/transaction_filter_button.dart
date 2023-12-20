@@ -4,6 +4,7 @@ import '../../app/icon.dart';
 import '../../app/router.dart';
 import '../../l10n/l10n.dart';
 import '../../model/domain/category.dart';
+import '../../model/domain/transaction.dart';
 import '../../model/domain/wallet.dart';
 import '../../model/transaction_filter.dart';
 import '../common/sort_field.dart';
@@ -141,13 +142,16 @@ class _FilterDialogState extends State<_FilterDialog> {
     final l10n = L10n.of(context);
     return AlertDialog(
       title: Text(l10n.transactionsFilters),
-      content: Column(
-        children: filterItems().map((item) {
-          return Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: item,
-          );
-        }).toList(),
+      content: Container(
+        constraints: const BoxConstraints(minWidth: 350),
+        child: Column(
+          children: filterItems().map((item) {
+            return Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: item,
+            );
+          }).toList(),
+        ),
       ),
       actions: [
         TextButton(
@@ -189,6 +193,9 @@ class _FilterDialogState extends State<_FilterDialog> {
         hintText: L10n.of(context).transactionCategoryHint,
       ),
       TransactionTypeSelect(
+        list: TransactionType.values.where((value) {
+          return value != TransactionType.walletTransfer;
+        }).toList(),
         value: filter.transactionType,
         allowClear: true,
         onChanged: (value) {

@@ -5,6 +5,7 @@ import '../../model/domain/transaction.dart';
 import '../common/select_field.dart';
 
 class TransactionTypeSelect extends StatelessWidget {
+  final List<TransactionType> list;
   final TransactionType? value;
   final Function(TransactionType?) onChanged;
   final String? hintText;
@@ -14,6 +15,7 @@ class TransactionTypeSelect extends StatelessWidget {
 
   const TransactionTypeSelect({
     super.key,
+    required this.list,
     this.value,
     required this.onChanged,
     this.hintText,
@@ -25,7 +27,7 @@ class TransactionTypeSelect extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SelectField<TransactionType>(
-      items: TransactionType.values.where((value) => value.canSelect).toList(),
+      items: list,
       itemBuilder: (context, value) {
         return Text(value.l10n(context));
       },
