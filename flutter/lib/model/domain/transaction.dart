@@ -14,6 +14,8 @@ abstract class Transaction {
 
   TransactionStatus get transactionStatus;
 
+  set transactionStatus(TransactionStatus value);
+
   Wallet get wallet;
 
   Category get category;

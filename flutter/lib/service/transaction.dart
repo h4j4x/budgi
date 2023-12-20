@@ -44,6 +44,9 @@ abstract class TransactionService {
       description: sourceDescription ?? targetWallet.name,
     );
     // target
+    if (targetWallet.walletType == WalletType.creditCard) {
+      await _completePendingTransactions(targetWallet, maxAmount: amount);
+    }
     try {
       await saveTransaction(
         code: 'target_$transactionCode',
@@ -58,6 +61,30 @@ abstract class TransactionService {
     } catch (e) {
       await deleteTransaction(code: sourceTransactionCode);
       rethrow;
+    }
+  }
+
+  Future<void> _completePendingTransactions(Wallet wallet, {required double maxAmount}) async {
+    final transactions = await listTransactions(
+      transactionStatuses: [TransactionStatus.pending],
+      dateTimeSort: Sort.asc,
+    );
+    double restAmount = maxAmount;
+    for (var transaction in transactions) {
+      if (restAmount == 0 || restAmount < transaction.amount) {
+        break;
+      }
+      restAmount -= transaction.amount;
+      await saveTransaction(
+        code: transaction.code,
+        transactionType: transaction.transactionType,
+        transactionStatus: TransactionStatus.completed,
+        category: transaction.category,
+        wallet: transaction.wallet,
+        amount: transaction.amount,
+        dateTime: transaction.dateTime,
+        description: transaction.description,
+      );
     }
   }
 

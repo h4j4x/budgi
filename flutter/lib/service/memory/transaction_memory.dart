@@ -32,12 +32,15 @@ class TransactionMemoryService extends TransactionService {
     int? deferredMonths,
   }) {
     final transactionCode = code ?? randomString(6);
-    final trnDateTime = dateTime ?? _transactions[transactionCode]?.dateTime ?? DateTime.now();
-    final months = deferredMonths != null && deferredMonths > 1 ? deferredMonths : 1;
+    final trnDateTime =
+        dateTime ?? _transactions[transactionCode]?.dateTime ?? DateTime.now();
+    final months =
+        deferredMonths != null && deferredMonths > 1 ? deferredMonths : 1;
     Transaction? firstTransaction;
     final theAmount = amount / months;
     for (int i = 0; i < months; i++) {
-      final theTransactionCode = '$transactionCode-${i + 1}';
+      final theTransactionCode =
+          i > 0 ? '$transactionCode-${i + 1}' : transactionCode;
       final transaction = _Transaction(
         theTransactionCode,
         category,
@@ -68,10 +71,12 @@ class TransactionMemoryService extends TransactionService {
     Sort? dateTimeSort,
   }) {
     final list = _transactions.values.toList().where((transaction) {
-      if (transactionTypes != null && !transactionTypes.contains(transaction.transactionType)) {
+      if (transactionTypes != null &&
+          !transactionTypes.contains(transaction.transactionType)) {
         return false;
       }
-      if (transactionStatuses != null && !transactionStatuses.contains(transaction.transactionStatus)) {
+      if (transactionStatuses != null &&
+          !transactionStatuses.contains(transaction.transactionStatus)) {
         return false;
       }
       if (category != null && transaction.category != category) {
@@ -109,17 +114,6 @@ class TransactionMemoryService extends TransactionService {
 }
 
 class _Transaction extends Transaction {
-  _Transaction(
-    this.code,
-    this.category,
-    this.wallet,
-    this.transactionType,
-    this.transactionStatus,
-    this.amount,
-    this.description,
-    DateTime? dateTime,
-  ) : dateTime = dateTime ?? DateTime.now();
-
   @override
   String code;
 
@@ -144,12 +138,25 @@ class _Transaction extends Transaction {
   @override
   String description;
 
+  _Transaction(
+    this.code,
+    this.category,
+    this.wallet,
+    this.transactionType,
+    this.transactionStatus,
+    this.amount,
+    this.description,
+    DateTime? dateTime,
+  ) : dateTime = dateTime ?? DateTime.now();
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) {
       return true;
     }
-    return other is _Transaction && runtimeType == other.runtimeType && code == other.code;
+    return other is _Transaction &&
+        runtimeType == other.runtimeType &&
+        code == other.code;
   }
 
   @override

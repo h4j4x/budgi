@@ -1,5 +1,4 @@
 - Help dialog on transactions explained:
   x All transactions have payment status completed except with CreditCard.
   x Deferred transactions will create multiple transactions.
-  - Transfers to Credit Cards mark older pending transactions as completed.
-    Remaining amount should create completed income transaction.
+  x Transfers to Credit Cards mark older pending transactions as completed.
