@@ -56,8 +56,8 @@ class _SignInState extends State<SignIn> {
       emailField(),
       passwordField(),
       Center(child: signInButton()),
-      const Divider(),
-      Center(child: githubButton()),
+      // const Divider(),
+      // Center(child: githubButton()),
     ];
     if (processing) {
       items.insert(

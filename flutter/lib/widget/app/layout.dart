@@ -54,14 +54,14 @@ class _AppScaffoldState extends State<AppScaffold> {
     final extraItemsCount = user != null ? 2 : 1;
     return ResponsiveWidget(
       mobile: Scaffold(
-        appBar: appBar(user, false),
+        appBar: appBar(user, true),
         body: SafeArea(child: widget.child),
         drawer: Drawer(
           child: menu(extraItemsCount),
         ),
       ),
       desktop: Scaffold(
-        appBar: appBar(user, true),
+        appBar: appBar(user, false),
         body: SafeArea(
           child: SideCollapsibleWidget(
             sideCollapsed: menuCollapsed,
@@ -73,9 +73,9 @@ class _AppScaffoldState extends State<AppScaffold> {
     );
   }
 
-  PreferredSizeWidget appBar(AppUser? user, bool canCollapse) {
+  PreferredSizeWidget appBar(AppUser? user, bool isMobile) {
     return AppBar(
-      leading: canCollapse
+      leading: !isMobile
           ? IconButton(
               icon: AppIcon.menu,
               onPressed: () {
@@ -87,7 +87,13 @@ class _AppScaffoldState extends State<AppScaffold> {
           : null,
       title: title(context),
       actions: [
-        if (user != null)
+        if (user != null && isMobile)
+          IconButton(
+            onPressed: () {},
+            icon: user.icon,
+            tooltip: user.usernameOrEmail,
+          ),
+        if (user != null && !isMobile)
           TextButton.icon(
             onPressed: () {},
             icon: user.icon,
@@ -145,9 +151,7 @@ class _AppScaffoldState extends State<AppScaffold> {
       return IconButton(
         onPressed: onTap,
         icon: route.icon ?? Container(),
-        tooltip: route.menuTextBuilder != null
-            ? route.menuTextBuilder!(context)
-            : null,
+        tooltip: route.menuTextBuilder != null ? route.menuTextBuilder!(context) : null,
       );
     }
     return ListTile(
@@ -169,7 +173,12 @@ class _AppScaffoldState extends State<AppScaffold> {
     }
     return ListTile(
       enabled: false,
-      title: !menuCollapsed ? Text(aboutText) : null,
+      title: !menuCollapsed
+          ? Text(
+              aboutText,
+              textScaler: const TextScaler.linear(0.8),
+            )
+          : null,
       leading: AppIcon.about,
     );
   }

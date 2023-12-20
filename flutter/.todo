@@ -1,3 +1,4 @@
+- User profile page
 - Help dialog on transactions explained:
   x All transactions have payment status completed except with CreditCard.
   x Deferred transactions will create multiple transactions.

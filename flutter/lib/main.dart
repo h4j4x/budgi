@@ -27,7 +27,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       onGenerateTitle: (context) => L10n.of(context).appTitle,
-      debugShowCheckedModeBanner: false,
       theme: lightTheme,
       darkTheme: darkTheme,
       localizationsDelegates: const [
