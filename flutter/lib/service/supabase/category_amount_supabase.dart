@@ -5,6 +5,7 @@ import '../../model/domain/category.dart';
 import '../../model/domain/category_amount.dart';
 import '../../model/domain/transaction.dart';
 import '../../model/domain/user.dart';
+import '../../model/domain/wallet.dart';
 import '../../model/error/category.dart';
 import '../../model/error/validation.dart';
 import '../../model/fields.dart';
@@ -162,6 +163,7 @@ class CategoryAmountSupabaseService implements CategoryAmountService {
     required Period period,
     bool expensesTransactions = true,
     bool showZeroTotal = false,
+    List<WalletType>? walletTypes,
   }) async {
     final transactionTypes = TransactionType.values.where((type) {
       if (expensesTransactions) {
@@ -173,6 +175,7 @@ class CategoryAmountSupabaseService implements CategoryAmountService {
           transactionTypes: transactionTypes,
           period: period,
           dateTimeSort: Sort.asc,
+          walletTypes: walletTypes,
         );
     final map = <CategoryAmount, double>{};
     final amounts = await listAmounts(period: period, showZeroAmount: true);

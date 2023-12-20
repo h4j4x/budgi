@@ -1,5 +1,6 @@
 import '../model/domain/category.dart';
 import '../model/domain/category_amount.dart';
+import '../model/domain/wallet.dart';
 import '../model/period.dart';
 import '../model/sort.dart';
 
@@ -48,5 +49,6 @@ abstract class CategoryAmountService {
     required Period period,
     bool expensesTransactions = true,
     bool showZeroTotal = false,
+    List<WalletType>? walletTypes,
   });
 }

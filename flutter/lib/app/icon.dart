@@ -188,7 +188,7 @@ class _Icon extends StatelessWidget {
     return FaIcon(
       icon,
       color: color,
-      size: size ?? 18,
+      size: size ?? 16,
     );
   }
 }

@@ -47,8 +47,18 @@ class AuthSupabaseService extends AuthService {
 
   @override
   Stream<bool> authenticatedStream() {
-    return config.supabase.auth.onAuthStateChange.map((state) {
-      return state.session != null;
+    final listenedEvents = <AuthChangeEvent>[
+      AuthChangeEvent.signedIn,
+      AuthChangeEvent.signedOut,
+      AuthChangeEvent.initialSession,
+      AuthChangeEvent.tokenRefreshed,
+    ];
+    return config.supabase.auth.onAuthStateChange.where((state) {
+      return listenedEvents.contains(state.event);
+    }).map((state) {
+      final hasSession = state.session != null && !(state.session!.isExpired);
+      debugPrint('Supabase onAuthStateChange event: ${state.event}, has session: $hasSession');
+      return hasSession;
     });
   }
 

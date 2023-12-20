@@ -65,6 +65,7 @@ class TransactionMemoryService extends TransactionService {
   Future<List<Transaction>> listTransactions({
     List<TransactionType>? transactionTypes,
     List<TransactionStatus>? transactionStatuses,
+    List<WalletType>? walletTypes,
     Category? category,
     Wallet? wallet,
     Period? period,
@@ -77,6 +78,10 @@ class TransactionMemoryService extends TransactionService {
       }
       if (transactionStatuses != null &&
           !transactionStatuses.contains(transaction.transactionStatus)) {
+        return false;
+      }
+      if (walletTypes != null &&
+          !walletTypes.contains(transaction.wallet.walletType)) {
         return false;
       }
       if (category != null && transaction.category != category) {

@@ -91,6 +91,7 @@ abstract class TransactionService {
   Future<List<Transaction>> listTransactions({
     List<TransactionType>? transactionTypes,
     List<TransactionStatus>? transactionStatuses,
+    List<WalletType>? walletTypes,
     Category? category,
     Wallet? wallet,
     Period? period,

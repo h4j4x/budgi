@@ -2,6 +2,7 @@ import '../../di.dart';
 import '../../model/domain/category.dart';
 import '../../model/domain/category_amount.dart';
 import '../../model/domain/transaction.dart';
+import '../../model/domain/wallet.dart';
 import '../../model/error/category.dart';
 import '../../model/error/validation.dart';
 import '../../model/period.dart';
@@ -50,9 +51,7 @@ class CategoryMemoryService implements CategoryService, CategoryAmountService {
     final list = _categories.values.toList();
     if (period != null) {
       final amountsCategories =
-          (_values[period.toString()] ?? <CategoryAmount>{})
-              .map((amount) => amount.category.code)
-              .toList();
+          (_values[period.toString()] ?? <CategoryAmount>{}).map((amount) => amount.category.code).toList();
       list.removeWhere((category) {
         if (excludingCodes != null && excludingCodes.contains(category.code)) {
           return true;
@@ -96,8 +95,7 @@ class CategoryMemoryService implements CategoryService, CategoryAmountService {
 
     final periodKey = period.toString();
     _values[periodKey] ??= <CategoryAmount>{};
-    _values[periodKey]!
-        .removeWhere((amount) => amount.category.code == category.code);
+    _values[periodKey]!.removeWhere((amount) => amount.category.code == category.code);
     _values[periodKey]!.add(categoryAmount);
     return Future.value(categoryAmount);
   }
@@ -184,6 +182,7 @@ class CategoryMemoryService implements CategoryService, CategoryAmountService {
     required Period period,
     bool expensesTransactions = true,
     bool showZeroTotal = false,
+    List<WalletType>? walletTypes,
   }) async {
     final transactionTypes = TransactionType.values.where((type) {
       if (expensesTransactions) {
@@ -195,16 +194,14 @@ class CategoryMemoryService implements CategoryService, CategoryAmountService {
           transactionTypes: transactionTypes,
           period: period,
           dateTimeSort: Sort.asc,
+          walletTypes: walletTypes,
         );
     final map = <CategoryAmount, double>{};
     final amounts = _values[period.toString()] ?? {};
     for (var transaction in transactions) {
-      final categoryAmount = amounts
-          .where((amount) => amount.category == transaction.category)
-          .toList();
+      final categoryAmount = amounts.where((amount) => amount.category == transaction.category).toList();
       if (categoryAmount.length == 1) {
-        map[categoryAmount.first] =
-            (map[categoryAmount.first] ?? 0) + transaction.signedAmount;
+        map[categoryAmount.first] = (map[categoryAmount.first] ?? 0) + transaction.signedAmount;
       }
     }
     if (showZeroTotal) {
@@ -240,9 +237,7 @@ class _Category implements Category {
     if (identical(this, other)) {
       return true;
     }
-    return other is _Category &&
-        runtimeType == other.runtimeType &&
-        code == other.code;
+    return other is _Category && runtimeType == other.runtimeType && code == other.code;
   }
 
   @override
@@ -268,9 +263,7 @@ class _CategoryAmount implements CategoryAmount {
     if (identical(this, other)) {
       return true;
     }
-    return other is _CategoryAmount &&
-        runtimeType == other.runtimeType &&
-        category == other.category;
+    return other is _CategoryAmount && runtimeType == other.runtimeType && category == other.category;
   }
 
   @override
