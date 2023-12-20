@@ -13,6 +13,7 @@ import '../page/category.dart';
 import '../page/category_amount.dart';
 import '../page/home.dart';
 import '../page/sign_in.dart';
+import '../page/splash.dart';
 import '../page/transaction.dart';
 import '../page/transactions.dart';
 import '../page/wallet.dart';
@@ -22,6 +23,14 @@ import '../widget/app/layout.dart';
 import 'icon.dart';
 
 final _routes = <AppRoute>[
+  // splash
+  AppRoute(
+    anon: true,
+    path: SplashPage.route,
+    pageBuilder: (_, __) {
+      return const SplashPage();
+    },
+  ),
   // sign in
   AppRoute(
     anon: true,
@@ -129,7 +138,7 @@ final _redirectRoute = _routes.firstWhere((route) => route.anon).path;
 
 // https://pub.dev/documentation/go_router/latest/topics/Get%20started-topic.html
 final router = GoRouter(
-  initialLocation: HomePage.route,
+  initialLocation: SplashPage.route,
   navigatorKey: _rootNavigatorKey,
   routes: [
     ..._routes.where((route) => route.anon).map((route) {
@@ -169,9 +178,7 @@ final router = GoRouter(
   redirect: (context, state) {
     if (DI().has<AuthService>()) {
       final route = _routes.where((r) => r.path == state.matchedLocation);
-      if (route.isNotEmpty &&
-          !route.first.anon &&
-          DI().get<AuthService>().user() == null) {
+      if (route.isNotEmpty && !route.first.anon && DI().get<AuthService>().user() == null) {
         return _redirectRoute;
       }
     }
