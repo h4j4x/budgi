@@ -1,5 +1,6 @@
-- User profile page
+- Fix wallets balance by period (not using previous period balance)
 - Help dialog on transactions explained:
   x All transactions have payment status completed except with CreditCard.
   x Deferred transactions will create multiple transactions.
   x Transfers to Credit Cards mark older pending transactions as completed.
+- User profile page

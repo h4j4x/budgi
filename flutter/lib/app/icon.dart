@@ -126,8 +126,8 @@ class AppIcon {
     return _Icon(FontAwesomeIcons.moneyBillTransfer, color: color);
   }
 
-  static Widget get user {
-    return const _Icon(FontAwesomeIcons.user);
+  static Widget user({double? size, Color? color}) {
+    return _Icon(FontAwesomeIcons.user, size: size, color: color);
   }
 
   static Widget get wallet {

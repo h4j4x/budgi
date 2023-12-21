@@ -120,18 +120,23 @@ class _User implements AppUser {
   }
 
   @override
-  Widget get icon {
+  Widget icon({double? size, Color? color}) {
     if (avatarUrl != null) {
       return ClipOval(
         child: Image.network(
           avatarUrl!,
-          width: 30,
-          height: 30,
+          width: size ?? 30,
+          height: size ?? 30,
+          color: color,
           fit: BoxFit.scaleDown,
         ),
       );
     }
-    return AppIcon.user;
+    return SizedBox(
+      width: size,
+      height: size,
+      child: Center(child: AppIcon.user(size: size, color: color)),
+    );
   }
 
   @override

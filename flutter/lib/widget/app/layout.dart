@@ -51,13 +51,12 @@ class _AppScaffoldState extends State<AppScaffold> {
   @override
   Widget build(BuildContext context) {
     final user = appUser;
-    final extraItemsCount = user != null ? 2 : 1;
     return ResponsiveWidget(
       mobile: Scaffold(
         appBar: appBar(user, true),
         body: SafeArea(child: widget.child),
         drawer: Drawer(
-          child: menu(extraItemsCount),
+          child: menu(user, true),
         ),
       ),
       desktop: Scaffold(
@@ -65,7 +64,7 @@ class _AppScaffoldState extends State<AppScaffold> {
         body: SafeArea(
           child: SideCollapsibleWidget(
             sideCollapsed: menuCollapsed,
-            side: menu(extraItemsCount),
+            side: menu(user, false),
             child: widget.child,
           ),
         ),
@@ -85,25 +84,25 @@ class _AppScaffoldState extends State<AppScaffold> {
               },
             )
           : null,
-      title: title(context),
+      title: title(),
       actions: [
         if (user != null && isMobile)
           IconButton(
             onPressed: () {},
-            icon: user.icon,
+            icon: user.icon(),
             tooltip: user.usernameOrEmail,
           ),
         if (user != null && !isMobile)
           TextButton.icon(
             onPressed: () {},
-            icon: user.icon,
+            icon: user.icon(),
             label: Text(user.usernameOrEmail),
           ),
       ],
     );
   }
 
-  Widget? title(BuildContext context) {
+  Widget? title() {
     final currentRouteIndex = widget.routes.indexWhere((route) {
       return route.path == widget.path;
     });
@@ -121,25 +120,60 @@ class _AppScaffoldState extends State<AppScaffold> {
     return null;
   }
 
-  Widget menu(int extraItemsCount) {
+  Widget menu(AppUser? user, bool isMobile) {
+    final items = <Widget>[
+      ...widget.routes.map(routeWidget),
+      aboutWidget(),
+    ];
+    if (user != null) {
+      if (isMobile) {
+        items.insert(0, headerWidget(user));
+      }
+      items.add(signOutWidget());
+    }
     return ListView.separated(
-      itemCount: widget.routes.length + extraItemsCount,
+      itemCount: items.length,
       itemBuilder: (context, index) {
-        if (index < widget.routes.length) {
-          return routeWidget(context, widget.routes[index]);
-        }
-        if (index == widget.routes.length) {
-          return aboutWidget(context);
-        }
-        return signOutWidget(context);
+        return items[index];
       },
-      separatorBuilder: (_, __) {
+      separatorBuilder: (_, index) {
+        if (isMobile && index == 0) {
+          return Container();
+        }
         return const Divider();
       },
     );
   }
 
-  Widget routeWidget(BuildContext context, AppRoute route) {
+  Widget headerWidget(AppUser user) {
+    final theme = Theme.of(context);
+    final foregroundColor = theme.colorScheme.onPrimaryContainer;
+    final backgroundColor = theme.colorScheme.primaryContainer;
+    return DrawerHeader(
+      decoration: BoxDecoration(
+        color: backgroundColor,
+      ), //BoxDecoration
+      child: UserAccountsDrawerHeader(
+        decoration: BoxDecoration(color: backgroundColor),
+        accountName: Text(
+          user.name,
+          textScaler: const TextScaler.linear(1.2),
+          style: TextStyle(color: foregroundColor),
+        ),
+        accountEmail: Text(
+          user.usernameOrEmail,
+          style: TextStyle(color: foregroundColor),
+        ),
+        currentAccountPictureSize: const Size.square(40),
+        currentAccountPicture: CircleAvatar(
+          backgroundColor: theme.colorScheme.primary,
+          child: user.icon(size: 20, color: theme.colorScheme.onPrimary), //Text
+        ), //circleAvatar
+      ), //UserAccountDrawerHeader
+    );
+  }
+
+  Widget routeWidget(AppRoute route) {
     final selected = route.path == widget.path;
     final onTap = !selected
         ? () {
@@ -162,7 +196,7 @@ class _AppScaffoldState extends State<AppScaffold> {
     );
   }
 
-  Widget aboutWidget(BuildContext context) {
+  Widget aboutWidget() {
     final aboutText = L10n.of(context).appAbout(version, DateTime.now().year);
     if (menuCollapsed) {
       return IconButton(
@@ -183,7 +217,7 @@ class _AppScaffoldState extends State<AppScaffold> {
     );
   }
 
-  Widget signOutWidget(BuildContext context) {
+  Widget signOutWidget() {
     if (menuCollapsed) {
       return IconButton(
         onPressed: onSignOut,

@@ -11,7 +11,7 @@ abstract class AppUser {
 
   String get username;
 
-  Widget get icon;
+  Widget icon({double? size, Color? color});
 
   String get usernameOrEmail;
 }
