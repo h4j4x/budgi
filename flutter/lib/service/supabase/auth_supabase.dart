@@ -32,6 +32,9 @@ class AuthSupabaseService extends AuthService {
       return response.session != null;
     } on AuthException catch (_) {
       throw SignInError();
+    } catch (e) {
+      debugPrint('Unexpected error $e');
+      throw SignInError();
     }
   }
 

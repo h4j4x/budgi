@@ -38,7 +38,7 @@ flutter:
   uses-material-design: true
 
 flutter_native_splash:
-  color: "#f8fcfa"
-  image: "icon/icon-foreground-432x432.png"
-  color_dark: "#282828"
-  image_dark: "icon/icon-foreground-invert-432x432.png"
+  color: "#acb7b9"
+  image: "icon/logo-400.png"
+  color_dark: "#34495e"
+  image_dark: "icon/logo-400.png"
