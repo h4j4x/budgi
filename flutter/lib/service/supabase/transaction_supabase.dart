@@ -34,7 +34,7 @@ class TransactionSupabaseService extends TransactionService {
   });
 
   @override
-  Future<Transaction> saveTransaction({
+  Future<Transaction> doSaveTransaction({
     String? code,
     required TransactionType transactionType,
     required TransactionStatus transactionStatus,
@@ -58,20 +58,24 @@ class TransactionSupabaseService extends TransactionService {
 
     final transactionCode = code ?? randomString(6);
     final transactionExists = await _transactionExistsByCode(transactionCode);
-    final months = deferredMonths != null && deferredMonths > 1 ? deferredMonths : 1;
+    final months =
+        deferredMonths != null && deferredMonths > 1 ? deferredMonths : 1;
     if (transactionExists && months > 1) {
       throw ValidationError({
         'months': TransactionError.invalidTransactionDeferredMonths,
       });
     }
 
-    final user = DI().get<AuthService>().fetchUser(errorIfMissing: TransactionError.invalidUser);
+    final user = DI()
+        .get<AuthService>()
+        .fetchUser(errorIfMissing: TransactionError.invalidUser);
     final trnDateTime = dateTime ?? DateTime.now();
 
     Transaction? firstTransaction;
     final theAmount = amount / months;
     for (int i = 0; i < months; i++) {
-      final theTransactionCode = i > 0 ? '$transactionCode-${i + 1}' : transactionCode;
+      final theTransactionCode =
+          i > 0 ? '$transactionCode-${i + 1}' : transactionCode;
       final transaction = _Transaction(
         category: category,
         wallet: wallet,
@@ -90,11 +94,16 @@ class TransactionSupabaseService extends TransactionService {
       firstTransaction ??= transaction;
 
       if (transactionExists) {
-        await config.supabase.from(transactionTable).update(transaction.toMap(user)).match({
+        await config.supabase
+            .from(transactionTable)
+            .update(transaction.toMap(user))
+            .match({
           codeField: transactionCode,
         });
       } else {
-        await config.supabase.from(transactionTable).insert(transaction.toMap(user));
+        await config.supabase
+            .from(transactionTable)
+            .insert(transaction.toMap(user));
       }
     }
 
@@ -116,7 +125,10 @@ class TransactionSupabaseService extends TransactionService {
       return [];
     }
 
-    var query = config.supabase.from(transactionTable).select().eq(userIdField, user.id);
+    var query = config.supabase
+        .from(transactionTable)
+        .select()
+        .eq(userIdField, user.id);
     if (transactionTypes?.isNotEmpty ?? false) {
       query = query.inFilter(
           transactionTypeField,
@@ -145,12 +157,15 @@ class TransactionSupabaseService extends TransactionService {
       query = query.eq(walletIdField, wallet.id);
     }
     if (period != null) {
-      query = query.gte(dateTimeField, period.from.toIso8601String()).lte(dateTimeField, period.to.toIso8601String());
+      query = query
+          .gte(dateTimeField, period.from.toIso8601String())
+          .lte(dateTimeField, period.to.toIso8601String());
     }
 
     dynamic data;
     if (dateTimeSort != null) {
-      data = await query.order(dateTimeField, ascending: dateTimeSort == Sort.asc);
+      data =
+          await query.order(dateTimeField, ascending: dateTimeSort == Sort.asc);
     } else {
       data = await query;
     }
@@ -171,12 +186,18 @@ class TransactionSupabaseService extends TransactionService {
 
   @override
   Future<void> deleteTransaction({required String code}) async {
-    await config.supabase.from(transactionTable).delete().match({codeField: code});
+    await config.supabase
+        .from(transactionTable)
+        .delete()
+        .match({codeField: code});
   }
 
   Future<bool> _transactionExistsByCode(String code) async {
-    final count =
-        await config.supabase.from(transactionTable).select(idField).eq(codeField, code).count(CountOption.exact);
+    final count = await config.supabase
+        .from(transactionTable)
+        .select(idField)
+        .eq(codeField, code)
+        .count(CountOption.exact);
     return count.count > 0;
   }
 
@@ -267,8 +288,10 @@ class _Transaction extends Transaction {
       final categoryId = raw[categoryIdField] as int?;
       final walletId = raw[walletIdField] as int?;
       final code = raw[codeField] as String?;
-      final transactionType = TransactionType.tryParse(raw[transactionTypeField] as String?);
-      final transactionStatus = TransactionStatus.tryParse(raw[transactionStatusField] as String?);
+      final transactionType =
+          TransactionType.tryParse(raw[transactionTypeField] as String?);
+      final transactionStatus =
+          TransactionStatus.tryParse(raw[transactionStatusField] as String?);
       final amount = raw[amountField] as num?;
       final dateTime = DateTime.tryParse((raw[dateTimeField] as String?) ?? '');
       final description = raw[descriptionField] as String?;
@@ -306,7 +329,9 @@ class _Transaction extends Transaction {
     if (identical(this, other)) {
       return true;
     }
-    return other is _Transaction && runtimeType == other.runtimeType && code == other.code;
+    return other is _Transaction &&
+        runtimeType == other.runtimeType &&
+        code == other.code;
   }
 
   @override

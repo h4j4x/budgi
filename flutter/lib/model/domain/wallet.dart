@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../app/icon.dart';
 import '../../l10n/l10n.dart';
+import '../period.dart';
 
 enum WalletType {
   cash,
@@ -44,4 +45,14 @@ abstract class Wallet {
   WalletType get walletType;
 
   String get name;
+}
+
+abstract class WalletBalance {
+  Wallet get wallet;
+
+  Period get period;
+
+  double get balance;
+
+  DateTime get updatedAt;
 }

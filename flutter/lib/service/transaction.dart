@@ -1,13 +1,43 @@
+import 'package:meta/meta.dart';
+
+import '../di.dart';
 import '../model/domain/category.dart';
 import '../model/domain/transaction.dart';
 import '../model/domain/wallet.dart';
 import '../model/period.dart';
 import '../model/sort.dart';
 import '../util/string.dart';
+import 'wallet.dart';
 
 abstract class TransactionService {
   /// @throws ValidationError
   Future<Transaction> saveTransaction({
+    String? code,
+    required TransactionType transactionType,
+    required TransactionStatus transactionStatus,
+    required Category category,
+    required Wallet wallet,
+    required double amount,
+    DateTime? dateTime,
+    String? description,
+    int? deferredMonths,
+  }) async {
+    final transaction = await doSaveTransaction(
+      transactionType: transactionType,
+      transactionStatus: transactionStatus,
+      category: category,
+      wallet: wallet,
+      amount: amount,
+    );
+    final period = Period.monthFromDateTime(transaction.dateTime);
+    await DI()
+        .get<WalletService>()
+        .updateWalletBalance(code: transaction.wallet.code, period: period);
+    return transaction;
+  }
+
+  @protected
+  Future<Transaction> doSaveTransaction({
     String? code,
     required TransactionType transactionType,
     required TransactionStatus transactionStatus,
@@ -64,7 +94,8 @@ abstract class TransactionService {
     }
   }
 
-  Future<void> _completePendingTransactions(Wallet wallet, {required double maxAmount}) async {
+  Future<void> _completePendingTransactions(Wallet wallet,
+      {required double maxAmount}) async {
     final transactions = await listTransactions(
       transactionStatuses: [TransactionStatus.pending],
       dateTimeSort: Sort.asc,

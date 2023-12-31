@@ -17,6 +17,12 @@ class Period {
     return Period.monthFromDateTime(DateTime.now());
   }
 
+  Period get previous {
+    final dateTime =
+        DateTime(from.year, from.month).add(const Duration(days: -1));
+    return Period.monthFromDateTime(dateTime);
+  }
+
   static Period? tryParse(String? value) {
     if (value != null) {
       final parts = value.split('-');

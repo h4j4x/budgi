@@ -20,7 +20,7 @@ class TransactionMemoryService extends TransactionService {
   });
 
   @override
-  Future<Transaction> saveTransaction({
+  Future<Transaction> doSaveTransaction({
     String? code,
     required TransactionType transactionType,
     required TransactionStatus transactionStatus,

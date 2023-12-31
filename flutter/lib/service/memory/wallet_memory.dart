@@ -13,6 +13,7 @@ class WalletMemoryService implements WalletService {
   final Validator<Wallet, WalletError>? walletValidator;
 
   final _wallets = <String, Wallet>{};
+  final _balances = <String, Set<_WalletBalance>>{};
 
   WalletMemoryService({
     this.walletValidator,
@@ -60,22 +61,20 @@ class WalletMemoryService implements WalletService {
   Future<Map<Wallet, double>> walletsBalance({
     required Period period,
     bool showZeroBalance = false,
-  }) async {
-    final transactions = await DI().get<TransactionService>().listTransactions(
-          period: period,
-          dateTimeSort: Sort.desc,
-        );
+  }) {
     final map = <Wallet, double>{};
-    for (var transaction in transactions) {
-      map[transaction.wallet] =
-          (map[transaction.wallet] ?? 0) + transaction.signedAmount;
+    if (_balances.containsKey(period.toString())) {
+      final balances = _balances[period.toString()]!;
+      for (var balance in balances) {
+        map[balance.wallet] = balance.balance;
+      }
     }
     if (showZeroBalance) {
       for (var wallet in _wallets.values) {
         map[wallet] ??= 0;
       }
     }
-    return map;
+    return Future.value(map);
   }
 
   @override
@@ -86,6 +85,42 @@ class WalletMemoryService implements WalletService {
   @override
   Future<Wallet?> fetchWalletById(int id) {
     return Future.value();
+  }
+
+  @override
+  Future<void> updateWalletBalance({
+    required String code,
+    required Period period,
+  }) async {
+    if (_wallets.containsKey(code)) {
+      final wallet = _wallets[code]!;
+      final transactions =
+          await DI().get<TransactionService>().listTransactions(
+                period: period,
+                wallet: wallet,
+              );
+      final previousPeriod = period.previous;
+      double balance = 0;
+      if (_balances.containsKey(previousPeriod.toString())) {
+        final previousBalance = _balances[period.toString()]!
+            .where((element) => element.wallet == wallet)
+            .firstOrNull;
+        balance = previousBalance?.balance ?? 0;
+      }
+      for (var transaction in transactions) {
+        balance += transaction.signedAmount;
+      }
+      if (!_balances.containsKey(period.toString())) {
+        _balances[period.toString()] = {};
+      }
+      final walletBalance = _WalletBalance(
+        wallet: wallet,
+        period: period,
+        balance: balance,
+        updatedAt: DateTime.now(),
+      );
+      _balances[period.toString()]!.add(walletBalance);
+    }
   }
 }
 
@@ -115,4 +150,25 @@ class _Wallet implements Wallet {
   int get hashCode {
     return code.hashCode;
   }
+}
+
+class _WalletBalance implements WalletBalance {
+  @override
+  final Wallet wallet;
+
+  @override
+  final Period period;
+
+  @override
+  final double balance;
+
+  @override
+  final DateTime updatedAt;
+
+  _WalletBalance({
+    required this.wallet,
+    required this.period,
+    required this.balance,
+    required this.updatedAt,
+  });
 }
