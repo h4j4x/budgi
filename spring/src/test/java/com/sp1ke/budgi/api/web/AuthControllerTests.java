@@ -16,6 +16,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import static org.junit.jupiter.api.Assertions.*;
@@ -138,6 +141,39 @@ public class AuthControllerTests {
         var body = new HttpEntity<>(user);
         var response = rest.postForEntity(url("/signin"), body, ApiMessage.class);
         assertEquals(401, response.getStatusCode().value());
+    }
+
+    @Test
+    public void meValidTokenReturnsUser() {
+        var user = ApiUser.builder()
+            .name("Test")
+            .email("test@mail.com")
+            .password("test")
+            .build();
+        var body = new HttpEntity<>(user);
+        var signUpResponse = rest.postForEntity(url("/signup"), body, ApiToken.class);
+
+        assertEquals(201, signUpResponse.getStatusCode().value());
+        var apiToken = signUpResponse.getBody();
+        assertNotNull(apiToken);
+        assertNotNull(apiToken.getToken());
+
+        var headers = new HttpHeaders();
+        headers.add("Authorization", apiToken.getTokenType() + " " + apiToken.getToken());
+        headers.add("Content-Type", MediaType.APPLICATION_JSON_VALUE);
+        var entity = new HttpEntity<>(headers);
+        var response = rest.exchange(url("/me"), HttpMethod.GET, entity, ApiUser.class);
+        assertEquals(200, response.getStatusCode().value());
+        var apiUser = response.getBody();
+        assertNotNull(apiUser);
+        assertEquals(user.getName(), apiUser.getName());
+        assertEquals(user.getEmail(), apiUser.getEmail());
+    }
+
+    @Test
+    public void meWithoutTokenThrowsException() {
+        var response = rest.getForEntity(url("/me"), ApiMessage.class);
+        assertEquals(403, response.getStatusCode().value());
     }
 
     @NonNull
