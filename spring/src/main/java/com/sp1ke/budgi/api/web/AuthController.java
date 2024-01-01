@@ -25,14 +25,14 @@ public class AuthController {
     private final TokenService tokenService;
 
     @PostMapping("/signup")
-    public ResponseEntity<ApiToken> signup(@RequestBody ApiUser user) {
+    public ResponseEntity<ApiToken> signUp(@RequestBody ApiUser user) {
         var apiUser = authService.createUser(user);
         var token = tokenService.generateToken(apiUser);
         return ResponseEntity.status(201).body(token);
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<ApiToken> signin(@RequestBody ApiUser user) {
+    public ResponseEntity<ApiToken> signIn(@RequestBody ApiUser user) {
         var apiUser = authService.findUser(user);
         var token = tokenService.generateToken(apiUser);
         return ResponseEntity.ok(token);

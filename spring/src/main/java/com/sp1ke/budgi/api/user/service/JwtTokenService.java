@@ -52,7 +52,6 @@ public class JwtTokenService implements TokenService {
                 .parseSignedClaims(token); // TODO: validate expiration
             return jwt.getPayload().getSubject();
         } catch (Exception ignored) {
-            // TODO: proper exception
             throw new BadCredentialsException("Invalid token");
         }
     }
