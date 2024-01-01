@@ -22,22 +22,28 @@ repositories {
 }
 
 ext {
-    set('springModulithVersion', "1.1.0")
+    set('springModulithVersion', '1.1.0')
+    set('jjwtVersion', '0.12.3')
 }
 
 dependencies {
+    implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-freemarker'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.modulith:spring-modulith-starter-core'
     implementation 'org.springframework.modulith:spring-modulith-starter-jpa'
 
     compileOnly 'org.projectlombok:lombok'
 
-    runtimeOnly 'org.postgresql:postgresql'
+    runtimeOnly 'com.h2database:h2'
+    runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
+    runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
+//    runtimeOnly 'org.postgresql:postgresql'
     runtimeOnly 'org.springframework.modulith:spring-modulith-actuator'
-    runtimeOnly 'org.springframework.modulith:spring-modulith-observability'
 
     annotationProcessor 'org.projectlombok:lombok'
 
@@ -55,4 +61,5 @@ dependencyManagement {
 
 tasks.named('test') {
     useJUnitPlatform()
+    jvmArgs("-XX:+EnableDynamicAgentLoading")
 }
