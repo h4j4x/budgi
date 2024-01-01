@@ -1,4 +1,4 @@
-package com.sp1ke.budgi.api.model;
+package com.sp1ke.budgi.api.error;
 
 import lombok.Builder;
 import lombok.Getter;

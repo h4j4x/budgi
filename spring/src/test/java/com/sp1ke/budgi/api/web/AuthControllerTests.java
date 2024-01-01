@@ -1,6 +1,6 @@
 package com.sp1ke.budgi.api.web;
 
-import com.sp1ke.budgi.api.model.ApiMessage;
+import com.sp1ke.budgi.api.error.ApiMessage;
 import com.sp1ke.budgi.api.user.ApiToken;
 import com.sp1ke.budgi.api.user.ApiUser;
 import com.sp1ke.budgi.api.user.domain.JpaUser;

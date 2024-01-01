@@ -42,7 +42,7 @@ public class AuthController {
     public ResponseEntity<ApiUser> me(@AuthenticationPrincipal UserDetails principal) {
         var user = authService
             .findUser(principal.getUsername())
-            .orElseThrow(() -> new UsernameNotFoundException("Username not found"));
+            .orElseThrow(() -> new UsernameNotFoundException("Username not found")); // TODO: proper exception
         var apiUser = ApiUser.builder()
             .name(user.getName())
             .email(user.getEmail())
