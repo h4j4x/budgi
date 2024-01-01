@@ -1,7 +1,9 @@
 package com.sp1ke.budgi.api.user;
 
+import com.sp1ke.budgi.api.error.BadRequestException;
 import com.sp1ke.budgi.api.user.domain.JpaUser;
 import com.sp1ke.budgi.api.user.repository.UserRepo;
+import jakarta.validation.Validator;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
@@ -17,18 +19,27 @@ public class AuthService {
 
     private final PasswordEncoder passwordEncoder;
 
+    private final Validator validator;
+
     @NonNull
     public ApiUser createUser(@NonNull ApiUser apiUser) {
         var byEmail = userRepo.findByEmail(apiUser.getEmail());
         if (byEmail.isPresent()) {
+            // TODO: proper exception
             throw new LockedException("Email already registered");
         }
 
         var user = JpaUser.builder()
             .name(apiUser.getName())
             .email(apiUser.getEmail())
-            .password(passwordEncoder.encode(apiUser.getPassword()))
+            .password(apiUser.getPassword())
             .build();
+        var violations = validator.validate(user);
+        if (!violations.isEmpty()) {
+            throw new BadRequestException(violations);
+        }
+
+        user.fixPassword(passwordEncoder);
         user = userRepo.save(user);
         return mapToApiUser(user);
     }
@@ -39,6 +50,7 @@ public class AuthService {
         if (byEmail.isPresent() && passwordEncoder.matches(apiUser.getPassword(), byEmail.get().getPassword())) {
             return mapToApiUser(byEmail.get());
         }
+        // TODO: proper exception
         throw new BadCredentialsException("Invalid credentials");
     }
 

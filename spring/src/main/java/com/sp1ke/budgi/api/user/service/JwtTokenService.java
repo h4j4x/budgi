@@ -3,19 +3,21 @@ package com.sp1ke.budgi.api.user.service;
 import com.sp1ke.budgi.api.user.ApiToken;
 import com.sp1ke.budgi.api.user.ApiUser;
 import com.sp1ke.budgi.api.user.TokenService;
+import com.sp1ke.budgi.api.user.config.TokenConfig;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.Calendar;
 import javax.crypto.SecretKey;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
 // https://github.com/jwtk/jjwt
 @Service
+@EnableConfigurationProperties(TokenConfig.class)
 public class JwtTokenService implements TokenService {
     private static final String ISSUER = "budgi";
 
@@ -27,10 +29,9 @@ public class JwtTokenService implements TokenService {
 
     private final int tokenExpirationInDays;
 
-    public JwtTokenService() {
-        var secretString = "FITSy9dGK9BlOOrOqOi3xRaWjMPgR9KQtT0GaPiBaKQ7LcYniHsdsSA78iEy8BmOGAXpkVi7Imp9dZeHfJPptA==";
-        signingKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretString)); // TODO: from config
-        tokenExpirationInDays = 7; // TODO: from config
+    public JwtTokenService(TokenConfig tokenConfig) {
+        signingKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(tokenConfig.getSecret()));
+        tokenExpirationInDays = tokenConfig.getExpirationInDays();
     }
 
     @Override
@@ -51,6 +52,7 @@ public class JwtTokenService implements TokenService {
                 .parseSignedClaims(token); // TODO: validate expiration
             return jwt.getPayload().getSubject();
         } catch (Exception ignored) {
+            // TODO: proper exception
             throw new BadCredentialsException("Invalid token");
         }
     }
@@ -71,7 +73,7 @@ public class JwtTokenService implements TokenService {
         return ApiToken.builder()
             .token(token)
             .tokenType(TOKEN_TYPE)
-            .expiresAt(expiresAt.toInstant().atOffset(ZoneOffset.of(ZoneId.systemDefault().getId())))
+            .expiresAt(expiresAt.toInstant().atOffset(ZoneOffset.UTC))
             .build();
     }
 }

@@ -1,1 +1,15 @@
-
+token:
+  secret: ${TOKEN_SECRET}
+  expirationInDays: ${TOKEN_EXPIRATION_IN_DAYS:7}
+management:
+  endpoint:
+    health:
+      showDetails: always
+  endpoints:
+    web:
+      basePath: /manage
+      exposure:
+        include: health
+spring:
+  config:
+    import: optional:file:.env[.properties]

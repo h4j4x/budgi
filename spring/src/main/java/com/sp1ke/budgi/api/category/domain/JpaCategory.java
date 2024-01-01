@@ -2,20 +2,22 @@ package com.sp1ke.budgi.api.category.domain;
 
 import jakarta.persistence.*;
 import java.time.OffsetDateTime;
-import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Table(name = "categories")
-@Setter
+@Builder
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class JpaCategory {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Setter(AccessLevel.NONE)
     private Long id;
 
     @Column(length = 100, nullable = false, unique = true)
@@ -26,11 +28,9 @@ public class JpaCategory {
 
     @CreationTimestamp
     @Column(updatable = false, name = "created_at")
-    @Setter(AccessLevel.NONE)
     private OffsetDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
-    @Setter(AccessLevel.NONE)
     private OffsetDateTime updatedAt;
 }
