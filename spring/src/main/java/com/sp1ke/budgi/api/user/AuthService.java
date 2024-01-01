@@ -25,7 +25,6 @@ public class AuthService {
     public ApiUser createUser(@NonNull ApiUser apiUser) {
         var byEmail = userRepo.findByEmail(apiUser.getEmail());
         if (byEmail.isPresent()) {
-            // TODO: proper exception
             throw new LockedException("Email already registered");
         }
 
@@ -50,7 +49,6 @@ public class AuthService {
         if (byEmail.isPresent() && passwordEncoder.matches(apiUser.getPassword(), byEmail.get().getPassword())) {
             return mapToApiUser(byEmail.get());
         }
-        // TODO: proper exception
         throw new BadCredentialsException("Invalid credentials");
     }
 
