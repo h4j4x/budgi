@@ -1,13 +1,13 @@
 # https://EditorConfig.org
 root = true
 
-[*.{css,ftlh,java,json,yml}]
+[*.{css,ftlh,java,json,md,yml}]
 charset = utf-8
 end_of_line = lf
 insert_final_newline = true
 trim_trailing_whitespace = true
 
-[*.{css,ftlh,json,yml}]
+[*.{css,ftlh,json,md,yml}]
 indent_style = space
 indent_size = 2
 max_line_length = 120

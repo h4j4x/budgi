@@ -1,6 +1,5 @@
 package com.sp1ke.budgi.api.web.config;
 
-import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -27,11 +26,11 @@ public class WebConfig {
         http.csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests((registry) ->
                 registry
-                    .requestMatchers(HttpMethod.GET, "/").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/", "/*.css", "/*.png", "/*.webmanifest").permitAll()
                     .requestMatchers(HttpMethod.POST, "/auth/signup", "/auth/signin").permitAll()
                     .requestMatchers("/auth/**").authenticated()
             )
-            .sessionManagement((configurer) -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .sessionManagement((config) -> config.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authenticationProvider(authProvider)
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
@@ -40,9 +39,9 @@ public class WebConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         var configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("*"));
-        configuration.setAllowedMethods(List.of("*"));
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        configuration.addAllowedOrigin("*");
+        configuration.addAllowedMethod("*");
+        configuration.addAllowedHeader("*");
         var source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

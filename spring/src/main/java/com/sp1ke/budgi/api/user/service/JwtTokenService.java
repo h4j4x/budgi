@@ -4,10 +4,10 @@ import com.sp1ke.budgi.api.user.ApiToken;
 import com.sp1ke.budgi.api.user.ApiUser;
 import com.sp1ke.budgi.api.user.TokenService;
 import com.sp1ke.budgi.api.user.config.TokenConfig;
+import com.sp1ke.budgi.api.util.DateTimeUtils;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import java.time.ZoneOffset;
 import java.util.Calendar;
 import javax.crypto.SecretKey;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -59,20 +59,19 @@ public class JwtTokenService implements TokenService {
     @Override
     @NonNull
     public ApiToken generateToken(@NonNull ApiUser apiUser) {
-        var calendar = Calendar.getInstance();
-        calendar.add(Calendar.DAY_OF_MONTH, tokenExpirationInDays);
-        var expiresAt = calendar.getTime();
+        var expiresAt = Calendar.getInstance();
+        expiresAt.add(Calendar.DAY_OF_MONTH, tokenExpirationInDays);
         var token = Jwts.builder()
             .subject(apiUser.getEmail())
             .issuer(ISSUER)
             .audience().add(AUDIENCE).and()
-            .expiration(expiresAt)
+            .expiration(expiresAt.getTime())
             .signWith(signingKey)
             .compact();
         return ApiToken.builder()
             .token(token)
             .tokenType(TOKEN_TYPE)
-            .expiresAt(expiresAt.toInstant().atOffset(ZoneOffset.UTC))
+            .expiresAt(DateTimeUtils.calendarToOffsetDateTime(expiresAt))
             .build();
     }
 }

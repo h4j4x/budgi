@@ -13,3 +13,17 @@ management:
 spring:
   config:
     import: optional:file:.env[.properties]
+  datasource:
+    driverClassName: ${DATASOURCE_DRIVER}
+    url: ${DATASOURCE_URL}
+    username: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
+  jackson:
+    defaultPropertyInclusion: non_null
+    deserialization:
+      failOnUnknownProperties: false
+    serialization:
+      failOnEmptyBeans: false
+  jpa:
+    hibernate:
+      ddlAuto: ${DATASOURCE_DDL:validate}

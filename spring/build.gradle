@@ -39,10 +39,9 @@ dependencies {
 
     compileOnly 'org.projectlombok:lombok'
 
-    runtimeOnly 'com.h2database:h2'
     runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
     runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
-//    runtimeOnly 'org.postgresql:postgresql'
+    runtimeOnly 'org.postgresql:postgresql'
     runtimeOnly 'org.springframework.modulith:spring-modulith-actuator'
 
     annotationProcessor 'org.projectlombok:lombok'

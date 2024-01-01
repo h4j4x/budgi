@@ -1,0 +1,18 @@
+token:
+  secret: TOKENxTESTx00000000000000000/TOKENxTESTx0000000000000000/TOKENxTESTx000000000000000000==
+  expirationInDays: 7
+spring:
+  datasource:
+    driverClassName: org.h2.Driver
+    url: jdbc:h2:mem:budgi;DB_CLOSE_DELAY=-1
+    username: budgi
+    password: budgi
+  jackson:
+    defaultPropertyInclusion: non_null
+    deserialization:
+      failOnUnknownProperties: false
+    serialization:
+      failOnEmptyBeans: false
+  jpa:
+    hibernate:
+      ddlAuto: update
