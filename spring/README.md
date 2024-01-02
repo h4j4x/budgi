@@ -13,7 +13,7 @@ TODO: Project description.
 
 ### Configuration
 
-All configurations should be done on [.env file](./.env), create it if not exists.
+All configurations should be done in [.env file](./.env), create it if not exists.
 
 - Generate secret key for token generation:
   ```shell

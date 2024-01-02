@@ -1,12 +1,11 @@
 package com.sp1ke.budgi.api.user.domain;
 
+import com.sp1ke.budgi.api.user.AuthUser;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.OffsetDateTime;
-import java.util.Collection;
-import java.util.Collections;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,17 +13,17 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.lang.NonNull;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users", uniqueConstraints = {
+    @UniqueConstraint(name = "users_email_IDX", columnNames = "email")
+})
 @Builder
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class JpaUser implements UserDetails {
+public class JpaUser extends AuthUser {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(nullable = false)
@@ -32,7 +31,7 @@ public class JpaUser implements UserDetails {
 
     @Email(message = "Valid user email is required")
     @NotNull(message = "Valid user email is required")
-    @Column(length = 100, nullable = false, unique = true)
+    @Column(length = 100, nullable = false)
     private String email;
 
     @Size(min = 2, max = 255, message = "Valid user name is required (2 to 255 characters)")
@@ -54,33 +53,13 @@ public class JpaUser implements UserDetails {
     private OffsetDateTime updatedAt;
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptyList();
+    public Long userId() {
+        return id;
     }
 
     @Override
     public String getUsername() {
         return email;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
     }
 
     public void fixPassword(@NonNull PasswordEncoder passwordEncoder) {

@@ -1,10 +1,10 @@
 package com.sp1ke.budgi.api.user.service;
 
+import com.sp1ke.budgi.api.common.DateTimeUtil;
 import com.sp1ke.budgi.api.user.ApiToken;
 import com.sp1ke.budgi.api.user.ApiUser;
 import com.sp1ke.budgi.api.user.TokenService;
 import com.sp1ke.budgi.api.user.config.TokenConfig;
-import com.sp1ke.budgi.api.util.DateTimeUtils;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -71,7 +71,7 @@ public class JwtTokenService implements TokenService {
         return ApiToken.builder()
             .token(token)
             .tokenType(TOKEN_TYPE)
-            .expiresAt(DateTimeUtils.calendarToOffsetDateTime(expiresAt))
+            .expiresAt(DateTimeUtil.calendarToOffsetDateTime(expiresAt))
             .build();
     }
 }

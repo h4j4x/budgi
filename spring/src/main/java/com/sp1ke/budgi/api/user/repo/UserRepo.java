@@ -1,4 +1,4 @@
-package com.sp1ke.budgi.api.user.repository;
+package com.sp1ke.budgi.api.user.repo;
 
 import com.sp1ke.budgi.api.user.domain.JpaUser;
 import java.util.Optional;

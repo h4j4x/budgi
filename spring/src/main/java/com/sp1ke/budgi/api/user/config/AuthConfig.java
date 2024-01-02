@@ -1,6 +1,6 @@
 package com.sp1ke.budgi.api.user.config;
 
-import com.sp1ke.budgi.api.user.repository.UserRepo;
+import com.sp1ke.budgi.api.user.repo.UserRepo;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

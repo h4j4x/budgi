@@ -1,5 +1,8 @@
-package com.sp1ke.budgi.api.error;
+package com.sp1ke.budgi.api.web.error;
 
+import com.sp1ke.budgi.api.error.ApiMessage;
+import com.sp1ke.budgi.api.error.BadRequestException;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.LockedException;
@@ -20,14 +23,14 @@ public class WebExceptionResolver extends ResponseEntityExceptionHandler {
         return handle(401, ex.getMessage());
     }
 
+    @ExceptionHandler({UsernameNotFoundException.class, EntityNotFoundException.class})
+    protected ResponseEntity<ApiMessage> handleNotFoundException(Exception ex) {
+        return handle(404, ex.getMessage());
+    }
+
     @ExceptionHandler(LockedException.class)
     protected ResponseEntity<ApiMessage> handleLockedException(LockedException ex) {
         return handle(409, ex.getMessage());
-    }
-
-    @ExceptionHandler(UsernameNotFoundException.class)
-    protected ResponseEntity<ApiMessage> handleUsernameNotFoundException(UsernameNotFoundException ex) {
-        return handle(404, ex.getMessage());
     }
 
     private ResponseEntity<ApiMessage> handle(int status, String message) {

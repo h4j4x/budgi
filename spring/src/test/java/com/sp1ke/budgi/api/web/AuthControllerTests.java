@@ -4,7 +4,7 @@ import com.sp1ke.budgi.api.error.ApiMessage;
 import com.sp1ke.budgi.api.user.ApiToken;
 import com.sp1ke.budgi.api.user.ApiUser;
 import com.sp1ke.budgi.api.user.domain.JpaUser;
-import com.sp1ke.budgi.api.user.repository.UserRepo;
+import com.sp1ke.budgi.api.user.repo.UserRepo;
 import jakarta.validation.Validator;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -53,7 +53,7 @@ public class AuthControllerTests {
     }
 
     @Test
-    public void signUpReturnsApiToken() {
+    void signUpReturnsApiToken() {
         var user = ApiUser.builder()
             .name("Test")
             .email("test@mail.com")
@@ -77,7 +77,7 @@ public class AuthControllerTests {
     }
 
     @Test
-    public void signUpInvalidThrowsException() {
+    void signUpInvalidThrowsException() {
         var users = List.of(
             ApiUser.builder().name("test").build(),
             ApiUser.builder().email("test@mail.com").build(),
@@ -107,7 +107,7 @@ public class AuthControllerTests {
     }
 
     @Test
-    public void signInReturnsApiToken() {
+    void signInReturnsApiToken() {
         var password = "test";
         var jpaUser = JpaUser.builder()
             .name("Test")
@@ -133,7 +133,7 @@ public class AuthControllerTests {
     }
 
     @Test
-    public void signInInvalidThrowsException() {
+    void signInInvalidThrowsException() {
         var user = ApiUser.builder()
             .email("test@mail.com")
             .password("password")
@@ -144,7 +144,7 @@ public class AuthControllerTests {
     }
 
     @Test
-    public void meValidTokenReturnsUser() {
+    void meValidTokenReturnsUser() {
         var user = ApiUser.builder()
             .name("Test")
             .email("test@mail.com")
@@ -171,13 +171,13 @@ public class AuthControllerTests {
     }
 
     @Test
-    public void meWithoutTokenThrowsException() {
+    void meWithoutTokenThrowsException() {
         var response = rest.getForEntity(url("/me"), ApiMessage.class);
         assertEquals(403, response.getStatusCode().value());
     }
 
     @NonNull
-    private String url(@NonNull String endpoint) {
+    String url(@NonNull String endpoint) {
         return String.format("http://localhost:%d/auth%s", port, endpoint);
     }
 }
