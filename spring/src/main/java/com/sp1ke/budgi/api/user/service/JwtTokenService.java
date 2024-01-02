@@ -11,9 +11,10 @@ import io.jsonwebtoken.security.Keys;
 import java.util.Calendar;
 import javax.crypto.SecretKey;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
 // https://github.com/jwtk/jjwt
 @Service
@@ -52,7 +53,7 @@ public class JwtTokenService implements TokenService {
                 .parseSignedClaims(token); // TODO: validate expiration
             return jwt.getPayload().getSubject();
         } catch (Exception ignored) {
-            throw new BadCredentialsException("Invalid token");
+            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED, "Invalid token");
         }
     }
 

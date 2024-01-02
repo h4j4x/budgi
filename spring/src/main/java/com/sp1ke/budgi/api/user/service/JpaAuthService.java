@@ -1,6 +1,6 @@
 package com.sp1ke.budgi.api.user.service;
 
-import com.sp1ke.budgi.api.error.BadRequestException;
+import com.sp1ke.budgi.api.common.ValidatorUtil;
 import com.sp1ke.budgi.api.user.ApiUser;
 import com.sp1ke.budgi.api.user.AuthService;
 import com.sp1ke.budgi.api.user.domain.JpaUser;
@@ -8,11 +8,11 @@ import com.sp1ke.budgi.api.user.repo.UserRepo;
 import jakarta.validation.Validator;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.LockedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +27,7 @@ public class JpaAuthService implements AuthService {
     public ApiUser createUser(@NonNull ApiUser apiUser) {
         var byEmail = userRepo.findByEmail(apiUser.getEmail());
         if (byEmail.isPresent()) {
-            throw new LockedException("Email already registered");
+            throw new HttpClientErrorException(HttpStatus.CONFLICT, "Email already registered");
         }
 
         var user = JpaUser.builder()
@@ -35,10 +35,7 @@ public class JpaAuthService implements AuthService {
             .email(apiUser.getEmail())
             .password(apiUser.getPassword())
             .build();
-        var violations = validator.validate(user);
-        if (!violations.isEmpty()) {
-            throw new BadRequestException(violations);
-        }
+        ValidatorUtil.validate(validator, user);
 
         user.fixPassword(passwordEncoder);
         user = userRepo.save(user);
@@ -51,7 +48,7 @@ public class JpaAuthService implements AuthService {
         if (byEmail.isPresent() && passwordEncoder.matches(apiUser.getPassword(), byEmail.get().getPassword())) {
             return mapToApiUser(byEmail.get());
         }
-        throw new BadCredentialsException("Invalid credentials");
+        throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
     }
 
     public Optional<ApiUser> findUser(@NonNull String email) {

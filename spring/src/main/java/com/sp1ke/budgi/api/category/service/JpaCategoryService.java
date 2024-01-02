@@ -5,15 +5,16 @@ import com.sp1ke.budgi.api.category.CategoryService;
 import com.sp1ke.budgi.api.category.domain.JpaCategory;
 import com.sp1ke.budgi.api.category.repo.CategoryRepo;
 import com.sp1ke.budgi.api.common.StringUtil;
-import com.sp1ke.budgi.api.error.BadRequestException;
+import com.sp1ke.budgi.api.common.ValidatorUtil;
 import jakarta.validation.Validator;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
-import org.springframework.security.authentication.LockedException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
 @Service
 @RequiredArgsConstructor
@@ -37,17 +38,14 @@ public class JpaCategoryService implements CategoryService {
             .findByUserIdAndCode(userId, code)
             .orElse(new JpaCategory());
         if (throwIfExists && category.getId() != null) {
-            throw new LockedException("Category code already exists");
+            throw new HttpClientErrorException(HttpStatus.CONFLICT, "Category code already exists");
         }
         category = category.toBuilder()
+            .userId(userId)
             .code(code)
             .name(data.getName())
             .build();
-
-        var violations = validator.validate(category);
-        if (!violations.isEmpty()) {
-            throw new BadRequestException(violations);
-        }
+        ValidatorUtil.validate(validator, category);
 
         category = categoryRepo.save(category);
         return mapToApiCategory(category);

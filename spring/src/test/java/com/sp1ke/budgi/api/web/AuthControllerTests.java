@@ -1,6 +1,6 @@
 package com.sp1ke.budgi.api.web;
 
-import com.sp1ke.budgi.api.error.ApiMessage;
+import com.sp1ke.budgi.api.common.ApiMessage;
 import com.sp1ke.budgi.api.user.ApiToken;
 import com.sp1ke.budgi.api.user.ApiUser;
 import com.sp1ke.budgi.api.user.domain.JpaUser;
@@ -13,38 +13,36 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.lang.NonNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClient;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AuthControllerTests {
-    private final int port;
-
     private final Validator validator;
 
     private final UserRepo userRepo;
 
     private final PasswordEncoder passwordEncoder;
 
-    private final TestRestTemplate rest;
+    private final RestClient restClient;
 
     @Autowired
     public AuthControllerTests(@LocalServerPort int port,
                                Validator validator,
                                UserRepo userRepo,
                                PasswordEncoder passwordEncoder) {
-        this.port = port;
         this.validator = validator;
         this.userRepo = userRepo;
         this.passwordEncoder = passwordEncoder;
-        rest = new TestRestTemplate();
+        restClient = RestClient.builder()
+            .baseUrl(String.format("http://localhost:%d/auth", port))
+            .defaultHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+            .build();
     }
 
     @BeforeEach
@@ -59,10 +57,13 @@ public class AuthControllerTests {
             .email("test@mail.com")
             .password("test")
             .build();
-        var body = new HttpEntity<>(user);
-        var response = rest.postForEntity(url("/signup"), body, ApiToken.class);
+        var response = restClient.post()
+            .uri("/signup")
+            .body(user)
+            .retrieve()
+            .toEntity(ApiToken.class);
 
-        assertEquals(201, response.getStatusCode().value());
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
         var apiToken = response.getBody();
         assertNotNull(apiToken);
         assertNotNull(apiToken.getToken());
@@ -94,14 +95,21 @@ public class AuthControllerTests {
             var violations = validator.validate(user);
             assertFalse(violations.isEmpty());
 
-            var body = new HttpEntity<>(user);
-            var response = rest.postForEntity(url("/signup"), body, ApiMessage.class);
-            assertEquals(400, response.getStatusCode().value());
-            var apiMessage = response.getBody();
-            assertNotNull(apiMessage);
-            assertNotNull(apiMessage.getMessage());
-            for (var violation : violations) {
-                assertTrue(apiMessage.getMessage().contains(violation.getMessage()));
+            try {
+                restClient.post()
+                    .uri("/signup")
+                    .body(user)
+                    .retrieve()
+                    .toEntity(ApiMessage.class);
+                fail();
+            } catch (HttpClientErrorException e) {
+                assertEquals(HttpStatus.BAD_REQUEST, e.getStatusCode());
+                assertNotNull(e.getMessage());
+                for (var violation : violations) {
+                    assertTrue(e.getMessage().contains(violation.getMessage()));
+                }
+            } catch (Exception e) {
+                fail(e.getMessage());
             }
         }
     }
@@ -120,10 +128,13 @@ public class AuthControllerTests {
             .email(jpaUser.getEmail())
             .password(password)
             .build();
-        var body = new HttpEntity<>(user);
-        var response = rest.postForEntity(url("/signin"), body, ApiToken.class);
+        var response = restClient.post()
+            .uri("/signin")
+            .body(user)
+            .retrieve()
+            .toEntity(ApiToken.class);
 
-        assertEquals(200, response.getStatusCode().value());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
         var apiToken = response.getBody();
         assertNotNull(apiToken);
         assertNotNull(apiToken.getToken());
@@ -138,9 +149,17 @@ public class AuthControllerTests {
             .email("test@mail.com")
             .password("password")
             .build();
-        var body = new HttpEntity<>(user);
-        var response = rest.postForEntity(url("/signin"), body, ApiMessage.class);
-        assertEquals(401, response.getStatusCode().value());
+        try {
+            restClient.post()
+                .uri("/signin")
+                .body(user)
+                .retrieve()
+                .toEntity(ApiMessage.class);
+        } catch (HttpClientErrorException e) {
+            assertEquals(HttpStatus.UNAUTHORIZED, e.getStatusCode());
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
     }
 
     @Test
@@ -150,20 +169,23 @@ public class AuthControllerTests {
             .email("test@mail.com")
             .password("test")
             .build();
-        var body = new HttpEntity<>(user);
-        var signUpResponse = rest.postForEntity(url("/signup"), body, ApiToken.class);
+        var signUpResponse = restClient.post()
+            .uri("/signup")
+            .body(user)
+            .retrieve()
+            .toEntity(ApiToken.class);
 
-        assertEquals(201, signUpResponse.getStatusCode().value());
+        assertEquals(HttpStatus.CREATED, signUpResponse.getStatusCode());
         var apiToken = signUpResponse.getBody();
         assertNotNull(apiToken);
         assertNotNull(apiToken.getToken());
 
-        var headers = new HttpHeaders();
-        headers.add("Authorization", apiToken.getTokenType() + " " + apiToken.getToken());
-        headers.add("Content-Type", MediaType.APPLICATION_JSON_VALUE);
-        var entity = new HttpEntity<>(headers);
-        var response = rest.exchange(url("/me"), HttpMethod.GET, entity, ApiUser.class);
-        assertEquals(200, response.getStatusCode().value());
+        var response = restClient.get()
+            .uri("/me")
+            .header("Authorization", "Bearer " + apiToken.getToken())
+            .retrieve()
+            .toEntity(ApiUser.class);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
         var apiUser = response.getBody();
         assertNotNull(apiUser);
         assertEquals(user.getName(), apiUser.getName());
@@ -172,12 +194,16 @@ public class AuthControllerTests {
 
     @Test
     void meWithoutTokenThrowsException() {
-        var response = rest.getForEntity(url("/me"), ApiMessage.class);
-        assertEquals(403, response.getStatusCode().value());
-    }
-
-    @NonNull
-    String url(@NonNull String endpoint) {
-        return String.format("http://localhost:%d/auth%s", port, endpoint);
+        try {
+            restClient.get()
+                .uri("/me")
+                .retrieve()
+                .toEntity(ApiMessage.class);
+            fail();
+        } catch (HttpClientErrorException e) {
+            assertEquals(HttpStatus.FORBIDDEN, e.getStatusCode());
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
     }
 }

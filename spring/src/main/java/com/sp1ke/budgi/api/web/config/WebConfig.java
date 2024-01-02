@@ -29,6 +29,7 @@ public class WebConfig {
                     .requestMatchers(HttpMethod.GET, "/", "/*.css", "/*.png", "/*.webmanifest").permitAll()
                     .requestMatchers(HttpMethod.POST, "/auth/signup", "/auth/signin").permitAll()
                     .requestMatchers("/auth/**").authenticated()
+                    .requestMatchers("/category/**").authenticated()
             )
             .sessionManagement((config) -> config.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authenticationProvider(authProvider)

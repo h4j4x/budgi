@@ -2,18 +2,14 @@ package com.sp1ke.budgi.api.web;
 
 import com.sp1ke.budgi.api.user.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 
 @RestController
-@RequestMapping(
-    value = "/auth",
-    consumes = MediaType.APPLICATION_JSON_VALUE,
-    produces = MediaType.APPLICATION_JSON_VALUE
-)
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
@@ -38,7 +34,7 @@ public class AuthController {
     ResponseEntity<ApiUser> me(@AuthenticationPrincipal AuthUser principal) {
         var user = authService
             .findUser(principal.getUsername())
-            .orElseThrow(() -> new UsernameNotFoundException("Username not found"));
+            .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, "Username not found"));
         var apiUser = ApiUser.builder()
             .name(user.getName())
             .email(user.getEmail())
