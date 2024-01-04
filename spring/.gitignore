@@ -38,4 +38,4 @@ out/
 
 ### APP ###
 .env
-docker/pgsql/
+docker/data/

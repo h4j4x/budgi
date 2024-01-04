@@ -11,8 +11,15 @@ TODO: Project description.
 
 ## Development
 
-You can use [DevBox](https://www.jetpack.io/devbox/) for a portable dev environment.
-Launch the shell to have Java 21 and Newman:
+### Technology Stack
+
+- [H2](https://h2database.com/html/main.html).
+- [Jib](https://github.com/GoogleContainerTools/jib).
+- [Docker](https://www.docker.com/).
+- [Postman](https://www.postman.com/).
+- [Newman](https://github.com/postmanlabs/newman).
+
+You can use [DevBox](https://www.jetpack.io/devbox/) for a portable dev environment. Launch the shell to have Java 21 and Newman:
 ```shell
 devbox shell
 ```
@@ -42,9 +49,18 @@ All configurations should be done in [.env file](./.env), create it if not exist
   DATASOURCE_DDL=create-drop
   ```
 
+### Generate docker image
+
+- Dockerize with [Jib](https://github.com/GoogleContainerTools/jib/tree/master/jib-gradle-plugin):
+  ```shell
+  ./gradlew jibDockerBuild
+  ```
+
 ### Run server
 
-- Start [Docker](https://www.docker.com/) postgres server using [Docker Compose](https://docs.docker.com/compose/):
+#### Java
+
+- Start [Docker](https://www.docker.com/) Postgres server using [Docker Compose](https://docs.docker.com/compose/):
   ```shell
   cd ./docker
   docker compose up -d
@@ -54,7 +70,19 @@ All configurations should be done in [.env file](./.env), create it if not exist
   ./gradlew bootRun
   ```
 
-### Test API
+#### Docker
+
+- Start [Docker](https://www.docker.com/) server using [Docker Compose](https://docs.docker.com/compose/):
+  ```shell
+  cd ./docker
+  docker compose -f ./compose-app.yml up -d
+  ```
+
+---
+
+Check status navigating to [health page](http://localhost:8080/manage/health).
+
+### Integrations tests
 
 - Install [Newman](https://learning.postman.com/docs/collections/using-newman-cli/installing-running-newman/) or [Postman CLI](https://learning.postman.com/docs/postman-cli/postman-cli-installation/).
 - Run tests:

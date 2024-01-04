@@ -20,17 +20,20 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableMethodSecurity
 public class WebConfig {
     static final String[] AUTH_POST_ANON_PATHS = new String[] {
-        "/auth/signup", "/auth/signin"
+        "/auth/signup", "/auth/signin", "/manage"
     };
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http,
                                             AuthenticationProvider authProvider,
                                             JwtAuthFilter jwtAuthFilter) throws Exception {
+        var staticAnonPaths = new String[] {
+            "/", "/*.css", "/*.png", "/*.webmanifest", "/manage/**"
+        };
         http.csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests((registry) ->
                 registry
-                    .requestMatchers(HttpMethod.GET, "/", "/*.css", "/*.png", "/*.webmanifest").permitAll()
+                    .requestMatchers(HttpMethod.GET, staticAnonPaths).permitAll()
                     .requestMatchers(HttpMethod.POST, AUTH_POST_ANON_PATHS).permitAll()
                     .requestMatchers("/auth/**").authenticated()
                     .requestMatchers("/category/**").authenticated()
