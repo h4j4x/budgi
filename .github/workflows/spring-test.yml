@@ -17,3 +17,4 @@ jobs:
           java-version: '21'
           cache: 'gradle'
       - run: ./gradlew test --no-daemon
+        working-directory: ./spring
