@@ -20,8 +20,8 @@ public class CategoryController {
 
     @GetMapping
     ResponseEntity<Page<ApiCategory>> list(@AuthenticationPrincipal AuthUser principal,
-                                           @RequestParam(required = false) int page,
-                                           @RequestParam(required = false, defaultValue = "10") int pageSize) {
+                                           @RequestParam(required = false, defaultValue = "0") Integer page,
+                                           @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
         var pageable = PageRequest.of(page, pageSize);
         var itemsPage = categoryService.fetch(principal.userId(), pageable);
         return ResponseEntity.ok(itemsPage);

@@ -4,6 +4,7 @@ import com.sp1ke.budgi.api.category.ApiCategory;
 import com.sp1ke.budgi.api.category.domain.JpaCategory;
 import com.sp1ke.budgi.api.category.repo.CategoryRepo;
 import com.sp1ke.budgi.api.helper.AuthHelper;
+import com.sp1ke.budgi.api.helper.RestResponsePage;
 import com.sp1ke.budgi.api.user.repo.UserRepo;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,8 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -59,7 +58,8 @@ public class CategoryControllerTests {
             .uri("/category")
             .header("Authorization", "Bearer " + authTokenPair.getSecond())
             .body(category)
-            .retrieve().toEntity(ApiCategory.class);
+            .retrieve()
+            .toEntity(ApiCategory.class);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         var apiCategory = response.getBody();
@@ -87,7 +87,8 @@ public class CategoryControllerTests {
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .body(category)
-            .retrieve().toEntity(ApiCategory.class);
+            .retrieve()
+            .toEntity(ApiCategory.class);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         var apiCategory = response.getBody();
@@ -116,7 +117,9 @@ public class CategoryControllerTests {
         var response = restClient.get()
             .uri("/category")
             .header("Authorization", "Bearer " + authTokenPair.getSecond())
-            .retrieve().toEntity(Page.class);
+            .retrieve()
+            .toEntity(new ParameterizedTypeReference<RestResponsePage<ApiCategory>>() {
+            });
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         var page = response.getBody();

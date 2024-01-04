@@ -16,8 +16,8 @@ import org.springframework.lang.NonNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity
-@Table(name = "users", uniqueConstraints = {
-    @UniqueConstraint(name = "users_email_IDX", columnNames = "email")
+@Table(name = "users", indexes = {
+    @Index(name = "users_email_IDX", columnList = "email", unique = true)
 })
 @Builder
 @Getter
