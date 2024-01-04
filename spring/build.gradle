@@ -1,64 +1,82 @@
 plugins {
-    id 'java'
-    id 'org.springframework.boot' version '3.2.1'
-    id 'io.spring.dependency-management' version '1.1.4'
+  id 'java'
+  id 'org.springframework.boot' version "${springVersion}"
+  id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
+  id 'com.google.cloud.tools.jib' version "${jibVersion}"
 }
 
 group = 'com.sp1ke.budgi'
-version = '0.0.1-SNAPSHOT'
 
 java {
-    sourceCompatibility = '21'
+  sourceCompatibility = '21'
 }
 
 configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
+  compileOnly {
+    extendsFrom annotationProcessor
+  }
 }
 
 repositories {
-    mavenCentral()
-}
-
-ext {
-    set('springModulithVersion', '1.1.0')
-    set('jjwtVersion', '0.12.3')
+  mavenCentral()
 }
 
 dependencies {
-    implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-freemarker'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.modulith:spring-modulith-starter-core'
-    implementation 'org.springframework.modulith:spring-modulith-starter-jpa'
+  implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
+  implementation 'org.springframework.boot:spring-boot-starter-actuator'
+  implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+  implementation 'org.springframework.boot:spring-boot-starter-freemarker'
+  implementation 'org.springframework.boot:spring-boot-starter-security'
+  implementation 'org.springframework.boot:spring-boot-starter-validation'
+  implementation 'org.springframework.boot:spring-boot-starter-web'
+  implementation 'org.springframework.modulith:spring-modulith-starter-core'
+  implementation 'org.springframework.modulith:spring-modulith-starter-jpa'
 
-    compileOnly 'org.projectlombok:lombok'
+  compileOnly 'org.projectlombok:lombok'
 
-    runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
-    runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
-    runtimeOnly 'org.postgresql:postgresql'
-    runtimeOnly 'org.springframework.modulith:spring-modulith-actuator'
+  runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
+  runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
+  runtimeOnly 'org.postgresql:postgresql'
+  runtimeOnly 'org.springframework.modulith:spring-modulith-actuator'
 
-    annotationProcessor 'org.projectlombok:lombok'
+  annotationProcessor 'org.projectlombok:lombok'
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.modulith:spring-modulith-starter-test'
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  testImplementation 'org.springframework.modulith:spring-modulith-starter-test'
 
-    testRuntimeOnly 'com.h2database:h2'
+  testRuntimeOnly 'com.h2database:h2'
 }
 
 dependencyManagement {
-    imports {
-        mavenBom "org.springframework.modulith:spring-modulith-bom:${springModulithVersion}"
-    }
+  imports {
+    mavenBom "org.springframework.modulith:spring-modulith-bom:${springModulithVersion}"
+  }
 }
 
 tasks.named('test') {
-    useJUnitPlatform()
-    jvmArgs("-XX:+EnableDynamicAgentLoading")
+  useJUnitPlatform()
+  jvmArgs("-XX:+EnableDynamicAgentLoading")
+}
+
+def githubActor = System.getenv().getOrDefault('GITHUB_ACTOR', 'none')
+def githubToken = System.getenv().getOrDefault('GITHUB_TOKEN', 'none')
+
+jib {
+  from {
+    image = 'azul/zulu-openjdk:21-latest'
+  }
+  to {
+    image = 'ghcr.io/h4j4x/budgi'
+    tags = ["$version", 'latest']
+    auth {
+      username = githubActor
+      password = githubToken
+    }
+  }
+  container {
+    jvmFlags = ['-server', '-Xms512m', '-Xmx2g']
+    mainClass = 'com.sp1ke.budgi.api.ApiApplication'
+    ports = ['8080']
+    format = 'OCI'
+  }
 }
