@@ -260,7 +260,7 @@
   "variable": [
     {
       "key": "authBaseUrl",
-      "value": "http://localhost:8080/auth",
+      "value": "http://127.0.0.1:8080/auth",
       "type": "string"
     },
     {
@@ -285,7 +285,7 @@
     },
     {
       "key": "categoryUrl",
-      "value": "http://localhost:8080/category",
+      "value": "http://127.0.0.1:8080/category",
       "type": "string"
     },
     {

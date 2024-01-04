@@ -9,7 +9,13 @@ TODO: Project description.
 - [JWT](https://jwt.io/) using [jwtk-jjwt](https://github.com/jwtk/jjwt).
 - [Postgres](https://www.postgresql.org/).
 
-## Run
+## Development
+
+You can use [DevBox](https://www.jetpack.io/devbox/) for a portable dev environment.
+Launch the shell to have Java 21 and Newman:
+```shell
+devbox shell
+```
 
 ### Configuration
 
@@ -33,7 +39,7 @@ All configurations should be done in [.env file](./.env), create it if not exist
   DATASOURCE_USERNAME=budgi
   DATASOURCE_PASSWORD=budgi
   DATASOURCE_DRIVER=org.postgresql.Driver
-  DATASOURCE_DDL=update
+  DATASOURCE_DDL=create-drop
   ```
 
 ### Run server
@@ -50,8 +56,10 @@ All configurations should be done in [.env file](./.env), create it if not exist
 
 ### Test API
 
-- Install [Postman CLI](https://learning.postman.com/docs/postman-cli/postman-cli-installation/).
+- Install [Newman](https://learning.postman.com/docs/collections/using-newman-cli/installing-running-newman/) or [Postman CLI](https://learning.postman.com/docs/postman-cli/postman-cli-installation/).
 - Run tests:
   ```shell
+  newman run ./postman_collection.json
+  # OR
   postman collection run ./postman_collection.json
   ```

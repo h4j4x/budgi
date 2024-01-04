@@ -1,7 +1,8 @@
 {
   "packages": [
     "binutils@latest",
-    "jdk@21"
+    "jdk@21",
+    "newman@latest"
   ],
   "shell": {
     "init_hook": [
