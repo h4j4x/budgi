@@ -36,6 +36,16 @@ out/
 ### VS Code ###
 .vscode/
 
+# Devenv
+.devenv*
+devenv.local.nix
+
+# direnv
+.direnv
+
+# pre-commit
+.pre-commit-config.yaml
+
 ### APP ###
 .env
 docker/data/

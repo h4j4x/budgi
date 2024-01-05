@@ -19,9 +19,9 @@ TODO: Project description.
 - [Postman](https://www.postman.com/).
 - [Newman](https://github.com/postmanlabs/newman).
 
-You can use [DevBox](https://www.jetpack.io/devbox/) for a portable dev environment. Launch the shell to have Java 21 and Newman:
+You can use [DevEnv](https://devenv.sh/) for a portable dev environment. Launch the shell to have Java 21 and Newman:
 ```shell
-devbox shell
+devenv shell
 ```
 
 ### Configuration
