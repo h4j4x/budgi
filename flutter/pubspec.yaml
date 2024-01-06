@@ -14,17 +14,17 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.2
   flex_color_scheme: ^7.3.1
-  flutter_native_splash: ^2.3.8
+  flutter_native_splash: ^2.3.9
   flutter_secure_storage: ^9.0.0
   font_awesome_flutter: ^10.6.0
-  get_it: ^7.6.4
-  go_router: ^13.0.0
+  get_it: ^7.6.6
+  go_router: ^13.0.1
   google_fonts: ^6.1.0
   intl: any
-  meta: ^1.10.0
+  meta: any
   month_year_picker: ^0.3.0+1
   package_info_plus: ^5.0.1
-  supabase_flutter: ^2.0.2
+  supabase_flutter: ^2.1.0
 
 dev_dependencies:
   flutter_test:

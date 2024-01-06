@@ -191,10 +191,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_native_splash
-      sha256: "141b20f15a2c4fe6e33c49257ca1bc114fc5c500b04fcbc8d75016bb86af672f"
+      sha256: "9cdb5d9665dab5d098dc50feab74301c2c228cd02ca25c9b546ab572cebcd6af"
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.8"
+    version: "2.3.9"
   flutter_secure_storage:
     dependency: "direct main"
     description:
@@ -281,10 +281,10 @@ packages:
     dependency: "direct main"
     description:
       name: get_it
-      sha256: f79870884de16d689cf9a7d15eedf31ed61d750e813c538a6efb92660fea83c3
+      sha256: d0b88dc35a7f97fd91fec0cf8f165abd97a57977968d8fc02ba0bc92e14ba07e
       url: "https://pub.dev"
     source: hosted
-    version: "7.6.4"
+    version: "7.6.6"
   glob:
     dependency: transitive
     description:
@@ -297,10 +297,10 @@ packages:
     dependency: "direct main"
     description:
       name: go_router
-      sha256: ca7e4a2249f96773152f1853fa25933ac752495cdd7fdf5dafb9691bd05830fd
+      sha256: "3b40e751eaaa855179b416974d59d29669e750d2e50fcdb2b37f1cb0ca8c803a"
       url: "https://pub.dev"
     source: hosted
-    version: "13.0.0"
+    version: "13.0.1"
   google_fonts:
     dependency: "direct main"
     description:
@@ -313,10 +313,10 @@ packages:
     dependency: transitive
     description:
       name: gotrue
-      sha256: "1e3e58e5a87aca51d3f161e8086c6c539e314d0cce7f252885ab4e0f51d94704"
+      sha256: f6040d446881658b4b2115a17c649e61c3ff3f82ff47d6c785aaa45f9608ae0d
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.0"
+    version: "2.2.0"
   gtk:
     dependency: transitive
     description:
@@ -601,10 +601,10 @@ packages:
     dependency: transitive
     description:
       name: postgrest
-      sha256: "4ee1d32c00b7e915e757724072ec10f4859bda25f232edafce82071870c75bce"
+      sha256: "748ebffffb60b4eaa270955dcf3742a19a2b315344c41ff1b4a0ebcd322b5181"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.1"
+    version: "2.1.0"
   pub_semver:
     dependency: transitive
     description:
@@ -790,18 +790,18 @@ packages:
     dependency: transitive
     description:
       name: supabase
-      sha256: "4d794826444bde1f84edeec3bec10ef0cdf529bb65aac1c52d42b4acf1555d50"
+      sha256: "13d24f1c7c489219f37bbb53842eafca008f2855fdea5cf731de835aebfc50bc"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.2"
+    version: "2.0.3"
   supabase_flutter:
     dependency: "direct main"
     description:
       name: supabase_flutter
-      sha256: "9ac78129afb3f18dca2b04b3d4e510eb46decd81e921d171b9fa6682021cb053"
+      sha256: "57ca6c970042e6cef29056b0dc71bb17fc9d6848188df5ddc69e819cf28c7923"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.2"
+    version: "2.1.0"
   term_glyph:
     dependency: transitive
     description:

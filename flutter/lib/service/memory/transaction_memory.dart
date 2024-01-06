@@ -16,6 +16,7 @@ class TransactionMemoryService extends TransactionService {
   final _transactions = <String, Transaction>{};
 
   TransactionMemoryService({
+    required super.walletService,
     this.transactionValidator,
   });
 

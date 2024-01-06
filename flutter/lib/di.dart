@@ -75,6 +75,7 @@ class DI {
         walletValidator: walletValidator,
       );
       transactionService = TransactionSupabaseService(
+        walletService: walletService,
         config: supabaseConfig,
         transactionValidator: transactionValidator,
       );
@@ -91,6 +92,7 @@ class DI {
         walletValidator: walletValidator,
       );
       transactionService = TransactionMemoryService(
+        walletService: walletService,
         transactionValidator: transactionValidator,
       );
     }

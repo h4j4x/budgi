@@ -3,12 +3,16 @@ import 'package:budgi/model/domain/transaction.dart';
 import 'package:budgi/model/domain/wallet.dart';
 import 'package:budgi/model/sort.dart';
 import 'package:budgi/service/memory/transaction_memory.dart';
+import 'package:budgi/service/memory/wallet_memory.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('.saveWalletTransfer() mark credit cards pending transactions as completed and create income with rest',
+  test(
+      '.saveWalletTransfer() mark credit cards pending transactions as completed and create income with rest',
       () async {
-    final service = TransactionMemoryService();
+    final service = TransactionMemoryService(
+      walletService: WalletMemoryService(),
+    );
     final category = _TestCategory();
     final creditWallet = _TestWallet(WalletType.creditCard);
 
@@ -22,7 +26,8 @@ void main() {
     );
     var transactions = await service.listTransactions();
     expect(transactions.length, equals(1));
-    expect(transactions[0].transactionStatus, equals(TransactionStatus.pending));
+    expect(
+        transactions[0].transactionStatus, equals(TransactionStatus.pending));
     expect(transactions[0].amount, equals(firstExpenseAmount));
 
     const secondExpenseAmount = 15.0;
@@ -35,7 +40,8 @@ void main() {
     );
     transactions = await service.listTransactions(dateTimeSort: Sort.desc);
     expect(transactions.length, equals(2));
-    expect(transactions[0].transactionStatus, equals(TransactionStatus.pending));
+    expect(
+        transactions[0].transactionStatus, equals(TransactionStatus.pending));
     expect(transactions[0].amount, equals(secondExpenseAmount));
 
     const transferAmount = firstExpenseAmount + secondExpenseAmount + 10;
@@ -50,14 +56,17 @@ void main() {
     expect(transactions.length, equals(4));
     for (var i = 0; i < transactions.length; i++) {
       final transaction = transactions[i];
-      expect(transaction.transactionStatus, equals(TransactionStatus.completed));
+      expect(
+          transaction.transactionStatus, equals(TransactionStatus.completed));
       if (transaction.code.startsWith('source_')) {
         expect(transaction.wallet.code, equals(cashWallet.code));
-        expect(transaction.transactionType, equals(TransactionType.expenseTransfer));
+        expect(transaction.transactionType,
+            equals(TransactionType.expenseTransfer));
         expect(transferAmount, equals(transaction.amount));
       } else if (transaction.code.startsWith('target_')) {
         expect(transaction.wallet.code, equals(creditWallet.code));
-        expect(transaction.transactionType, equals(TransactionType.incomeTransfer));
+        expect(transaction.transactionType,
+            equals(TransactionType.incomeTransfer));
         expect(transferAmount, equals(transaction.amount));
       }
     }

@@ -3,7 +3,6 @@ import '../../model/domain/wallet.dart';
 import '../../model/error/validation.dart';
 import '../../model/error/wallet.dart';
 import '../../model/period.dart';
-import '../../model/sort.dart';
 import '../../util/string.dart';
 import '../transaction.dart';
 import '../validator.dart';

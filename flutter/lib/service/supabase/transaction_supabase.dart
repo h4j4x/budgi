@@ -17,7 +17,6 @@ import '../auth.dart';
 import '../category.dart';
 import '../transaction.dart';
 import '../validator.dart';
-import '../wallet.dart';
 import 'category_supabase.dart';
 import 'config.dart';
 import 'wallet_supabase.dart';
@@ -29,6 +28,7 @@ class TransactionSupabaseService extends TransactionService {
   final Validator<Transaction, TransactionError>? transactionValidator;
 
   TransactionSupabaseService({
+    required super.walletService,
     required this.config,
     this.transactionValidator,
   });
@@ -210,7 +210,7 @@ class TransactionSupabaseService extends TransactionService {
   }
 
   Future<SupabaseWallet?> _fetchWalletById(int id) async {
-    final wallet = await DI().get<WalletService>().fetchWalletById(id);
+    final wallet = await walletService.fetchWalletById(id);
     if (wallet is SupabaseWallet) {
       return wallet;
     }

@@ -1,6 +1,5 @@
 import 'package:meta/meta.dart';
 
-import '../di.dart';
 import '../model/domain/category.dart';
 import '../model/domain/transaction.dart';
 import '../model/domain/wallet.dart';
@@ -10,6 +9,10 @@ import '../util/string.dart';
 import 'wallet.dart';
 
 abstract class TransactionService {
+  final WalletService walletService;
+
+  TransactionService({required this.walletService});
+
   /// @throws ValidationError
   Future<Transaction> saveTransaction({
     String? code,
@@ -23,16 +26,21 @@ abstract class TransactionService {
     int? deferredMonths,
   }) async {
     final transaction = await doSaveTransaction(
+      code: code,
       transactionType: transactionType,
       transactionStatus: transactionStatus,
       category: category,
       wallet: wallet,
       amount: amount,
+      dateTime: dateTime,
+      description: description,
+      deferredMonths: deferredMonths,
     );
     final period = Period.monthFromDateTime(transaction.dateTime);
-    await DI()
-        .get<WalletService>()
-        .updateWalletBalance(code: transaction.wallet.code, period: period);
+    await walletService.updateWalletBalance(
+      code: transaction.wallet.code,
+      period: period,
+    );
     return transaction;
   }
 
@@ -74,9 +82,6 @@ abstract class TransactionService {
       description: sourceDescription ?? targetWallet.name,
     );
     // target
-    if (targetWallet.walletType == WalletType.creditCard) {
-      await _completePendingTransactions(targetWallet, maxAmount: amount);
-    }
     try {
       await saveTransaction(
         code: 'target_$transactionCode',
@@ -88,6 +93,9 @@ abstract class TransactionService {
         dateTime: transactionDateTime,
         description: targetDescription ?? sourceWallet.name,
       );
+      if (targetWallet.walletType == WalletType.creditCard) {
+        await _completePendingTransactions(targetWallet, maxAmount: amount);
+      }
     } catch (e) {
       await deleteTransaction(code: sourceTransactionCode);
       rethrow;

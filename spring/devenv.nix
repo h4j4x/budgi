@@ -10,7 +10,6 @@
 
   enterShell = ''
     echo ---
-    echo Java:
     java -version
     echo ___
     echo Newman:
