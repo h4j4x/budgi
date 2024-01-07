@@ -13,6 +13,8 @@ import 'service/impl/wallet_validator.dart';
 import 'service/memory/category_memory.dart';
 import 'service/memory/transaction_memory.dart';
 import 'service/memory/wallet_memory.dart';
+import 'service/spring/auth_spring.dart';
+import 'service/spring/config.dart';
 import 'service/storage.dart';
 import 'service/supabase/auth_supabase.dart';
 import 'service/supabase/category_amount_supabase.dart';
@@ -42,65 +44,13 @@ class DI {
     final storageService = SecureStorageService();
     _getIt.registerSingleton<StorageService>(storageService);
 
-    CategoryService categoryService;
-    CategoryAmountService categoryAmountService;
-    WalletService walletService;
-    TransactionService transactionService;
-
-    final categoryValidator = CategoryValidator();
-    final categoryAmountValidator = CategoryAmountValidator();
-    final walletValidator = WalletValidator();
-    final transactionValidator = TransactionValidator();
-
-    if (config.hasSupabaseAuth()) {
-      final supabaseConfig = SupabaseConfig(
-          url: config.supabaseUrl!, token: config.supabaseToken!);
-      await supabaseConfig.initialize();
-      _getIt.registerSingleton<AuthService>(
-        AuthSupabaseService(config: supabaseConfig),
-      );
-
-      categoryService = CategorySupabaseService(
-        config: supabaseConfig,
-        storageService: storageService,
-        categoryValidator: categoryValidator,
-      );
-      categoryAmountService = CategoryAmountSupabaseService(
-        config: supabaseConfig,
-        storageService: storageService,
-        amountValidator: categoryAmountValidator,
-      );
-      walletService = WalletSupabaseService(
-        config: supabaseConfig,
-        walletValidator: walletValidator,
-      );
-      transactionService = TransactionSupabaseService(
-        walletService: walletService,
-        config: supabaseConfig,
-        transactionValidator: transactionValidator,
-      );
+    if (config.isSupabase()) {
+      await _configSupabase(config, storageService);
+    } else if (config.isSpring()) {
+      await _configSpring(config, storageService);
     } else {
-      categoryService = CategoryMemoryService(
-        categoryValidator: categoryValidator,
-        amountValidator: categoryAmountValidator,
-      );
-      categoryAmountService = CategoryMemoryService(
-        categoryValidator: categoryValidator,
-        amountValidator: categoryAmountValidator,
-      );
-      walletService = WalletMemoryService(
-        walletValidator: walletValidator,
-      );
-      transactionService = TransactionMemoryService(
-        walletService: walletService,
-        transactionValidator: transactionValidator,
-      );
+      _configMemory(config);
     }
-
-    _getIt.registerSingleton<CategoryService>(categoryService);
-    _getIt.registerSingleton<CategoryAmountService>(categoryAmountService);
-    _getIt.registerSingleton<WalletService>(walletService);
-    _getIt.registerSingleton<TransactionService>(transactionService);
   }
 
   T get<T extends Object>() {
@@ -109,5 +59,73 @@ class DI {
 
   bool has<T extends Object>() {
     return _getIt.isRegistered<T>();
+  }
+
+  Future<void> _configSupabase(
+      AppConfig config, StorageService storageService) async {
+    final supabaseConfig = SupabaseConfig(
+      url: config.apiUrl!,
+      token: config.apiToken!,
+    );
+    await supabaseConfig.initialize();
+
+    _getIt.registerSingleton<AuthService>(
+      AuthSupabaseService(config: supabaseConfig),
+    );
+
+    _getIt.registerSingleton<CategoryService>(CategorySupabaseService(
+      config: supabaseConfig,
+      storageService: storageService,
+      categoryValidator: CategoryValidator(),
+    ));
+
+    _getIt
+        .registerSingleton<CategoryAmountService>(CategoryAmountSupabaseService(
+      config: supabaseConfig,
+      storageService: storageService,
+      amountValidator: CategoryAmountValidator(),
+    ));
+
+    final walletService = WalletSupabaseService(
+      config: supabaseConfig,
+      walletValidator: WalletValidator(),
+    );
+    _getIt.registerSingleton<WalletService>(walletService);
+
+    _getIt.registerSingleton<TransactionService>(TransactionSupabaseService(
+      walletService: walletService,
+      config: supabaseConfig,
+      transactionValidator: TransactionValidator(),
+    ));
+  }
+
+  Future<void> _configSpring(
+      AppConfig config, StorageService storageService) async {
+    final springConfig = SpringConfig(url: config.apiUrl!);
+    final authService = AuthSpringService(
+      storageService: storageService,
+      config: springConfig,
+    );
+    await authService.initialize();
+    _getIt.registerSingleton<AuthService>(authService);
+  }
+
+  Future<void> _configMemory(AppConfig config) async {
+    final categoryService = CategoryMemoryService(
+      categoryValidator: CategoryValidator(),
+      amountValidator: CategoryAmountValidator(),
+    );
+    _getIt.registerSingleton<CategoryService>(categoryService);
+    _getIt.registerSingleton<CategoryAmountService>(categoryService);
+
+    final walletService = WalletMemoryService(
+      walletValidator: WalletValidator(),
+    );
+    _getIt.registerSingleton<WalletService>(walletService);
+
+    _getIt.registerSingleton<TransactionService>(TransactionMemoryService(
+      walletService: walletService,
+      transactionValidator: TransactionValidator(),
+    ));
   }
 }

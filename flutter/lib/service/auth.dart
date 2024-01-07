@@ -1,22 +1,24 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
-
 import '../model/domain/user.dart';
 import '../model/error/validation.dart';
+import '../model/token.dart';
 
 abstract class AuthService {
-  Future<bool> signIn(
-    BuildContext context, {
+  /// @throws SignInError
+  Future<bool> signIn({
     required String email,
     required String password,
   });
 
-  Future<bool> signInWithGithub(BuildContext context);
+  /// @throws SignInError
+  Future<bool> signInWithGithub();
 
   Stream<bool> authenticatedStream();
 
   AppUser? user();
+
+  AppToken? token();
 
   Future<void> signOut();
 
@@ -30,3 +32,5 @@ abstract class AuthService {
     });
   }
 }
+
+class SignInError extends Error {}

@@ -7,7 +7,6 @@ import '../app/config.dart';
 import '../app/icon.dart';
 import '../app/router.dart';
 import '../di.dart';
-import '../model/error/sign_in.dart';
 import '../page/home.dart';
 import '../service/auth.dart';
 import '../util/ui.dart';
@@ -179,7 +178,7 @@ class _SignInState extends State<SignIn> {
     try {
       success = await DI()
           .get<AuthService>()
-          .signIn(context, email: email, password: password);
+          .signIn(email: email, password: password);
     } on SignInError catch (_) {
       if (mounted) {
         context.showError(L10n.of(context).invalidUserCredentials);
@@ -199,7 +198,7 @@ class _SignInState extends State<SignIn> {
     setState(() {
       processing = true;
     });
-    final success = await DI().get<AuthService>().signInWithGithub(context);
+    final success = await DI().get<AuthService>().signInWithGithub();
     if (success && mounted) {
       context.go(HomePage.route);
     } else {

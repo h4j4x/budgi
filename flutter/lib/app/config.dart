@@ -1,5 +1,6 @@
 enum AuthProvider {
-  supabase;
+  supabase,
+  spring;
 
   static AuthProvider tryParse(String? value) {
     if (value?.isNotEmpty ?? false) {
@@ -23,35 +24,44 @@ class AppConfig {
   }
 
   final AuthProvider authProvider;
-  final String? supabaseUrl;
-  final String? supabaseToken;
+  final String? apiUrl;
+  final String? apiToken;
 
   AppConfig({
-    String? authProviderStr,
-    this.supabaseUrl,
-    this.supabaseToken,
-  }) : authProvider = AuthProvider.tryParse(authProviderStr);
+    required this.authProvider,
+    this.apiUrl,
+    this.apiToken,
+  });
 
-  bool hasSupabaseAuth() {
+  bool isSupabase() {
     return authProvider == AuthProvider.supabase &&
-        (supabaseUrl?.isNotEmpty ?? false) &&
-        (supabaseToken?.isNotEmpty ?? false);
+        (apiUrl?.isNotEmpty ?? false) &&
+        (apiToken?.isNotEmpty ?? false);
+  }
+
+  bool isSpring() {
+    return authProvider == AuthProvider.spring && (apiUrl?.isNotEmpty ?? false);
   }
 
   static AppConfig create() {
     const authProviderStr = bool.hasEnvironment('AUTH_PROVIDER')
         ? String.fromEnvironment('AUTH_PROVIDER')
         : null;
-    const supabaseUrl = bool.hasEnvironment('SUPABASE_URL')
-        ? String.fromEnvironment('SUPABASE_URL')
-        : null;
-    const supabaseToken = bool.hasEnvironment('SUPABASE_TOKEN')
-        ? String.fromEnvironment('SUPABASE_TOKEN')
-        : null;
+    final authProvider = AuthProvider.tryParse(authProviderStr);
+
+    String? apiUrl;
+    String? apiToken;
+    if (authProvider == AuthProvider.supabase) {
+      apiUrl = const String.fromEnvironment('SUPABASE_URL');
+      apiToken = const String.fromEnvironment('SUPABASE_TOKEN');
+    } else if (authProvider == AuthProvider.spring) {
+      apiUrl = const String.fromEnvironment('SPRING_URL');
+    }
+
     return AppConfig(
-      authProviderStr: authProviderStr,
-      supabaseUrl: supabaseUrl,
-      supabaseToken: supabaseToken,
+      authProvider: authProvider,
+      apiUrl: apiUrl,
+      apiToken: apiToken,
     );
   }
 }

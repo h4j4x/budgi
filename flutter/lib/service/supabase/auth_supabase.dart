@@ -6,7 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../app/icon.dart';
 import '../../model/domain/user.dart';
-import '../../model/error/sign_in.dart';
+import '../../model/token.dart';
 import '../auth.dart';
 import 'config.dart';
 
@@ -19,8 +19,7 @@ class AuthSupabaseService extends AuthService {
 
   // https://supabase.com/docs/reference/dart/auth-signinwithpassword
   @override
-  Future<bool> signIn(
-    BuildContext context, {
+  Future<bool> signIn({
     required String email,
     required String password,
   }) async {
@@ -40,7 +39,7 @@ class AuthSupabaseService extends AuthService {
 
   // https://supabase.com/docs/reference/dart/auth-signinwithoauth
   @override
-  Future<bool> signInWithGithub(BuildContext context) {
+  Future<bool> signInWithGithub() {
     return config.supabase.auth.signInWithOAuth(
       OAuthProvider.github,
       redirectTo: kIsWeb ? null : 'com.sp1ke.budgi.flutter://sign-in-callback/',
@@ -60,7 +59,8 @@ class AuthSupabaseService extends AuthService {
       return listenedEvents.contains(state.event);
     }).map((state) {
       final hasSession = state.session != null && !(state.session!.isExpired);
-      debugPrint('Supabase onAuthStateChange event: ${state.event}, has session: $hasSession');
+      debugPrint(
+          'Supabase onAuthStateChange event: ${state.event}, has session: $hasSession');
       return hasSession;
     });
   }
@@ -75,6 +75,11 @@ class AuthSupabaseService extends AuthService {
   @override
   Future<void> signOut() {
     return config.supabase.auth.signOut();
+  }
+
+  @override
+  AppToken? token() {
+    return null;
   }
 }
 
@@ -107,8 +112,10 @@ class _User implements AppUser {
   @override
   String get name {
     if (user.userMetadata != null &&
-        (user.userMetadata!['full_name'] is String || user.userMetadata!['name'] is String)) {
-      return user.userMetadata!['full_name'] as String? ?? user.userMetadata!['name'] as String;
+        (user.userMetadata!['full_name'] is String ||
+            user.userMetadata!['name'] is String)) {
+      return user.userMetadata!['full_name'] as String? ??
+          user.userMetadata!['name'] as String;
     }
     return '-';
   }
@@ -116,8 +123,10 @@ class _User implements AppUser {
   @override
   String get username {
     if (user.userMetadata != null &&
-        (user.userMetadata!['preferred_username'] is String || user.userMetadata!['user_name'] is String)) {
-      return user.userMetadata!['preferred_username'] as String? ?? user.userMetadata!['user_name'] as String;
+        (user.userMetadata!['preferred_username'] is String ||
+            user.userMetadata!['user_name'] is String)) {
+      return user.userMetadata!['preferred_username'] as String? ??
+          user.userMetadata!['user_name'] as String;
     }
     return name;
   }

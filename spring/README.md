@@ -1,6 +1,8 @@
-# Budgi API
+# Budg1 Spring API
 
-TODO: Project description.
+Budg1 Spring project.
+
+![Test](https://github.com/h4j4x/budgi/actions/workflows/spring-test.yml/badge.svg)
 
 ## Technology Stack
 
