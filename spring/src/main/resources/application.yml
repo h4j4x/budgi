@@ -27,3 +27,4 @@ spring:
   jpa:
     hibernate:
       ddlAuto: ${DATASOURCE_DDL:validate}
+    open-in-view: false
