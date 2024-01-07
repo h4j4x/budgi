@@ -26,7 +26,7 @@ services:
       - DATASOURCE_USERNAME=budgi
       - DATASOURCE_PASSWORD=budgi
       - DATASOURCE_DRIVER=org.postgresql.Driver
-      - DATASOURCE_DDL=update
+      - DATASOURCE_DDL=create-drop
     ports:
       - '8080:8080'
     depends_on:

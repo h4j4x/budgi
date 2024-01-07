@@ -1,9 +1,10 @@
-name: Spring Test
+name: Spring Publish
 
 on:
-  push:
-  pull_request:
   workflow_dispatch:
+
+permissions:
+  packages: write
 
 jobs:
   build:
@@ -15,5 +16,5 @@ jobs:
           distribution: 'zulu'
           java-version: '21'
           cache: 'gradle'
-      - run: ./gradlew test --no-daemon
+      - run: ./gradlew jib --no-daemon
         working-directory: ./spring

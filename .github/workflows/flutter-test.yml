@@ -1,4 +1,3 @@
-# https://blog.logrocket.com/flutter-ci-cd-using-github-actions/
 name: Flutter Test
 
 on:

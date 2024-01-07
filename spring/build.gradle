@@ -67,7 +67,7 @@ jib {
     image = 'azul/zulu-openjdk:21-latest'
   }
   to {
-    image = 'ghcr.io/h4j4x/budgi'
+    image = 'ghcr.io/h4j4x/budgi-api'
     tags = ["$version", 'latest']
     auth {
       username = githubActor
