@@ -40,7 +40,7 @@ public class AuthControllerTests {
         this.userRepo = userRepo;
         this.passwordEncoder = passwordEncoder;
         restClient = RestClient.builder()
-            .baseUrl(String.format("http://localhost:%d/auth", port))
+            .baseUrl(String.format("http://localhost:%d/api/v1/auth", port))
             .defaultHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
             .build();
     }

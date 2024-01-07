@@ -38,7 +38,7 @@ public class CategoryControllerTests {
         this.categoryRepo = categoryRepo;
         this.passwordEncoder = passwordEncoder;
         restClient = RestClient.builder()
-            .baseUrl(String.format("http://localhost:%d", port))
+            .baseUrl(String.format("http://localhost:%d/api/v1", port))
             .defaultHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
             .build();
     }

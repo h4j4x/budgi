@@ -1,5 +1,7 @@
 package com.sp1ke.budgi.api.web.config;
 
+import java.util.Arrays;
+import java.util.stream.Stream;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -19,8 +21,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class WebConfig {
-    static final String[] AUTH_POST_ANON_PATHS = new String[] {
-        "/auth/signup", "/auth/signin", "/manage"
+    public static final String REST_BASE_PATH = "/api/v1";
+
+    static final String[] API_POST_ANON_PATHS = new String[] {
+        "/auth/signup", "/auth/signin"
     };
 
     @Bean
@@ -31,12 +35,18 @@ public class WebConfig {
             "/", "/*.css", "/*.png", "/*.webmanifest", "/manage/**"
         };
         http.csrf(AbstractHttpConfigurer::disable)
-            .authorizeHttpRequests((registry) ->
-                registry
-                    .requestMatchers(HttpMethod.GET, staticAnonPaths).permitAll()
-                    .requestMatchers(HttpMethod.POST, AUTH_POST_ANON_PATHS).permitAll()
-                    .requestMatchers("/auth/**").authenticated()
-                    .requestMatchers("/category/**").authenticated()
+            .authorizeHttpRequests((registry) -> {
+                    var apiAnonPaths = Arrays.stream(API_POST_ANON_PATHS)
+                        .map(path -> REST_BASE_PATH + path)
+                        .toArray(String[]::new);
+                    var apiUserPaths = Stream.of("/auth/me", "/category/**")
+                        .map(path -> REST_BASE_PATH + path)
+                        .toArray(String[]::new);
+                    registry
+                        .requestMatchers(HttpMethod.GET, staticAnonPaths).permitAll()
+                        .requestMatchers(HttpMethod.POST, apiAnonPaths).permitAll()
+                        .requestMatchers(apiUserPaths).authenticated();
+                }
             )
             .sessionManagement((config) -> config.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authenticationProvider(authProvider)

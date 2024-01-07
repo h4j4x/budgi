@@ -3,6 +3,7 @@ package com.sp1ke.budgi.api.web;
 import com.sp1ke.budgi.api.category.ApiCategory;
 import com.sp1ke.budgi.api.category.CategoryService;
 import com.sp1ke.budgi.api.user.AuthUser;
+import com.sp1ke.budgi.api.web.annot.ApiController;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,13 +13,12 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 
-@RestController
-@RequestMapping("/category")
+@ApiController
 @RequiredArgsConstructor
 public class CategoryController {
     private final CategoryService categoryService;
 
-    @GetMapping
+    @GetMapping("/category")
     ResponseEntity<Page<ApiCategory>> list(@AuthenticationPrincipal AuthUser principal,
                                            @RequestParam(required = false, defaultValue = "0") Integer page,
                                            @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
@@ -27,14 +27,14 @@ public class CategoryController {
         return ResponseEntity.ok(itemsPage);
     }
 
-    @PostMapping
+    @PostMapping("/category")
     ResponseEntity<ApiCategory> create(@AuthenticationPrincipal AuthUser principal,
                                        @RequestBody ApiCategory category) {
         var apiCategory = categoryService.save(principal.userId(), category, true);
         return ResponseEntity.status(201).body(apiCategory);
     }
 
-    @GetMapping("/{code}")
+    @GetMapping("/category/{code}")
     ResponseEntity<ApiCategory> getByCode(@AuthenticationPrincipal AuthUser principal,
                                           @PathVariable String code) {
         var apiCategory = categoryService
@@ -43,7 +43,7 @@ public class CategoryController {
         return ResponseEntity.ok(apiCategory);
     }
 
-    @PutMapping("/{code}")
+    @PutMapping("/category/{code}")
     ResponseEntity<ApiCategory> updateByCode(@AuthenticationPrincipal AuthUser principal,
                                              @PathVariable String code,
                                              @RequestBody ApiCategory category) {
@@ -54,7 +54,7 @@ public class CategoryController {
         return ResponseEntity.status(200).body(apiCategory);
     }
 
-    @DeleteMapping("/{code}")
+    @DeleteMapping("/category/{code}")
     ResponseEntity<Void> deleteByCode(@AuthenticationPrincipal AuthUser principal,
                                       @PathVariable String code) {
         categoryService.deleteByCode(principal.userId(), code);

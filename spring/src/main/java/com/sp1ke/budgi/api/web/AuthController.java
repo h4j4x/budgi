@@ -1,36 +1,38 @@
 package com.sp1ke.budgi.api.web;
 
 import com.sp1ke.budgi.api.user.*;
+import com.sp1ke.budgi.api.web.annot.ApiController;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.HttpClientErrorException;
 
-@RestController
-@RequestMapping("/auth")
+@ApiController
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
 
     private final TokenService tokenService;
 
-    @PostMapping("/signup")
+    @PostMapping("/auth/signup")
     ResponseEntity<ApiToken> signUp(@RequestBody ApiUser user) {
         var apiUser = authService.createUser(user);
         var token = tokenService.generateToken(apiUser);
         return ResponseEntity.status(201).body(token);
     }
 
-    @PostMapping("/signin")
+    @PostMapping("/auth/signin")
     ResponseEntity<ApiToken> signIn(@RequestBody ApiUser user) {
         var apiUser = authService.findUser(user);
         var token = tokenService.generateToken(apiUser);
         return ResponseEntity.ok(token);
     }
 
-    @GetMapping("/me")
+    @GetMapping("/auth/me")
     ResponseEntity<ApiUser> me(@AuthenticationPrincipal AuthUser principal) {
         var user = authService
             .findUser(principal.getUsername())

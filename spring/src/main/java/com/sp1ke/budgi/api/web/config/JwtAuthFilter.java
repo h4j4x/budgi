@@ -30,17 +30,21 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         @NonNull HttpServletResponse response,
         @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-        if (!isAnonPath(request.getRequestURI())) {
-            var authToken = extractToken(request.getHeader("Authorization"));
-            if (authToken != null) {
-                processAuthToken(request, authToken);
+        var requestURI = request.getRequestURI();
+        if (requestURI.startsWith(WebConfig.REST_BASE_PATH)) {
+            requestURI = requestURI.substring(WebConfig.REST_BASE_PATH.length());
+            if (!isAnonPath(requestURI)) {
+                var authToken = extractToken(request.getHeader("Authorization"));
+                if (authToken != null) {
+                    processAuthToken(request, authToken);
+                }
             }
         }
         filterChain.doFilter(request, response);
     }
 
     private boolean isAnonPath(@NonNull String requestURI) {
-        return Arrays.stream(WebConfig.AUTH_POST_ANON_PATHS).anyMatch(requestURI::startsWith);
+        return Arrays.stream(WebConfig.API_POST_ANON_PATHS).anyMatch(requestURI::startsWith);
     }
 
     @Nullable
