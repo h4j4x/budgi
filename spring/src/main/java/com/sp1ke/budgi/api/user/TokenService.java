@@ -1,11 +1,11 @@
 package com.sp1ke.budgi.api.user;
 
-import org.springframework.lang.NonNull;
+import jakarta.validation.constraints.NotNull;
 
 public interface TokenService {
-    @NonNull
-    String extractUsername(@NonNull String token);
+    @NotNull
+    String extractUsername(@NotNull String token);
 
-    @NonNull
-    ApiToken generateToken(@NonNull ApiUser apiUser);
+    @NotNull
+    ApiToken generateToken(@NotNull ApiUser apiUser);
 }

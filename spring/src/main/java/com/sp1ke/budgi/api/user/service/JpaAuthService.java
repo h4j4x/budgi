@@ -6,10 +6,10 @@ import com.sp1ke.budgi.api.user.AuthService;
 import com.sp1ke.budgi.api.user.domain.JpaUser;
 import com.sp1ke.budgi.api.user.repo.UserRepo;
 import jakarta.validation.Validator;
+import jakarta.validation.constraints.NotNull;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.lang.NonNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -23,8 +23,8 @@ public class JpaAuthService implements AuthService {
 
     private final Validator validator;
 
-    @NonNull
-    public ApiUser createUser(@NonNull ApiUser apiUser) {
+    @NotNull
+    public ApiUser createUser(@NotNull ApiUser apiUser) {
         var byEmail = userRepo.findByEmail(apiUser.getEmail());
         if (byEmail.isPresent()) {
             throw new HttpClientErrorException(HttpStatus.CONFLICT, "Email already registered");
@@ -42,8 +42,8 @@ public class JpaAuthService implements AuthService {
         return mapToApiUser(user);
     }
 
-    @NonNull
-    public ApiUser findUser(@NonNull ApiUser apiUser) {
+    @NotNull
+    public ApiUser findUser(@NotNull ApiUser apiUser) {
         var byEmail = userRepo.findByEmail(apiUser.getEmail());
         if (byEmail.isPresent() && passwordEncoder.matches(apiUser.getPassword(), byEmail.get().getPassword())) {
             return mapToApiUser(byEmail.get());
@@ -51,14 +51,14 @@ public class JpaAuthService implements AuthService {
         throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
     }
 
-    public Optional<ApiUser> findUser(@NonNull String email) {
+    public Optional<ApiUser> findUser(@NotNull String email) {
         return userRepo
             .findByEmail(email)
             .map(this::mapToApiUser);
     }
 
-    @NonNull
-    private ApiUser mapToApiUser(@NonNull JpaUser user) {
+    @NotNull
+    private ApiUser mapToApiUser(@NotNull JpaUser user) {
         return ApiUser.builder()
             .name(user.getName())
             .email(user.getEmail())

@@ -2,12 +2,12 @@ package com.sp1ke.budgi.api.common;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.http.HttpStatus;
-import org.springframework.lang.NonNull;
 import org.springframework.web.client.HttpClientErrorException;
 
 public class ValidatorUtil {
-    public static void validate(@NonNull Validator validator, @NonNull Object object) {
+    public static void validate(@NotNull Validator validator, @NotNull Object object) {
         var violations = validator.validate(object);
         if (!violations.isEmpty()) {
             var violationsMessage = String.join(

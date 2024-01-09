@@ -1,8 +1,7 @@
 package com.sp1ke.budgi.api.common;
 
-import java.util.Random;
-
 import jakarta.validation.constraints.NotNull;
+import java.util.Random;
 
 public class StringUtil {
     @NotNull

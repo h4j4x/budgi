@@ -9,11 +9,11 @@ import com.sp1ke.budgi.api.user.config.TokenConfig;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.validation.constraints.NotNull;
 import java.util.Calendar;
 import javax.crypto.SecretKey;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.HttpStatus;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -37,8 +37,8 @@ public class JwtTokenService implements TokenService {
     }
 
     @Override
-    @NonNull
-    public String extractUsername(@NonNull String token) {
+    @NotNull
+    public String extractUsername(@NotNull String token) {
         try {
             var jwt = Jwts.parser()
                 .requireIssuer(ISSUER)
@@ -54,8 +54,8 @@ public class JwtTokenService implements TokenService {
     }
 
     @Override
-    @NonNull
-    public ApiToken generateToken(@NonNull ApiUser apiUser) {
+    @NotNull
+    public ApiToken generateToken(@NotNull ApiUser apiUser) {
         var expiresAt = Calendar.getInstance();
         expiresAt.add(Calendar.DAY_OF_MONTH, tokenExpirationInDays);
         var token = Jwts.builder()

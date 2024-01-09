@@ -5,6 +5,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
@@ -42,11 +43,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private boolean isAnonPath(@NonNull String requestURI) {
+    private boolean isAnonPath(@NotNull String requestURI) {
         return Arrays.stream(WebConfig.API_POST_ANON_PATHS).anyMatch(requestURI::startsWith);
     }
 
-    private void processAuthToken(@NonNull HttpServletRequest request, @NonNull String token) {
+    private void processAuthToken(@NotNull HttpServletRequest request, @NotNull String token) {
         try {
             var username = tokenService.extractUsername(token);
             var userDetails = userDetailsService.loadUserByUsername(username);

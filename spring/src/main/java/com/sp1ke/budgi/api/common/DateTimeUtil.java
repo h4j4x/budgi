@@ -1,13 +1,13 @@
 package com.sp1ke.budgi.api.common;
 
+import jakarta.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.Calendar;
-import org.springframework.lang.NonNull;
 
 public class DateTimeUtil {
-    @NonNull
-    public static OffsetDateTime calendarToOffsetDateTime(@NonNull Calendar calendar) {
+    @NotNull
+    public static OffsetDateTime calendarToOffsetDateTime(@NotNull Calendar calendar) {
         return OffsetDateTime.ofInstant(calendar.toInstant(), ZoneId.systemDefault());
     }
 }

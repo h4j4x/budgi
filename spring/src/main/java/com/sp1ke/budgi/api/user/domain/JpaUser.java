@@ -12,7 +12,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.lang.NonNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity
@@ -62,7 +61,7 @@ public class JpaUser extends AuthUser {
         return email;
     }
 
-    public void fixPassword(@NonNull PasswordEncoder passwordEncoder) {
+    public void fixPassword(@NotNull PasswordEncoder passwordEncoder) {
         password = passwordEncoder.encode(password);
     }
 }

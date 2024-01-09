@@ -1,14 +1,14 @@
 package com.sp1ke.budgi.api.user;
 
+import jakarta.validation.constraints.NotNull;
 import java.util.Optional;
-import org.springframework.lang.NonNull;
 
 public interface AuthService {
-    @NonNull
-    ApiUser createUser(@NonNull ApiUser apiUser);
+    @NotNull
+    ApiUser createUser(@NotNull ApiUser apiUser);
 
-    @NonNull
-    ApiUser findUser(@NonNull ApiUser apiUser);
+    @NotNull
+    ApiUser findUser(@NotNull ApiUser apiUser);
 
-    Optional<ApiUser> findUser(@NonNull String email);
+    Optional<ApiUser> findUser(@NotNull String email);
 }
