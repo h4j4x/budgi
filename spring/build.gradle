@@ -64,7 +64,7 @@ def githubToken = System.getenv().getOrDefault('GITHUB_TOKEN', 'none')
 
 jib {
   from {
-    image = 'azul/zulu-openjdk:21-latest'
+    image = 'amazoncorretto:21-alpine'
   }
   to {
     image = 'ghcr.io/h4j4x/budgi'
