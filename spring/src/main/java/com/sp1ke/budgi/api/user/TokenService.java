@@ -4,9 +4,6 @@ import org.springframework.lang.NonNull;
 
 public interface TokenService {
     @NonNull
-    String getTokenType();
-
-    @NonNull
     String extractUsername(@NonNull String token);
 
     @NonNull

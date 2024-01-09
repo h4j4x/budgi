@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -34,7 +33,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if (requestURI.startsWith(WebConfig.REST_BASE_PATH)) {
             requestURI = requestURI.substring(WebConfig.REST_BASE_PATH.length());
             if (!isAnonPath(requestURI)) {
-                var authToken = extractToken(request.getHeader("Authorization"));
+                var authToken = request.getHeader("Authorization");
                 if (authToken != null) {
                     processAuthToken(request, authToken);
                 }
@@ -45,15 +44,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private boolean isAnonPath(@NonNull String requestURI) {
         return Arrays.stream(WebConfig.API_POST_ANON_PATHS).anyMatch(requestURI::startsWith);
-    }
-
-    @Nullable
-    private String extractToken(@Nullable String authHeader) {
-        var tokenPrefix = tokenService.getTokenType() + " ";
-        if (authHeader != null && authHeader.startsWith(tokenPrefix)) {
-            return authHeader.substring(tokenPrefix.length());
-        }
-        return null;
     }
 
     private void processAuthToken(@NonNull HttpServletRequest request, @NonNull String token) {

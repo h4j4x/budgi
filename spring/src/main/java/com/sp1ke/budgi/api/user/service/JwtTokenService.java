@@ -1,6 +1,7 @@
 package com.sp1ke.budgi.api.user.service;
 
 import com.sp1ke.budgi.api.common.DateTimeUtil;
+import com.sp1ke.budgi.api.common.StringUtil;
 import com.sp1ke.budgi.api.user.ApiToken;
 import com.sp1ke.budgi.api.user.ApiUser;
 import com.sp1ke.budgi.api.user.TokenService;
@@ -37,12 +38,6 @@ public class JwtTokenService implements TokenService {
 
     @Override
     @NonNull
-    public String getTokenType() {
-        return TOKEN_TYPE;
-    }
-
-    @Override
-    @NonNull
     public String extractUsername(@NonNull String token) {
         try {
             var jwt = Jwts.parser()
@@ -50,7 +45,8 @@ public class JwtTokenService implements TokenService {
                 .requireAudience(AUDIENCE)
                 .verifyWith(signingKey)
                 .build()
-                .parseSignedClaims(token); // TODO: validate expiration
+                .parseSignedClaims(StringUtil.removePrefix(token, TOKEN_TYPE + " "));
+            // TODO: validate expiration
             return jwt.getPayload().getSubject();
         } catch (Exception ignored) {
             throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED, "Invalid token");
