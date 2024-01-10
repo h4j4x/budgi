@@ -24,7 +24,7 @@ dependencies:
   meta: any
   month_year_picker: ^0.3.0+1
   package_info_plus: ^5.0.1
-  supabase_flutter: ^2.1.0
+  supabase_flutter: ^2.2.0
   http: ^1.1.2
 
 dev_dependencies:

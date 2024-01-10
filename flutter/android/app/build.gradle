@@ -24,7 +24,6 @@ if (flutterVersionName == null) {
 
 android {
     namespace "com.sp1ke.budgi.flutter"
-    compileSdkVersion flutter.compileSdkVersion
     ndkVersion "25.1.8937393"
 
     compileOptions {
