@@ -39,7 +39,7 @@ public class WebConfig {
                     var apiAnonPaths = Arrays.stream(API_POST_ANON_PATHS)
                         .map(path -> REST_BASE_PATH + path)
                         .toArray(String[]::new);
-                    var apiUserPaths = Stream.of("/auth/me", "/category/**")
+                    var apiUserPaths = Stream.of("/auth/me", "/category/**", "/wallet/**")
                         .map(path -> REST_BASE_PATH + path)
                         .toArray(String[]::new);
                     registry

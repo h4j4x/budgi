@@ -5,6 +5,6 @@
  |____/ \__,_|\__,_|\__, |_|
                     |___/
 ===================================
-Version: ${application.version}
+${application.version}
 SpringBoot: ${spring-boot.version}
 ===================================

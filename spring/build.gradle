@@ -54,9 +54,12 @@ dependencyManagement {
   }
 }
 
-tasks.named('test') {
+test {
   useJUnitPlatform()
   jvmArgs("-XX:+EnableDynamicAgentLoading")
+  testLogging {
+    events = ["passed", "skipped", "failed"]
+  }
 }
 
 def githubActor = System.getenv().getOrDefault('GITHUB_ACTOR', 'none')
