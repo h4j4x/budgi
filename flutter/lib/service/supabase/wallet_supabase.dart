@@ -1,6 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../di.dart';
+import '../../model/data_page.dart';
 import '../../model/domain/user.dart';
 import '../../model/domain/wallet.dart';
 import '../../model/error/validation.dart';
@@ -32,13 +33,10 @@ class WalletSupabaseService implements WalletService {
     required WalletType walletType,
     required String name,
   }) async {
-    final user = DI()
-        .get<AuthService>()
-        .fetchUser(errorIfMissing: WalletError.invalidUser);
+    final user = DI().get<AuthService>().fetchUser(errorIfMissing: WalletError.invalidUser);
 
     final walletCode = code ?? randomString(6);
-    final wallet =
-        SupabaseWallet(code: walletCode, walletType: walletType, name: name);
+    final wallet = SupabaseWallet(code: walletCode, walletType: walletType, name: name);
     final errors = walletValidator?.validate(wallet);
     if (errors?.isNotEmpty ?? false) {
       throw ValidationError<WalletError>(errors!);
@@ -46,10 +44,7 @@ class WalletSupabaseService implements WalletService {
 
     final walletExists = await _walletExistsByCode(walletCode);
     if (walletExists) {
-      await config.supabase
-          .from(walletTable)
-          .update(wallet.toMap(user))
-          .match({codeField: walletCode});
+      await config.supabase.from(walletTable).update(wallet.toMap(user)).match({codeField: walletCode});
     } else {
       await config.supabase.from(walletTable).insert(wallet.toMap(user));
     }
@@ -57,22 +52,22 @@ class WalletSupabaseService implements WalletService {
   }
 
   @override
-  Future<List<Wallet>> listWallets({
+  Future<DataPage<Wallet>> listWallets({
     List<String>? excludingCodes,
   }) async {
     final user = DI().get<AuthService>().user();
     if (user == null) {
-      return [];
+      return DataPage.empty();
     }
 
-    var query =
-        config.supabase.from(walletTable).select().eq(userIdField, user.id);
+    var query = config.supabase.from(walletTable).select().eq(userIdField, user.id);
     if (excludingCodes?.isNotEmpty ?? false) {
       query = query.not(codeField, 'in', '(${excludingCodes!.join(',')})');
     }
 
     final data = await query;
-    return data.map(SupabaseWallet.from).whereType<Wallet>().toList();
+    final list = data.map(SupabaseWallet.from).whereType<Wallet>().toList();
+    return DataPage(content: list);
   }
 
   @override
@@ -83,18 +78,13 @@ class WalletSupabaseService implements WalletService {
   }
 
   Future<bool> _walletExistsByCode(String code) async {
-    final count = await config.supabase
-        .from(walletTable)
-        .select(idField)
-        .eq(codeField, code)
-        .count(CountOption.exact);
+    final count = await config.supabase.from(walletTable).select(idField).eq(codeField, code).count(CountOption.exact);
     return count.count > 0;
   }
 
   @override
   Future<Wallet> fetchWalletByCode(String code) async {
-    final walletData =
-        await config.supabase.from(walletTable).select().eq(codeField, code);
+    final walletData = await config.supabase.from(walletTable).select().eq(codeField, code);
     final wallet = SupabaseWallet.from(walletData);
     if (wallet != null) {
       return wallet;
@@ -106,8 +96,7 @@ class WalletSupabaseService implements WalletService {
 
   @override
   Future<Wallet?> fetchWalletById(int id) async {
-    final walletData =
-        await config.supabase.from(walletTable).select().eq(idField, id);
+    final walletData = await config.supabase.from(walletTable).select().eq(idField, id);
     return SupabaseWallet.from(walletData);
   }
 
@@ -122,8 +111,7 @@ class WalletSupabaseService implements WalletService {
         );
     final map = <Wallet, double>{};
     for (var transaction in transactions) {
-      map[transaction.wallet] =
-          (map[transaction.wallet] ?? 0) + transaction.signedAmount;
+      map[transaction.wallet] = (map[transaction.wallet] ?? 0) + transaction.signedAmount;
     }
     if (showZeroBalance) {
       final includedWallets = map.keys.map((wallet) {
@@ -132,7 +120,7 @@ class WalletSupabaseService implements WalletService {
       final zeroWallets = await listWallets(
         excludingCodes: includedWallets.toList(),
       );
-      map.addEntries(zeroWallets.map((wallet) {
+      map.addEntries(zeroWallets.content.map((wallet) {
         return MapEntry(wallet, 0);
       }));
     }
@@ -187,12 +175,10 @@ class SupabaseWallet implements Wallet {
     if (rawData is Map<String, dynamic>) {
       final id = rawData[idField] as int?;
       final code = rawData[codeField] as String?;
-      final walletType =
-          WalletType.tryParse(rawData[walletTypeField] as String?);
+      final walletType = WalletType.tryParse(rawData[walletTypeField] as String?);
       final name = rawData[nameField] as String?;
       if (id != null && code != null && walletType != null && name != null) {
-        return SupabaseWallet(
-            id: id, code: code, walletType: walletType, name: name);
+        return SupabaseWallet(id: id, code: code, walletType: walletType, name: name);
       }
     }
     return null;
@@ -203,9 +189,7 @@ class SupabaseWallet implements Wallet {
     if (identical(this, other)) {
       return true;
     }
-    return other is SupabaseWallet &&
-        runtimeType == other.runtimeType &&
-        code == other.code;
+    return other is SupabaseWallet && runtimeType == other.runtimeType && code == other.code;
   }
 
   @override

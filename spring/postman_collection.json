@@ -1,302 +1,406 @@
 {
-  "info": {
-    "_postman_id": "9ccb8d02-3fda-4663-8057-1112f91e3714",
-    "name": "budgi",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "552368"
-  },
-  "item": [
-    {
-      "name": "001-user-signUp",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test('Status code is 201', () => {",
-              "  pm.response.to.have.status(201);",
-              "});",
-              "pm.test('Body contains token', () => {",
-              "  var json = pm.response.json();",
-              "  pm.expect(json).to.have.ownProperty('token');",
-              "  pm.expect(json).to.have.ownProperty('tokenType');",
-              "  pm.expect(json).to.have.ownProperty('expiresAt');",
-              "",
-              "  pm.environment.set('authToken', json.token);",
-              "});"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n    \"name\": \"{{userName}}\",\n    \"email\": \"{{userEmail}}\",\n    \"password\": \"{{userPassword}}\"\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "{{authBaseUrl}}/signup",
-          "host": [
-            "{{authBaseUrl}}"
-          ],
-          "path": [
-            "signup"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "002-user-signIn",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test('Status code is 200', () => {",
-              "  pm.response.to.have.status(200);",
-              "});",
-              "pm.test('Body contains token', () => {",
-              "  var json = pm.response.json();",
-              "  pm.expect(json).to.have.ownProperty('token');",
-              "  pm.expect(json).to.have.ownProperty('tokenType');",
-              "  pm.expect(json).to.have.ownProperty('expiresAt');",
-              "",
-              "  pm.environment.set('authToken', json.token);",
-              "});"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n    \"email\": \"{{userEmail}}\",\n    \"password\": \"{{userPassword}}\"\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "{{authBaseUrl}}/signin",
-          "host": [
-            "{{authBaseUrl}}"
-          ],
-          "path": [
-            "signin"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "003-user-me",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test('Status code is 200', () => {",
-              "  pm.response.to.have.status(200);",
-              "});",
-              "pm.test('Body contains user data', () => {",
-              "  var json = pm.response.json();",
-              "  pm.expect(json).to.have.ownProperty('name');",
-              "  pm.expect(json).to.have.ownProperty('email');",
-              "",
-              "  pm.expect(json.name).to.equal(pm.variables.get('userName'));",
-              "  pm.expect(json.email).to.equal(pm.variables.get('userEmail'));",
-              "});"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "{{authBaseUrl}}/me",
-          "host": [
-            "{{authBaseUrl}}"
-          ],
-          "path": [
-            "me"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "004-category-add",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test('Status code is 201', () => {",
-              "  pm.response.to.have.status(201);",
-              "});",
-              "pm.test('Body contains data', () => {",
-              "  var json = pm.response.json();",
-              "  pm.expect(json).to.have.ownProperty('code');",
-              "  pm.expect(json).to.have.ownProperty('name');",
-              "",
-              "  pm.expect(json.code).to.equal(pm.variables.get('categoryCode'));",
-              "  pm.expect(json.name).to.equal(pm.variables.get('categoryName'));",
-              "});"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n    \"code\": \"{{categoryCode}}\",\n    \"name\": \"{{categoryName}}\"\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "{{categoryUrl}}",
-          "host": [
-            "{{categoryUrl}}"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "004-category-list",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test('Status code is 200', () => {",
-              "  pm.response.to.have.status(200);",
-              "});",
-              "pm.test('Body contains data', () => {",
-              "  var json = pm.response.json();",
-              "  pm.expect(json).to.have.ownProperty('content');",
-              "  pm.expect(json.content).to.have.ownProperty('length');",
-              "  pm.expect(json).to.have.ownProperty('totalElements');",
-              "",
-              "  pm.expect(json.content.length).to.equal(1);",
-              "  pm.expect(json.totalElements).to.equal(1);",
-              "  pm.expect(json.content[0].code).to.equal(pm.variables.get('categoryCode'));",
-              "  pm.expect(json.content[0].name).to.equal(pm.variables.get('categoryName'));",
-              "});"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{categoryUrl}}",
-          "host": [
-            "{{categoryUrl}}"
-          ]
-        }
-      },
-      "response": []
-    }
-  ],
-  "auth": {
-    "type": "bearer",
-    "bearer": [
-      {
-        "key": "token",
-        "value": "{{authToken}}",
-        "type": "string"
-      }
-    ]
-  },
-  "event": [
-    {
-      "listen": "prerequest",
-      "script": {
-        "type": "text/javascript",
-        "exec": [
-          ""
-        ]
-      }
-    },
-    {
-      "listen": "test",
-      "script": {
-        "type": "text/javascript",
-        "exec": [
-          ""
-        ]
-      }
-    }
-  ],
-  "variable": [
-    {
-      "key": "authBaseUrl",
-      "value": "http://127.0.0.1:8080/api/v1/auth",
-      "type": "string"
-    },
-    {
-      "key": "authToken",
-      "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0LXVzZXJAbWFpbC5jb20iLCJpc3MiOiJidWRnaSIsImF1ZCI6WyJhcGkiXSwiZXhwIjoxNzA0OTMxMjAxfQ.MJr31qb_en7YNjTBahtw_O79aDCLHq_GlBGkVPVysnOBo8KOnk0H9eY75UyUh919dWFzm079N7lHEYwctTJM4w",
-      "type": "string"
-    },
-    {
-      "key": "userName",
-      "value": "Test User",
-      "type": "string"
-    },
-    {
-      "key": "userEmail",
-      "value": "test-user@mail.com",
-      "type": "string"
-    },
-    {
-      "key": "userPassword",
-      "value": "12345678",
-      "type": "string"
-    },
-    {
-      "key": "categoryUrl",
-      "value": "http://127.0.0.1:8080/api/v1/category",
-      "type": "string"
-    },
-    {
-      "key": "categoryCode",
-      "value": "first-category",
-      "type": "string"
-    },
-    {
-      "key": "categoryName",
-      "value": "First Category",
-      "type": "string"
-    }
-  ]
+	"info": {
+		"_postman_id": "9ccb8d02-3fda-4663-8057-1112f91e3714",
+		"name": "budgi",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "552368"
+	},
+	"item": [
+		{
+			"name": "001-user-signUp",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 201', () => {",
+							"  pm.response.to.have.status(201);",
+							"});",
+							"pm.test('Body contains token', () => {",
+							"  var json = pm.response.json();",
+							"  pm.expect(json).to.have.ownProperty('token');",
+							"  pm.expect(json).to.have.ownProperty('tokenType');",
+							"  pm.expect(json).to.have.ownProperty('expiresAt');",
+							"",
+							"  pm.environment.set('authToken', json.token);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"{{userName}}\",\n    \"email\": \"{{userEmail}}\",\n    \"password\": \"{{userPassword}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{authBaseUrl}}/signup",
+					"host": [
+						"{{authBaseUrl}}"
+					],
+					"path": [
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "002-user-signIn",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200', () => {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"pm.test('Body contains token', () => {",
+							"  var json = pm.response.json();",
+							"  pm.expect(json).to.have.ownProperty('token');",
+							"  pm.expect(json).to.have.ownProperty('tokenType');",
+							"  pm.expect(json).to.have.ownProperty('expiresAt');",
+							"",
+							"  pm.environment.set('authToken', json.token);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"{{userEmail}}\",\n    \"password\": \"{{userPassword}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{authBaseUrl}}/signin",
+					"host": [
+						"{{authBaseUrl}}"
+					],
+					"path": [
+						"signin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "003-user-me",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200', () => {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"pm.test('Body contains user data', () => {",
+							"  var json = pm.response.json();",
+							"  pm.expect(json).to.have.ownProperty('name');",
+							"  pm.expect(json).to.have.ownProperty('email');",
+							"",
+							"  pm.expect(json.name).to.equal(pm.variables.get('userName'));",
+							"  pm.expect(json.email).to.equal(pm.variables.get('userEmail'));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{authBaseUrl}}/me",
+					"host": [
+						"{{authBaseUrl}}"
+					],
+					"path": [
+						"me"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "004-category-add",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 201', () => {",
+							"  pm.response.to.have.status(201);",
+							"});",
+							"pm.test('Body contains data', () => {",
+							"  var json = pm.response.json();",
+							"  pm.expect(json).to.have.ownProperty('code');",
+							"  pm.expect(json).to.have.ownProperty('name');",
+							"",
+							"  pm.expect(json.code).to.equal(pm.variables.get('categoryCode'));",
+							"  pm.expect(json.name).to.equal(pm.variables.get('categoryName'));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"code\": \"{{categoryCode}}\",\n    \"name\": \"{{categoryName}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{categoryUrl}}",
+					"host": [
+						"{{categoryUrl}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "005-category-list",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200', () => {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"pm.test('Body contains data', () => {",
+							"  var json = pm.response.json();",
+							"  pm.expect(json).to.have.ownProperty('content');",
+							"  pm.expect(json.content).to.have.ownProperty('length');",
+							"  pm.expect(json).to.have.ownProperty('totalElements');",
+							"",
+							"  pm.expect(json.content.length).to.equal(1);",
+							"  pm.expect(json.totalElements).to.equal(1);",
+							"  pm.expect(json.content[0].code).to.equal(pm.variables.get('categoryCode'));",
+							"  pm.expect(json.content[0].name).to.equal(pm.variables.get('categoryName'));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{categoryUrl}}",
+					"host": [
+						"{{categoryUrl}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "006-wallet-add",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 201', () => {",
+							"  pm.response.to.have.status(201);",
+							"});",
+							"pm.test('Body contains data', () => {",
+							"  var json = pm.response.json();",
+							"  pm.expect(json).to.have.ownProperty('code');",
+							"  pm.expect(json).to.have.ownProperty('name');",
+							"",
+							"  pm.expect(json.code).to.equal(pm.variables.get('cashWalletCode'));",
+							"  pm.expect(json.name).to.equal(pm.variables.get('cashWalletName'));",
+							"  pm.expect(json.walletType).to.equal(pm.variables.get('cashWalletType'));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"code\": \"{{cashWalletCode}}\",\n    \"name\": \"{{cashWalletName}}\",\n    \"walletType\": \"{{cashWalletType}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{walletUrl}}",
+					"host": [
+						"{{walletUrl}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "007-wallet-list",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200', () => {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"pm.test('Body contains data', () => {",
+							"  var json = pm.response.json();",
+							"  pm.expect(json).to.have.ownProperty('content');",
+							"  pm.expect(json.content).to.have.ownProperty('length');",
+							"  pm.expect(json).to.have.ownProperty('totalElements');",
+							"",
+							"  pm.expect(json.content.length).to.equal(1);",
+							"  pm.expect(json.totalElements).to.equal(1);",
+							"  pm.expect(json.content[0].code).to.equal(pm.variables.get('cashWalletCode'));",
+							"  pm.expect(json.content[0].name).to.equal(pm.variables.get('cashWalletName'));",
+							"  pm.expect(json.content[0].walletType).to.equal(pm.variables.get('cashWalletType'));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{walletUrl}}",
+					"host": [
+						"{{walletUrl}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{authToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "authBaseUrl",
+			"value": "http://localhost:8080/api/v1/auth",
+			"type": "string"
+		},
+		{
+			"key": "authToken",
+			"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0LXVzZXJAbWFpbC5jb20iLCJpc3MiOiJidWRnaSIsImF1ZCI6WyJhcGkiXSwiZXhwIjoxNzA0OTMxMjAxfQ.MJr31qb_en7YNjTBahtw_O79aDCLHq_GlBGkVPVysnOBo8KOnk0H9eY75UyUh919dWFzm079N7lHEYwctTJM4w",
+			"type": "string"
+		},
+		{
+			"key": "userName",
+			"value": "Test User",
+			"type": "string"
+		},
+		{
+			"key": "userEmail",
+			"value": "test-user@mail.com",
+			"type": "string"
+		},
+		{
+			"key": "userPassword",
+			"value": "12345678",
+			"type": "string"
+		},
+		{
+			"key": "categoryUrl",
+			"value": "http://localhost:8080/api/v1/category",
+			"type": "string"
+		},
+		{
+			"key": "categoryCode",
+			"value": "first-category",
+			"type": "string"
+		},
+		{
+			"key": "categoryName",
+			"value": "First Category",
+			"type": "string"
+		},
+		{
+			"key": "walletUrl",
+			"value": "http://localhost:8080/api/v1/wallet",
+			"type": "string"
+		},
+		{
+			"key": "cashWalletCode",
+			"value": "cash-wallet",
+			"type": "string"
+		},
+		{
+			"key": "cashWalletName",
+			"value": "Cash",
+			"type": "string"
+		},
+		{
+			"key": "cashWalletType",
+			"value": "cash",
+			"type": "string"
+		}
+	]
 }

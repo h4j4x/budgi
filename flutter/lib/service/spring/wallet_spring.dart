@@ -1,0 +1,131 @@
+import 'dart:io';
+
+import '../../model/data_page.dart';
+import '../../model/domain/wallet.dart';
+import '../../model/error/http.dart';
+import '../../model/error/validation.dart';
+import '../../model/error/wallet.dart';
+import '../../model/fields.dart';
+import '../../model/period.dart';
+import '../auth.dart';
+import '../validator.dart';
+import '../wallet.dart';
+import 'config.dart';
+import 'http_client.dart';
+
+class WalletSpringService implements WalletService {
+  final AuthService authService;
+  final Validator<Wallet, WalletError> walletValidator;
+  final ApiHttpClient _httpClient;
+
+  WalletSpringService({
+    required this.authService,
+    required this.walletValidator,
+    required SpringConfig config,
+  }) : _httpClient = ApiHttpClient(baseUrl: '${config.url}/wallet');
+
+  @override
+  Future<DataPage<Wallet>> listWallets({List<String>? excludingCodes}) async {
+    try {
+      return _httpClient.jsonGetPage<Wallet>(appToken: authService.token(), mapper: _SpringWallet.from);
+    } on SocketException catch (_) {
+      throw NoServerError();
+    }
+  }
+
+  @override
+  Future<Wallet> saveWallet({String? code, required WalletType walletType, required String name}) async {
+    final wallet = _SpringWallet()
+      ..code = code ?? ''
+      ..name = name
+      ..walletType = walletType;
+    final errors = walletValidator.validate(wallet);
+    if (errors.isNotEmpty) {
+      throw ValidationError(errors);
+    }
+    try {
+      final response = await _httpClient.jsonPost<Map<String, dynamic>>(
+        data: wallet.toMap(),
+        appToken: authService.token(),
+      );
+      return _SpringWallet.from(response)!;
+    } on SocketException catch (_) {
+      throw NoServerError();
+    }
+  }
+
+  @override
+  Future<void> deleteWallet({required String code}) {
+    // TODO: implement deleteWallet
+    return Future.value();
+  }
+
+  @override
+  Future<Wallet> fetchWalletByCode(String code) {
+    // TODO: implement fetchWalletByCode
+    return Future.value(_SpringWallet());
+  }
+
+  @override
+  Future<Wallet?> fetchWalletById(int id) {
+    // TODO: implement fetchWalletById
+    return Future.value();
+  }
+
+  @override
+  Future<void> updateWalletBalance({required String code, required Period period}) {
+    // TODO: implement updateWalletBalance
+    return Future.value();
+  }
+
+  @override
+  Future<Map<Wallet, double>> walletsBalance({required Period period, bool showZeroBalance = false}) {
+    // TODO: implement walletsBalance
+    return Future.value({});
+  }
+}
+
+class _SpringWallet implements Wallet {
+  @override
+  String code = '';
+
+  @override
+  WalletType walletType = WalletType.cash;
+
+  @override
+  String name = '';
+
+  Map<String, Object> toMap() {
+    return <String, Object>{
+      codeField: code,
+      walletTypeField: walletType.name,
+      nameField: name,
+    };
+  }
+
+  static _SpringWallet? from(Map<String, dynamic> map) {
+    final code = map[codeField] as String?;
+    final walletType = WalletType.tryParse(map[walletTypeField] as String?);
+    final name = map[nameField] as String?;
+    if (code != null && walletType != null && name != null) {
+      return _SpringWallet()
+        ..code = code
+        ..name = name
+        ..walletType = walletType;
+    }
+    return null;
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is _SpringWallet && runtimeType == other.runtimeType && code == other.code;
+  }
+
+  @override
+  int get hashCode {
+    return code.hashCode;
+  }
+}

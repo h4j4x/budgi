@@ -108,10 +108,10 @@ class _TransactionEditState extends State<TransactionEdit> {
     final lastWallet = await DI().get<StorageService>().readString(_lastWalletKey);
     final list = await DI().get<WalletService>().listWallets();
     if (wallet == null && lastWallet != null) {
-      wallet = list.where((item) => item.code == lastWallet).firstOrNull;
+      wallet = list.content.where((item) => item.code == lastWallet).firstOrNull;
     }
     setState(() {
-      wallets = list;
+      wallets = list.content;
     });
   }
 

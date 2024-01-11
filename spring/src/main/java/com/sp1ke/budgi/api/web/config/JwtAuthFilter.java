@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,6 +20,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtAuthFilter extends OncePerRequestFilter {
     private final TokenService tokenService;
 
@@ -55,7 +57,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 userDetails, null, userDetails.getAuthorities());
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authToken);
-        } catch (Exception ignore) {
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
         }
     }
 }

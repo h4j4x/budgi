@@ -38,6 +38,7 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   void redirect(bool isAuthenticated) {
+    authSubscription?.cancel();
     final route = isAuthenticated ? HomePage.route : SignInPage.route;
     debugPrint('Splash redirecting to $route');
     context.go(route);

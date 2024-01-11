@@ -80,7 +80,7 @@ public class WalletControllerTests {
         var wallet = ApiWallet.builder()
             .code("test")
             .name("Test")
-            .walletType(WalletType.CASH)
+            .walletType(WalletType.CREDIT_CARD)
             .build();
 
         var response = restClient.post()

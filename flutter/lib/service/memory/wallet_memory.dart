@@ -1,4 +1,5 @@
 import '../../di.dart';
+import '../../model/data_page.dart';
 import '../../model/domain/wallet.dart';
 import '../../model/error/validation.dart';
 import '../../model/error/wallet.dart';
@@ -36,7 +37,7 @@ class WalletMemoryService implements WalletService {
   }
 
   @override
-  Future<List<Wallet>> listWallets({
+  Future<DataPage<Wallet>> listWallets({
     List<String>? excludingCodes,
   }) {
     final list = _wallets.values.toList();
@@ -45,7 +46,7 @@ class WalletMemoryService implements WalletService {
         return excludingCodes!.contains(wallet.code);
       });
     }
-    return Future.value(list);
+    return Future.value(DataPage(content: list));
   }
 
   @override

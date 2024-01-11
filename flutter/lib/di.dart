@@ -15,6 +15,7 @@ import 'service/memory/transaction_memory.dart';
 import 'service/memory/wallet_memory.dart';
 import 'service/spring/auth_spring.dart';
 import 'service/spring/config.dart';
+import 'service/spring/wallet_spring.dart';
 import 'service/storage.dart';
 import 'service/supabase/auth_supabase.dart';
 import 'service/supabase/category_amount_supabase.dart';
@@ -61,8 +62,7 @@ class DI {
     return _getIt.isRegistered<T>();
   }
 
-  Future<void> _configSupabase(
-      AppConfig config, StorageService storageService) async {
+  Future<void> _configSupabase(AppConfig config, StorageService storageService) async {
     final supabaseConfig = SupabaseConfig(
       url: config.apiUrl!,
       token: config.apiToken!,
@@ -79,8 +79,7 @@ class DI {
       categoryValidator: CategoryValidator(),
     ));
 
-    _getIt
-        .registerSingleton<CategoryAmountService>(CategoryAmountSupabaseService(
+    _getIt.registerSingleton<CategoryAmountService>(CategoryAmountSupabaseService(
       config: supabaseConfig,
       storageService: storageService,
       amountValidator: CategoryAmountValidator(),
@@ -99,8 +98,7 @@ class DI {
     ));
   }
 
-  Future<void> _configSpring(
-      AppConfig config, StorageService storageService) async {
+  Future<void> _configSpring(AppConfig config, StorageService storageService) async {
     final springConfig = SpringConfig(url: config.apiUrl!);
     final authService = AuthSpringService(
       storageService: storageService,
@@ -108,6 +106,27 @@ class DI {
     );
     await authService.initialize();
     _getIt.registerSingleton<AuthService>(authService);
+
+    // TODO: implement service
+    final categoryService = CategoryMemoryService(
+      categoryValidator: CategoryValidator(),
+      amountValidator: CategoryAmountValidator(),
+    );
+    _getIt.registerSingleton<CategoryService>(categoryService);
+    _getIt.registerSingleton<CategoryAmountService>(categoryService);
+
+    final walletService = WalletSpringService(
+      authService: authService,
+      config: springConfig,
+      walletValidator: WalletValidator(),
+    );
+    _getIt.registerSingleton<WalletService>(walletService);
+
+    // TODO: implement service
+    _getIt.registerSingleton<TransactionService>(TransactionMemoryService(
+      walletService: walletService,
+      transactionValidator: TransactionValidator(),
+    ));
   }
 
   Future<void> _configMemory(AppConfig config) async {

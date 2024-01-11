@@ -1,3 +1,4 @@
+import '../model/data_page.dart';
 import '../model/domain/wallet.dart';
 import '../model/period.dart';
 
@@ -9,7 +10,7 @@ abstract class WalletService {
     required String name,
   });
 
-  Future<List<Wallet>> listWallets({
+  Future<DataPage<Wallet>> listWallets({
     List<String>? excludingCodes,
   });
 

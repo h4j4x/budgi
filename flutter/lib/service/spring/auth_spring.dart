@@ -39,9 +39,10 @@ class AuthSpringService extends AuthService {
   Future<void> initialize() async {
     final json = await storageService.readString(authTokenKey);
     if (json != null) {
-      final map = jsonDecode(json) as Map<String, String>;
+      final map = jsonDecode(json) as Map<String, dynamic>;
       _token = _Token.parseMap(map);
     }
+    debugPrint('Auth token $_token');
     _streamController.add(_token?.isValid ?? false);
   }
 
@@ -62,11 +63,9 @@ class AuthSpringService extends AuthService {
       await storageService.writeString(authTokenKey, _token!.isValid ? _token!.asJson : null);
       _streamController.add(_token!.isValid);
       return _token!.isValid;
-    } on http.ClientException catch (e) {
-      debugPrint('http.ClientException $e');
-      if (e is SocketException) {
-        throw NoServerError();
-      }
+    } on SocketException catch (_) {
+      throw NoServerError();
+    } on HttpError catch (_) {
       throw SignInError();
     } catch (e) {
       debugPrint('Unexpected error $e');
@@ -86,7 +85,10 @@ class AuthSpringService extends AuthService {
 
   @override
   AppUser? user() {
-    // TODO: recover from JSON
+    if (_token?.isValid ?? false) {
+      // TODO: recover from JSON
+      return _User(name: 'TODO', email: 'todo@mail.todo');
+    }
     return null;
   }
 
@@ -184,5 +186,10 @@ class _Token implements AppToken {
   @override
   String get tokenHeader {
     return '$tokenType $token';
+  }
+
+  @override
+  String toString() {
+    return 'AppToken{expiresAt: $expiresAt}';
   }
 }
