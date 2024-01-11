@@ -158,6 +158,9 @@ class L10nEn extends L10n {
   String get no => 'No';
 
   @override
+  String get noServerConnection => 'Could not connect to server :/';
+
+  @override
   String get nothingHere => 'Nothing here :(';
 
   @override

@@ -12,7 +12,7 @@ Create config in file `config.json`:
 
 ```json
 {
-  "AUTH_PROVIDER": "supabase",
+  "DATA_PROVIDER": "supabase",
   "SUPABASE_URL": "<SUPABASE_URL>",
   "SUPABASE_TOKEN": "<SUPABASE_TOKEN>"
 }

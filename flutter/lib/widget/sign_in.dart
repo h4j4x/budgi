@@ -7,6 +7,7 @@ import '../app/config.dart';
 import '../app/icon.dart';
 import '../app/router.dart';
 import '../di.dart';
+import '../model/error/http.dart';
 import '../page/home.dart';
 import '../service/auth.dart';
 import '../util/ui.dart';
@@ -182,6 +183,10 @@ class _SignInState extends State<SignIn> {
     } on SignInError catch (_) {
       if (mounted) {
         context.showError(L10n.of(context).invalidUserCredentials);
+      }
+    } on NoServerError catch (_) {
+      if (mounted) {
+        context.showError(L10n.of(context).noServerConnection);
       }
     } finally {
       if (success && mounted) {

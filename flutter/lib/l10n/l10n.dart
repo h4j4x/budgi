@@ -355,6 +355,12 @@ abstract class L10n {
   /// **'No'**
   String get no;
 
+  /// No description provided for @noServerConnection.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not connect to server :/'**
+  String get noServerConnection;
+
   /// No description provided for @nothingHere.
   ///
   /// In en, this message translates to:

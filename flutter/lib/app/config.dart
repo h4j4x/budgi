@@ -1,16 +1,16 @@
-enum AuthProvider {
+enum DataProvider {
   supabase,
   spring;
 
-  static AuthProvider tryParse(String? value) {
+  static DataProvider tryParse(String? value) {
     if (value?.isNotEmpty ?? false) {
-      for (final authProvider in AuthProvider.values) {
-        if (authProvider.name == value) {
-          return authProvider;
+      for (final dataProvider in DataProvider.values) {
+        if (dataProvider.name == value) {
+          return dataProvider;
         }
       }
     }
-    return AuthProvider.values[0];
+    return DataProvider.values[0];
   }
 }
 
@@ -23,43 +23,39 @@ class AppConfig {
     return 6;
   }
 
-  final AuthProvider authProvider;
+  final DataProvider dataProvider;
   final String? apiUrl;
   final String? apiToken;
 
   AppConfig({
-    required this.authProvider,
+    required this.dataProvider,
     this.apiUrl,
     this.apiToken,
   });
 
-  bool isSupabase() {
-    return authProvider == AuthProvider.supabase &&
-        (apiUrl?.isNotEmpty ?? false) &&
-        (apiToken?.isNotEmpty ?? false);
+  bool hasSupabaseProvider() {
+    return dataProvider == DataProvider.supabase && (apiUrl?.isNotEmpty ?? false) && (apiToken?.isNotEmpty ?? false);
   }
 
-  bool isSpring() {
-    return authProvider == AuthProvider.spring && (apiUrl?.isNotEmpty ?? false);
+  bool hasSpringProvider() {
+    return dataProvider == DataProvider.spring && (apiUrl?.isNotEmpty ?? false);
   }
 
   static AppConfig create() {
-    const authProviderStr = bool.hasEnvironment('AUTH_PROVIDER')
-        ? String.fromEnvironment('AUTH_PROVIDER')
-        : null;
-    final authProvider = AuthProvider.tryParse(authProviderStr);
+    const dataProviderStr = bool.hasEnvironment('DATA_PROVIDER') ? String.fromEnvironment('DATA_PROVIDER') : null;
+    final dataProvider = DataProvider.tryParse(dataProviderStr);
 
     String? apiUrl;
     String? apiToken;
-    if (authProvider == AuthProvider.supabase) {
+    if (dataProvider == DataProvider.supabase) {
       apiUrl = const String.fromEnvironment('SUPABASE_URL');
       apiToken = const String.fromEnvironment('SUPABASE_TOKEN');
-    } else if (authProvider == AuthProvider.spring) {
+    } else if (dataProvider == DataProvider.spring) {
       apiUrl = const String.fromEnvironment('SPRING_URL');
     }
 
     return AppConfig(
-      authProvider: authProvider,
+      dataProvider: dataProvider,
       apiUrl: apiUrl,
       apiToken: apiToken,
     );

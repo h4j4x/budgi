@@ -44,9 +44,9 @@ class DI {
     final storageService = SecureStorageService();
     _getIt.registerSingleton<StorageService>(storageService);
 
-    if (config.isSupabase()) {
+    if (config.hasSupabaseProvider()) {
       await _configSupabase(config, storageService);
-    } else if (config.isSpring()) {
+    } else if (config.hasSpringProvider()) {
       await _configSpring(config, storageService);
     } else {
       _configMemory(config);

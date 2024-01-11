@@ -103,6 +103,7 @@
   },
   "invalidWalletType": "Invalid wallet type.",
   "no": "No",
+  "noServerConnection": "Could not connect to server :/",
   "nothingHere": "Nothing here :(",
   "okAction": "Ok",
   "prefixWithDate": "{prefix}{date}",

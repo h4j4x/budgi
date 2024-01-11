@@ -1,11 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
+import 'package:rxdart/rxdart.dart';
 
 import '../../app/icon.dart';
 import '../../model/domain/user.dart';
+import '../../model/error/http.dart';
 import '../../model/token.dart';
 import '../../util/datetime.dart';
 import '../auth.dart';
@@ -30,9 +33,8 @@ class AuthSpringService extends AuthService {
     required this.storageService,
     required SpringConfig config,
     this.httpClient,
-  })  : _httpClient = ApiHttpClient(
-            httpClient: httpClient, baseUrl: '${config.url}/auth'),
-        _streamController = StreamController<bool>();
+  })  : _httpClient = ApiHttpClient(httpClient: httpClient, baseUrl: '${config.url}/auth'),
+        _streamController = BehaviorSubject<bool>();
 
   Future<void> initialize() async {
     final json = await storageService.readString(authTokenKey);
@@ -40,6 +42,7 @@ class AuthSpringService extends AuthService {
       final map = jsonDecode(json) as Map<String, String>;
       _token = _Token.parseMap(map);
     }
+    _streamController.add(_token?.isValid ?? false);
   }
 
   @override
@@ -56,11 +59,14 @@ class AuthSpringService extends AuthService {
         },
       );
       _token = _Token.parseMap(response);
-      await storageService.writeString(
-          authTokenKey, _token!.isValid ? _token!.asJson : null);
+      await storageService.writeString(authTokenKey, _token!.isValid ? _token!.asJson : null);
       _streamController.add(_token!.isValid);
       return _token!.isValid;
-    } on http.ClientException catch (_) {
+    } on http.ClientException catch (e) {
+      debugPrint('http.ClientException $e');
+      if (e is SocketException) {
+        throw NoServerError();
+      }
       throw SignInError();
     } catch (e) {
       debugPrint('Unexpected error $e');
@@ -158,8 +164,7 @@ class _Token implements AppToken {
     if (token != null && tokenType != null && expiresAt != null) {
       return _Token(token: token, tokenType: tokenType, expiresAt: expiresAt);
     }
-    return _Token(
-        token: '-', tokenType: '-', expiresAt: DateTime.now().atStartOfDay());
+    return _Token(token: '-', tokenType: '-', expiresAt: DateTime.now().atStartOfDay());
   }
 
   @override
