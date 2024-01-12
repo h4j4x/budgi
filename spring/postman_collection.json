@@ -344,7 +344,7 @@
 	"variable": [
 		{
 			"key": "authBaseUrl",
-			"value": "http://localhost:8080/api/v1/auth",
+			"value": "http://127.0.0.1:8080/api/v1/auth",
 			"type": "string"
 		},
 		{
@@ -369,7 +369,7 @@
 		},
 		{
 			"key": "categoryUrl",
-			"value": "http://localhost:8080/api/v1/category",
+			"value": "http://127.0.0.1:8080/api/v1/category",
 			"type": "string"
 		},
 		{
@@ -384,7 +384,7 @@
 		},
 		{
 			"key": "walletUrl",
-			"value": "http://localhost:8080/api/v1/wallet",
+			"value": "http://127.0.0.1:8080/api/v1/wallet",
 			"type": "string"
 		},
 		{
