@@ -33,7 +33,7 @@ public class JpaCategoryService implements CategoryService {
     @Override
     @NotNull
     public ApiCategory save(@NotNull Long userId, @NotNull ApiCategory data, boolean throwIfExists) {
-        var code = data.getCode() != null ? data.getCode() : StringUtil.randomString(6);
+        var code = StringUtil.isNotBlank(data.getCode()) ? data.getCode() : StringUtil.randomString(6);
         var category = categoryRepo
             .findByUserIdAndCode(userId, code)
             .orElse(new JpaCategory());

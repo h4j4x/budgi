@@ -31,7 +31,7 @@ public class JpaWalletService implements WalletService {
 
     @Override
     public ApiWallet save(Long userId, ApiWallet data, boolean throwIfExists) {
-        var code = data.getCode() != null ? data.getCode() : StringUtil.randomString(6);
+        var code = StringUtil.isNotBlank(data.getCode()) ? data.getCode() : StringUtil.randomString(6);
         var wallet = walletRepo
             .findByUserIdAndCode(userId, code)
             .orElse(new JpaWallet());

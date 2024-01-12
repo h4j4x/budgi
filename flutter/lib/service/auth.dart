@@ -22,14 +22,14 @@ abstract class AuthService {
 
   Future<void> signOut();
 
-  AppUser fetchUser<T>({required T errorIfMissing}) {
+  Future<AppUser> fetchUser<T>({required T errorIfMissing}) async {
     final appUser = user();
     if (appUser != null) {
-      return appUser;
+      return Future.value(appUser);
     }
-    throw ValidationError<T>({
+    throw Future.error(ValidationError<T>({
       'user': errorIfMissing,
-    });
+    }));
   }
 }
 

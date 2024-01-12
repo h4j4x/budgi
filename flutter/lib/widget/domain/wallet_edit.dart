@@ -10,6 +10,7 @@ import '../../model/domain/wallet.dart';
 import '../../model/error/wallet.dart';
 import '../../service/impl/wallet_validator.dart';
 import '../../service/wallet.dart';
+import '../../util/ui.dart';
 import '../common/form_toolbar.dart';
 import '../common/select_field.dart';
 
@@ -142,6 +143,9 @@ class _WalletEditState extends State<WalletEdit> {
       }
     } on ValidationError<WalletError> catch (e) {
       errors.addAll(e.errors);
+      if (errors.containsKey('wallet') && mounted) {
+        context.showError(errors['wallet']!.l10n(context));
+      }
     } finally {
       setState(() {
         saving = false;

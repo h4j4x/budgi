@@ -1,5 +1,6 @@
 package com.sp1ke.budgi.api.common;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import java.util.Random;
 
@@ -20,5 +21,9 @@ public class StringUtil {
             return value.substring(prefix.length());
         }
         return value;
+    }
+
+    public static boolean isNotBlank(@Nullable String value) {
+        return value != null && !value.isBlank();
     }
 }

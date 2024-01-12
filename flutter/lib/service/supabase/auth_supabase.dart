@@ -150,12 +150,4 @@ class _User implements AppUser {
       child: Center(child: AppIcon.user(size: size, color: color)),
     );
   }
-
-  @override
-  String get usernameOrEmail {
-    if (username.length > 1) {
-      return username;
-    }
-    return email ?? '-';
-  }
 }

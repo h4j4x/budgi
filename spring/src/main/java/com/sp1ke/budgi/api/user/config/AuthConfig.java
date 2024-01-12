@@ -18,7 +18,7 @@ public class AuthConfig {
     @Bean
     UserDetailsService userDetailsService(UserRepo userRepo) {
         return username -> userRepo.findByEmail(username)
-            .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, "User not found"));
+            .orElseThrow(() -> new HttpClientErrorException(HttpStatus.UNAUTHORIZED, "Unauthorized"));
     }
 
     @Bean

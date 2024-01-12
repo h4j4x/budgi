@@ -66,7 +66,7 @@ class TransactionSupabaseService extends TransactionService {
       });
     }
 
-    final user = DI()
+    final user = await DI()
         .get<AuthService>()
         .fetchUser(errorIfMissing: TransactionError.invalidUser);
     final trnDateTime = dateTime ?? DateTime.now();

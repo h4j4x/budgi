@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../app/icon.dart';
@@ -29,6 +31,8 @@ class AppScaffold extends StatefulWidget {
 }
 
 class _AppScaffoldState extends State<AppScaffold> {
+  StreamSubscription<bool>? authSubscription;
+
   String version = '';
   bool menuCollapsed = false;
 
@@ -38,6 +42,7 @@ class _AppScaffoldState extends State<AppScaffold> {
     Future.delayed(Duration.zero, () async {
       version = await DI().get<AppInfo>().version();
       setState(() {});
+      checkUser();
     });
   }
 
@@ -90,13 +95,13 @@ class _AppScaffoldState extends State<AppScaffold> {
           IconButton(
             onPressed: () {},
             icon: user.icon(),
-            tooltip: user.usernameOrEmail,
+            tooltip: user.name,
           ),
         if (user != null && !isMobile)
           TextButton.icon(
             onPressed: () {},
             icon: user.icon(),
-            label: Text(user.usernameOrEmail),
+            label: Text(user.name),
           ),
       ],
     );
@@ -161,7 +166,7 @@ class _AppScaffoldState extends State<AppScaffold> {
           style: TextStyle(color: foregroundColor),
         ),
         accountEmail: Text(
-          user.usernameOrEmail,
+          user.email ?? user.username,
           style: TextStyle(color: foregroundColor),
         ),
         currentAccountPictureSize: const Size.square(40),
@@ -185,7 +190,9 @@ class _AppScaffoldState extends State<AppScaffold> {
       return IconButton(
         onPressed: onTap,
         icon: route.icon ?? Container(),
-        tooltip: route.menuTextBuilder != null ? route.menuTextBuilder!(context) : null,
+        tooltip: route.menuTextBuilder != null
+            ? route.menuTextBuilder!(context)
+            : null,
       );
     }
     return ListTile(
@@ -239,7 +246,22 @@ class _AppScaffoldState extends State<AppScaffold> {
 
   void onSignOut() async {
     await DI().get<AuthService>().signOut();
-    if (mounted) {
+  }
+
+  void checkUser() {
+    if (DI().has<AuthService>()) {
+      authSubscription =
+          DI().get<AuthService>().authenticatedStream().listen(redirect);
+      try {
+        DI().get<AuthService>().fetchUser(errorIfMissing: '');
+      } catch (_) {}
+    }
+  }
+
+  void redirect(bool isAuthenticated) {
+    if (!isAuthenticated && mounted) {
+      authSubscription?.cancel();
+      debugPrint('Home redirecting to SignIn');
       context.go(SignInPage.route);
     }
   }

@@ -31,7 +31,8 @@ class _SplashPageState extends State<SplashPage> {
 
   void fetchAuth() async {
     if (DI().has<AuthService>()) {
-      authSubscription = DI().get<AuthService>().authenticatedStream().listen(redirect);
+      authSubscription =
+          DI().get<AuthService>().authenticatedStream().listen(redirect);
     } else {
       redirect(true);
     }

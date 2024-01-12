@@ -12,6 +12,8 @@ abstract class WalletService {
 
   Future<DataPage<Wallet>> listWallets({
     List<String>? excludingCodes,
+    int? page,
+    int? pageSize,
   });
 
   Future<void> deleteWallet({

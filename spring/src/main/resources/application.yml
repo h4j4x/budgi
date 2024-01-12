@@ -28,3 +28,9 @@ spring:
     hibernate:
       ddlAuto: ${DATASOURCE_DDL:validate}
     open-in-view: false
+logging:
+  level:
+    root: INFO
+    org.hibernate: INFO
+    org.springframework.web: DEBUG
+

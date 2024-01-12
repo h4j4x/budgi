@@ -34,7 +34,9 @@ class AppConfig {
   });
 
   bool hasSupabaseProvider() {
-    return dataProvider == DataProvider.supabase && (apiUrl?.isNotEmpty ?? false) && (apiToken?.isNotEmpty ?? false);
+    return dataProvider == DataProvider.supabase &&
+        (apiUrl?.isNotEmpty ?? false) &&
+        (apiToken?.isNotEmpty ?? false);
   }
 
   bool hasSpringProvider() {
@@ -42,7 +44,9 @@ class AppConfig {
   }
 
   static AppConfig create() {
-    const dataProviderStr = bool.hasEnvironment('DATA_PROVIDER') ? String.fromEnvironment('DATA_PROVIDER') : null;
+    const dataProviderStr = bool.hasEnvironment('DATA_PROVIDER')
+        ? String.fromEnvironment('DATA_PROVIDER')
+        : null;
     final dataProvider = DataProvider.tryParse(dataProviderStr);
 
     String? apiUrl;

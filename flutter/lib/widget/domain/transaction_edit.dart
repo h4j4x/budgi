@@ -80,7 +80,8 @@ class _TransactionEditState extends State<TransactionEdit> {
       wallet = widget.value!.wallet;
       transactionType = widget.value!.transactionType;
       transactionStatus = widget.value!.transactionStatus;
-      amountController.text = widget.value!.amount.toStringAsFixed(2).toString();
+      amountController.text =
+          widget.value!.amount.toStringAsFixed(2).toString();
       descriptionController.text = widget.value!.description;
       canEdit = Period.currentMonth.contains(widget.value!.dateTime);
     } else {
@@ -94,7 +95,8 @@ class _TransactionEditState extends State<TransactionEdit> {
   }
 
   void loadCategories() async {
-    final lastCategory = await DI().get<StorageService>().readString(_lastCategoryKey);
+    final lastCategory =
+        await DI().get<StorageService>().readString(_lastCategoryKey);
     final list = await DI().get<CategoryService>().listCategories();
     if (category == null && lastCategory != null) {
       category = list.where((item) => item.code == lastCategory).firstOrNull;
@@ -105,10 +107,12 @@ class _TransactionEditState extends State<TransactionEdit> {
   }
 
   void loadWallets() async {
-    final lastWallet = await DI().get<StorageService>().readString(_lastWalletKey);
+    final lastWallet =
+        await DI().get<StorageService>().readString(_lastWalletKey);
     final list = await DI().get<WalletService>().listWallets();
     if (wallet == null && lastWallet != null) {
-      wallet = list.content.where((item) => item.code == lastWallet).firstOrNull;
+      wallet =
+          list.content.where((item) => item.code == lastWallet).firstOrNull;
     }
     setState(() {
       wallets = list.content;
@@ -116,7 +120,8 @@ class _TransactionEditState extends State<TransactionEdit> {
   }
 
   void loadLastTransactionType() async {
-    final lastTransactionType = await DI().get<StorageService>().readString(_lastTransactionTypeKey);
+    final lastTransactionType =
+        await DI().get<StorageService>().readString(_lastTransactionTypeKey);
     if (transactionType == null && lastTransactionType != null) {
       setState(() {
         transactionType = TransactionType.tryParse(lastTransactionType);
@@ -165,10 +170,13 @@ class _TransactionEditState extends State<TransactionEdit> {
         });
         updateTransactionStatus();
         amountFocus.requestFocus();
-        DI().get<StorageService>().writeString(_lastTransactionTypeKey, value!.name);
+        DI()
+            .get<StorageService>()
+            .writeString(_lastTransactionTypeKey, value!.name);
       },
       list: TransactionType.values.where((value) {
-        return value != TransactionType.incomeTransfer && value != TransactionType.expenseTransfer;
+        return value != TransactionType.incomeTransfer &&
+            value != TransactionType.expenseTransfer;
       }).toList(),
       value: transactionType,
       hintText: L10n.of(context).transactionTypeHint,
@@ -221,8 +229,9 @@ class _TransactionEditState extends State<TransactionEdit> {
         updateTransactionStatus();
         DI().get<StorageService>().writeString(_lastWalletKey, value!.code);
       },
-      hintText:
-          isNotWalletTransfer ? L10n.of(context).transactionWalletHint : L10n.of(context).transactionWalletSourceHint,
+      hintText: isNotWalletTransfer
+          ? L10n.of(context).transactionWalletHint
+          : L10n.of(context).transactionWalletSourceHint,
       errorText: errors[TransactionValidator.wallet]?.l10n(context),
     );
   }
@@ -326,7 +335,8 @@ class _TransactionEditState extends State<TransactionEdit> {
     errors.clear();
 
     if (transactionType == null) {
-      errors[TransactionValidator.transactionType] = TransactionError.invalidTransactionType;
+      errors[TransactionValidator.transactionType] =
+          TransactionError.invalidTransactionType;
     }
 
     if (category == null) {
@@ -338,7 +348,8 @@ class _TransactionEditState extends State<TransactionEdit> {
     }
 
     if (isWalletTransfer && walletTarget == null) {
-      errors[TransactionValidator.walletTarget] = TransactionError.invalidWalletTarget;
+      errors[TransactionValidator.walletTarget] =
+          TransactionError.invalidWalletTarget;
     }
 
     if (errors.isNotEmpty) {
@@ -360,8 +371,10 @@ class _TransactionEditState extends State<TransactionEdit> {
               category: category!,
               sourceWallet: wallet!,
               targetWallet: walletTarget!,
-              sourceDescription: description ?? L10n.of(context).transferTo(walletTarget!.name),
-              targetDescription: description ?? L10n.of(context).transferFrom(wallet!.name),
+              sourceDescription: description ??
+                  L10n.of(context).transferTo(walletTarget!.name),
+              targetDescription:
+                  description ?? L10n.of(context).transferFrom(wallet!.name),
               amount: amount,
             );
       } else {

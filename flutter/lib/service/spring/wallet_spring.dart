@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
+
 import '../../model/data_page.dart';
 import '../../model/domain/wallet.dart';
 import '../../model/error/http.dart';
@@ -25,16 +27,28 @@ class WalletSpringService implements WalletService {
   }) : _httpClient = ApiHttpClient(baseUrl: '${config.url}/wallet');
 
   @override
-  Future<DataPage<Wallet>> listWallets({List<String>? excludingCodes}) async {
+  Future<DataPage<Wallet>> listWallets({
+    List<String>? excludingCodes,
+    int? page,
+    int? pageSize,
+  }) async {
     try {
-      return _httpClient.jsonGetPage<Wallet>(appToken: authService.token(), mapper: _SpringWallet.from);
+      return _httpClient.jsonGetPage<Wallet>(
+        authService: authService,
+        page: page,
+        pageSize: pageSize,
+        mapper: _SpringWallet.from,
+      );
     } on SocketException catch (_) {
       throw NoServerError();
     }
   }
 
   @override
-  Future<Wallet> saveWallet({String? code, required WalletType walletType, required String name}) async {
+  Future<Wallet> saveWallet(
+      {String? code,
+      required WalletType walletType,
+      required String name}) async {
     final wallet = _SpringWallet()
       ..code = code ?? ''
       ..name = name
@@ -45,12 +59,17 @@ class WalletSpringService implements WalletService {
     }
     try {
       final response = await _httpClient.jsonPost<Map<String, dynamic>>(
+        authService: authService,
         data: wallet.toMap(),
-        appToken: authService.token(),
       );
       return _SpringWallet.from(response)!;
     } on SocketException catch (_) {
       throw NoServerError();
+    } catch (e) {
+      debugPrint('Unexpected error $e');
+      throw ValidationError({
+        'wallet': WalletError.invalidWallet,
+      });
     }
   }
 
@@ -73,13 +92,15 @@ class WalletSpringService implements WalletService {
   }
 
   @override
-  Future<void> updateWalletBalance({required String code, required Period period}) {
+  Future<void> updateWalletBalance(
+      {required String code, required Period period}) {
     // TODO: implement updateWalletBalance
     return Future.value();
   }
 
   @override
-  Future<Map<Wallet, double>> walletsBalance({required Period period, bool showZeroBalance = false}) {
+  Future<Map<Wallet, double>> walletsBalance(
+      {required Period period, bool showZeroBalance = false}) {
     // TODO: implement walletsBalance
     return Future.value({});
   }
@@ -103,15 +124,17 @@ class _SpringWallet implements Wallet {
     };
   }
 
-  static _SpringWallet? from(Map<String, dynamic> map) {
-    final code = map[codeField] as String?;
-    final walletType = WalletType.tryParse(map[walletTypeField] as String?);
-    final name = map[nameField] as String?;
-    if (code != null && walletType != null && name != null) {
-      return _SpringWallet()
-        ..code = code
-        ..name = name
-        ..walletType = walletType;
+  static _SpringWallet? from(dynamic raw) {
+    if (raw is Map<String, dynamic>) {
+      final code = raw[codeField] as String?;
+      final walletType = WalletType.tryParse(raw[walletTypeField] as String?);
+      final name = raw[nameField] as String?;
+      if (code != null && walletType != null && name != null) {
+        return _SpringWallet()
+          ..code = code
+          ..name = name
+          ..walletType = walletType;
+      }
     }
     return null;
   }
@@ -121,7 +144,9 @@ class _SpringWallet implements Wallet {
     if (identical(this, other)) {
       return true;
     }
-    return other is _SpringWallet && runtimeType == other.runtimeType && code == other.code;
+    return other is _SpringWallet &&
+        runtimeType == other.runtimeType &&
+        code == other.code;
   }
 
   @override

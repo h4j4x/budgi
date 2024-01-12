@@ -49,23 +49,32 @@ class CategoryAmountSupabaseService implements CategoryAmountService {
       });
     }
 
-    final user = DI().get<AuthService>().fetchUser(errorIfMissing: CategoryError.invalidUser);
+    final user = await DI()
+        .get<AuthService>()
+        .fetchUser(errorIfMissing: CategoryError.invalidUser);
 
-    final categoryAmount = _CategoryAmount(category: category, period: period, amount: amount);
+    final categoryAmount =
+        _CategoryAmount(category: category, period: period, amount: amount);
     final errors = amountValidator?.validate(categoryAmount);
     if (errors?.isNotEmpty ?? false) {
       throw ValidationError(errors!);
     }
 
-    final categoryAmountExists = await _categoryAmountExistsByCategoryAndPeriod(category, period);
+    final categoryAmountExists =
+        await _categoryAmountExistsByCategoryAndPeriod(category, period);
     if (categoryAmountExists) {
-      await config.supabase.from(categoryAmountTable).update(categoryAmount.toMap(user)).match({
+      await config.supabase
+          .from(categoryAmountTable)
+          .update(categoryAmount.toMap(user))
+          .match({
         categoryIdField: category.id,
         fromDateField: period.from.toIso8601String(),
         toDateField: period.to.toIso8601String(),
       });
     } else {
-      await config.supabase.from(categoryAmountTable).insert(categoryAmount.toMap(user));
+      await config.supabase
+          .from(categoryAmountTable)
+          .insert(categoryAmount.toMap(user));
     }
     return categoryAmount;
   }
@@ -110,7 +119,8 @@ class CategoryAmountSupabaseService implements CategoryAmountService {
         final zeroCategories = await DI().get<CategoryService>().listCategories(
               excludingCodes: includedCategories.toList(),
             );
-        list.addAll(zeroCategories.whereType<SupabaseCategory>().map((category) {
+        list.addAll(
+            zeroCategories.whereType<SupabaseCategory>().map((category) {
           return _CategoryAmount(category: category, period: period, amount: 0);
         }));
       }
@@ -153,7 +163,10 @@ class CategoryAmountSupabaseService implements CategoryAmountService {
     if (lastPeriod != null && lastPeriod != period) {
       final lastAmounts = await listAmounts(period: lastPeriod);
       for (var categoryAmount in lastAmounts) {
-        await saveAmount(category: categoryAmount.category, period: period, amount: categoryAmount.amount);
+        await saveAmount(
+            category: categoryAmount.category,
+            period: period,
+            amount: categoryAmount.amount);
       }
     }
   }
@@ -180,9 +193,12 @@ class CategoryAmountSupabaseService implements CategoryAmountService {
     final map = <CategoryAmount, double>{};
     final amounts = await listAmounts(period: period, showZeroAmount: true);
     for (var transaction in transactions) {
-      final categoryAmount = amounts.where((amount) => amount.category == transaction.category).toList();
+      final categoryAmount = amounts
+          .where((amount) => amount.category == transaction.category)
+          .toList();
       if (categoryAmount.length == 1) {
-        map[categoryAmount.first] = (map[categoryAmount.first] ?? 0) + transaction.amount;
+        map[categoryAmount.first] =
+            (map[categoryAmount.first] ?? 0) + transaction.amount;
       }
     }
     if (showZeroTotal) {
@@ -197,7 +213,8 @@ class CategoryAmountSupabaseService implements CategoryAmountService {
     storageService.writeString(lastUsedPeriodKey, period.toString());
   }
 
-  Future<bool> _categoryAmountExistsByCategoryAndPeriod(SupabaseCategory category, Period period) async {
+  Future<bool> _categoryAmountExistsByCategoryAndPeriod(
+      SupabaseCategory category, Period period) async {
     final count = await config.supabase
         .from(categoryAmountTable)
         .select(idField)
@@ -259,11 +276,19 @@ class _CategoryAmount implements CategoryAmount {
       final fromDate = DateTime.tryParse((raw[fromDateField] as String?) ?? '');
       final toDate = DateTime.tryParse((raw[toDateField] as String?) ?? '');
       final amount = raw[amountField] as num?;
-      if (id != null && categoryId != null && fromDate != null && toDate != null && amount != null) {
+      if (id != null &&
+          categoryId != null &&
+          fromDate != null &&
+          toDate != null &&
+          amount != null) {
         final category = await fetcher(categoryId);
         if (category != null) {
           final period = Period(from: fromDate, to: toDate);
-          return _CategoryAmount(id: id, category: category, period: period, amount: amount.toDouble());
+          return _CategoryAmount(
+              id: id,
+              category: category,
+              period: period,
+              amount: amount.toDouble());
         }
       }
     }
@@ -275,7 +300,9 @@ class _CategoryAmount implements CategoryAmount {
     if (identical(this, other)) {
       return true;
     }
-    return other is _CategoryAmount && runtimeType == other.runtimeType && category == other.category;
+    return other is _CategoryAmount &&
+        runtimeType == other.runtimeType &&
+        category == other.category;
   }
 
   @override
@@ -285,6 +312,7 @@ class _CategoryAmount implements CategoryAmount {
 
   @override
   CategoryAmount copyWith({required Period period}) {
-    return _CategoryAmount(id: id, category: _category, period: period, amount: amount);
+    return _CategoryAmount(
+        id: id, category: _category, period: period, amount: amount);
   }
 }

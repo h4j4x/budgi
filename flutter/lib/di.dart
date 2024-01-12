@@ -62,7 +62,8 @@ class DI {
     return _getIt.isRegistered<T>();
   }
 
-  Future<void> _configSupabase(AppConfig config, StorageService storageService) async {
+  Future<void> _configSupabase(
+      AppConfig config, StorageService storageService) async {
     final supabaseConfig = SupabaseConfig(
       url: config.apiUrl!,
       token: config.apiToken!,
@@ -79,7 +80,8 @@ class DI {
       categoryValidator: CategoryValidator(),
     ));
 
-    _getIt.registerSingleton<CategoryAmountService>(CategoryAmountSupabaseService(
+    _getIt
+        .registerSingleton<CategoryAmountService>(CategoryAmountSupabaseService(
       config: supabaseConfig,
       storageService: storageService,
       amountValidator: CategoryAmountValidator(),
@@ -98,7 +100,8 @@ class DI {
     ));
   }
 
-  Future<void> _configSpring(AppConfig config, StorageService storageService) async {
+  Future<void> _configSpring(
+      AppConfig config, StorageService storageService) async {
     final springConfig = SpringConfig(url: config.apiUrl!);
     final authService = AuthSpringService(
       storageService: storageService,

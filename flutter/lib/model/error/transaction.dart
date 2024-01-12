@@ -23,7 +23,8 @@ enum TransactionError {
       invalidWalletTarget => l10n.invalidTransactionTargetWallet,
       invalidCategory => l10n.invalidBudgetCategory,
       invalidAmount => l10n.invalidTransactionAmount,
-      invalidDescription => l10n.invalidTransactionDescription(AppConfig.textFieldMaxLength),
+      invalidDescription =>
+        l10n.invalidTransactionDescription(AppConfig.textFieldMaxLength),
     };
   }
 }
