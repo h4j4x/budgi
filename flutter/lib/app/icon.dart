@@ -45,10 +45,14 @@ class AppIcon {
   }
 
   static Widget get loading {
-    return const SizedBox(
-      width: 24,
-      height: 24,
-      child: Center(
+    return loadingOfSize(24);
+  }
+
+  static Widget loadingOfSize(double size) {
+    return SizedBox(
+      width: size,
+      height: size,
+      child: const Center(
         child: CircularProgressIndicator.adaptive(),
       ),
     );

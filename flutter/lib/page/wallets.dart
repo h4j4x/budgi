@@ -47,7 +47,7 @@ class _WalletsPageState extends State<WalletsPage> {
     });
     dataPage.apply(fetchMode);
     final newDataPage = await DI().get<WalletService>().listWallets(
-          page: dataPage.pageNumber,
+          page: dataPage.nextPageNumber,
           pageSize: dataPage.pageSize,
         );
     dataPage.add(newDataPage);
@@ -57,7 +57,9 @@ class _WalletsPageState extends State<WalletsPage> {
   }
 
   void _scrollListener() {
-    if (_scrollController.offset >= _scrollController.position.maxScrollExtent &&
+    if (dataPage.hasNextPage &&
+        _scrollController.offset >=
+            _scrollController.position.maxScrollExtent - 10 &&
         !_scrollController.position.outOfRange) {
       loadData(FetchMode.nextPage);
     }
@@ -79,6 +81,7 @@ class _WalletsPageState extends State<WalletsPage> {
         WalletList(
           data: dataPage,
           enabled: !loading,
+          loadingNextPage: loading,
           onItemAction: onItemAction,
         ),
       ],

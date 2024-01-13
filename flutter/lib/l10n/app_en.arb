@@ -102,10 +102,19 @@
     }
   },
   "invalidWalletType": "Invalid wallet type.",
+  "loadingNextPage": "Loading next page...",
   "no": "No",
   "noServerConnection": "Could not connect to server :/",
   "nothingHere": "Nothing here :(",
   "okAction": "Ok",
+  "pageEnd": "Page {number} end",
+  "@pageEnd": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
   "prefixWithDate": "{prefix}{date}",
   "@prefixWithDate": {
     "placeholders": {

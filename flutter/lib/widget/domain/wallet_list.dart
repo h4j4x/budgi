@@ -8,16 +8,19 @@ import '../../model/item_action.dart';
 import '../../util/function.dart';
 import '../../util/ui.dart';
 import '../common/sliver_center.dart';
+import '../common/text_divider.dart';
 
 class WalletList extends StatelessWidget {
   final DataPage<Wallet> data;
   final bool enabled;
+  final bool loadingNextPage;
   final TypedContextItemAction<Wallet> onItemAction;
 
   const WalletList({
     super.key,
     required this.data,
     required this.enabled,
+    required this.loadingNextPage,
     required this.onItemAction,
   });
 
@@ -39,12 +42,31 @@ class WalletList extends StatelessWidget {
     }
     return SliverList.separated(
       itemBuilder: (_, index) {
-        return listItem(context, data[index]);
+        if (index < data.length) {
+          return listItem(context, data[index]);
+        }
+        return ListTile(
+          leading: AppIcon.loadingOfSize(18),
+          title: Text(
+            L10n.of(context).loadingNextPage,
+            textScaler: const TextScaler.linear(0.75),
+            style: TextStyle(
+              color: Theme.of(context).disabledColor,
+            ),
+          ),
+        );
       },
-      separatorBuilder: (_, __) {
+      separatorBuilder: (_, index) {
+        final isLastPageItem = data.indexIsLastPageItem(index);
+        if (isLastPageItem) {
+          return TextDivider(
+            color: Theme.of(context).primaryColor,
+            text: L10n.of(context).pageEnd(data.pageNumberOfIndex(index)),
+          );
+        }
         return const Divider();
       },
-      itemCount: data.length,
+      itemCount: data.length + (loadingNextPage ? 1 : 0),
     );
   }
 

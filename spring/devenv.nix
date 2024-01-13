@@ -16,4 +16,6 @@
     newman -version
     echo ---
   '';
+
+  dotenv.disableHint = true;
 }
