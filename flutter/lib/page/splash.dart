@@ -21,8 +21,6 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage> {
-  StreamSubscription<bool>? authSubscription;
-
   @override
   void initState() {
     super.initState();
@@ -31,15 +29,14 @@ class _SplashPageState extends State<SplashPage> {
 
   void fetchAuth() async {
     if (DI().has<AuthService>()) {
-      authSubscription =
-          DI().get<AuthService>().authenticatedStream().listen(redirect);
+      final user = DI().get<AuthService>().user();
+      redirect(user != null);
     } else {
       redirect(true);
     }
   }
 
   void redirect(bool isAuthenticated) {
-    authSubscription?.cancel();
     final route = isAuthenticated ? HomePage.route : SignInPage.route;
     debugPrint('Splash redirecting to $route');
     context.go(route);
@@ -61,11 +58,5 @@ class _SplashPageState extends State<SplashPage> {
     return const Center(
       child: CircularProgressIndicator.adaptive(),
     );
-  }
-
-  @override
-  void dispose() {
-    authSubscription?.cancel();
-    super.dispose();
   }
 }

@@ -17,12 +17,6 @@ import 'service/spring/auth_spring.dart';
 import 'service/spring/config.dart';
 import 'service/spring/wallet_spring.dart';
 import 'service/storage.dart';
-import 'service/supabase/auth_supabase.dart';
-import 'service/supabase/category_amount_supabase.dart';
-import 'service/supabase/category_supabase.dart';
-import 'service/supabase/config.dart';
-import 'service/supabase/transaction_supabase.dart';
-import 'service/supabase/wallet_supabase.dart';
 import 'service/transaction.dart';
 import 'service/wallet.dart';
 
@@ -45,9 +39,7 @@ class DI {
     final storageService = SecureStorageService();
     _getIt.registerSingleton<StorageService>(storageService);
 
-    if (config.hasSupabaseProvider()) {
-      await _configSupabase(config, storageService);
-    } else if (config.hasSpringProvider()) {
+    if (config.hasSpringProvider()) {
       await _configSpring(config, storageService);
     } else {
       _configMemory(config);
@@ -60,44 +52,6 @@ class DI {
 
   bool has<T extends Object>() {
     return _getIt.isRegistered<T>();
-  }
-
-  Future<void> _configSupabase(
-      AppConfig config, StorageService storageService) async {
-    final supabaseConfig = SupabaseConfig(
-      url: config.apiUrl!,
-      token: config.apiToken!,
-    );
-    await supabaseConfig.initialize();
-
-    _getIt.registerSingleton<AuthService>(
-      AuthSupabaseService(config: supabaseConfig),
-    );
-
-    _getIt.registerSingleton<CategoryService>(CategorySupabaseService(
-      config: supabaseConfig,
-      storageService: storageService,
-      categoryValidator: CategoryValidator(),
-    ));
-
-    _getIt
-        .registerSingleton<CategoryAmountService>(CategoryAmountSupabaseService(
-      config: supabaseConfig,
-      storageService: storageService,
-      amountValidator: CategoryAmountValidator(),
-    ));
-
-    final walletService = WalletSupabaseService(
-      config: supabaseConfig,
-      walletValidator: WalletValidator(),
-    );
-    _getIt.registerSingleton<WalletService>(walletService);
-
-    _getIt.registerSingleton<TransactionService>(TransactionSupabaseService(
-      walletService: walletService,
-      config: supabaseConfig,
-      transactionValidator: TransactionValidator(),
-    ));
   }
 
   Future<void> _configSpring(

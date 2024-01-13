@@ -1,4 +1,6 @@
-import 'domain/wallet.dart';
+import 'dart:math';
+
+import 'fetch_mode.dart';
 
 class DataPage<T> {
   List<T> content;
@@ -28,6 +30,16 @@ class DataPage<T> {
       pageNumber = dataPage.pageNumber;
     } else if (pageNumber > dataPage.pageNumber) {
       content.insertAll(0, dataPage.content);
+    } else if (pageNumber == dataPage.pageNumber) {
+      for (var element in dataPage.content) {
+        final index = content.indexOf(element);
+        if (index >= 0) {
+          content.removeAt(index);
+          content.insert(index, element);
+        } else {
+          content.add(element);
+        }
+      }
     }
     pageSize = dataPage.pageSize;
     totalElements = dataPage.totalElements;
@@ -39,5 +51,18 @@ class DataPage<T> {
 
   static DataPage<T> empty<T>() {
     return DataPage<T>(content: <T>[]);
+  }
+
+  void apply(FetchMode fetchMode) {
+    if (fetchMode == FetchMode.clear) {
+      content.clear();
+      pageNumber = 0;
+      totalElements = 0;
+    } else if (fetchMode == FetchMode.refreshPage) {
+      pageNumber = 0;
+      pageSize = max(content.length, 20);
+    } else if (fetchMode == FetchMode.nextPage) {
+      pageNumber += 1;
+    }
   }
 }

@@ -5,7 +5,6 @@ import 'package:http/http.dart' as http;
 
 import '../../model/data_page.dart';
 import '../../model/token.dart';
-import '../../util/string.dart';
 import '../auth.dart';
 
 class ApiHttpClient {
@@ -22,8 +21,7 @@ class ApiHttpClient {
     String path = '',
   }) async {
     final uri = Uri.parse('$baseUrl$path');
-    final response =
-        await httpClient.get(uri, headers: _headers(authService.token()));
+    final response = await httpClient.get(uri, headers: _headers(authService.token()));
     if (_is2xxStatus(response.statusCode)) {
       return jsonDecode(response.body) as T;
     }
@@ -43,8 +41,7 @@ class ApiHttpClient {
     Map<String, String>? data,
   }) async {
     final uri = _queryUri('$baseUrl$path', data, page, pageSize);
-    final response =
-        await httpClient.get(uri, headers: _headers(authService.token()));
+    final response = await httpClient.get(uri, headers: _headers(authService.token()));
     if (_is2xxStatus(response.statusCode)) {
       final map = jsonDecode(response.body) as Map<String, dynamic>;
       return _from<T>(map, mapper: mapper)!;
@@ -63,7 +60,7 @@ class ApiHttpClient {
   }) async {
     final response = await httpClient.post(
       Uri.parse('$baseUrl$path'),
-      body: data != null ? jsonEncode(_fixedKeys(data)) : null,
+      body: data != null ? jsonEncode(data) : null,
       headers: _headers(authService.token()),
     );
     if (_is2xxStatus(response.statusCode)) {
@@ -90,29 +87,20 @@ class ApiHttpClient {
     return code >= 200 && code < 300;
   }
 
-  static DataPage<T>? _from<T>(Map<String, dynamic> map,
-      {required DataMapper mapper}) {
+  static DataPage<T>? _from<T>(Map<String, dynamic> map, {required DataMapper mapper}) {
     final content = map['content'] as List<dynamic>?;
     final totalElements = map['totalElements'] as int?;
     final pageable = (map['pageable'] as Map<String, dynamic>?) ?? {};
     final pageNumber = pageable['pageNumber'] as int?;
     final pageSize = pageable['pageSize'] as int?;
-    if (content != null &&
-        totalElements != null &&
-        pageNumber != null &&
-        pageSize != null) {
+    if (content != null && totalElements != null && pageNumber != null && pageSize != null) {
       final list = content.map((e) => mapper).whereType<T>().toList();
-      return DataPage<T>(
-          content: list,
-          pageNumber: pageNumber,
-          pageSize: pageSize,
-          totalElements: totalElements);
+      return DataPage<T>(content: list, pageNumber: pageNumber, pageSize: pageSize, totalElements: totalElements);
     }
     return null;
   }
 
-  Uri _queryUri(String url, Map<String, String>? data,
-      [int? page, int? pageSize]) {
+  Uri _queryUri(String url, Map<String, String>? data, [int? page, int? pageSize]) {
     final params = <String, String>{};
     if (data?.isNotEmpty ?? false) {
       params.addAll(data!);
@@ -125,12 +113,7 @@ class ApiHttpClient {
     }
     final uri = Uri.parse(url);
     if (params.isNotEmpty) {
-      return Uri(
-          scheme: uri.scheme,
-          host: uri.host,
-          port: uri.port,
-          path: uri.path,
-          queryParameters: params);
+      return Uri(scheme: uri.scheme, host: uri.host, port: uri.port, path: uri.path, queryParameters: params);
     }
     return uri;
   }
@@ -139,12 +122,6 @@ class ApiHttpClient {
     if (statusCode == 401) {
       await authService.signOut();
     }
-  }
-
-  Map<String, Object> _fixedKeys(Map<String, Object> data) {
-    return data.map((key, value) {
-      return MapEntry(key.toCamelCase(), value);
-    });
   }
 }
 

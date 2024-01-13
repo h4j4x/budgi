@@ -44,10 +44,6 @@ class AppIcon {
     return const _Icon(FontAwesomeIcons.house);
   }
 
-  static Widget get github {
-    return const _Icon(FontAwesomeIcons.github);
-  }
-
   static Widget get loading {
     return const SizedBox(
       width: 24,

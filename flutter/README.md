@@ -12,9 +12,8 @@ Create config in file `config.json`:
 
 ```json
 {
-  "DATA_PROVIDER": "supabase",
-  "SUPABASE_URL": "<SUPABASE_URL>",
-  "SUPABASE_TOKEN": "<SUPABASE_TOKEN>"
+  "DATA_PROVIDER": "spring",
+  "SPRING_URL": "http://localhost:8080/api/v1"
 }
 ```
 

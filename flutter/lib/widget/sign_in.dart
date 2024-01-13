@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 
 import '../../l10n/l10n.dart';
@@ -28,27 +26,10 @@ class _SignInState extends State<SignIn> {
   final passwordController = TextEditingController();
   final passwordFocus = FocusNode();
 
-  StreamSubscription<bool>? authSubscription;
-
   bool processing = false;
 
   String? emailError;
   String? passwordError;
-
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(Duration.zero, () {
-      authSubscription = DI()
-          .get<AuthService>()
-          .authenticatedStream()
-          .listen((isAuthenticated) {
-        if (isAuthenticated) {
-          context.go(HomePage.route);
-        }
-      });
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -143,18 +124,6 @@ class _SignInState extends State<SignIn> {
     );
   }
 
-  Widget githubButton() {
-    return Container(
-      constraints: const BoxConstraints(maxWidth: 220, minWidth: 100),
-      child: TextButton.icon(
-        icon: AppIcon.github,
-        label: Text(L10n.of(context).signInGithub),
-        style: ElevatedButtonTheme.of(context).style,
-        onPressed: !processing ? onGithub : null,
-      ),
-    );
-  }
-
   void onSignIn() async {
     final email = emailController.text;
     if (email.isEmpty && email.indexOf('@') != 1) {
@@ -199,28 +168,10 @@ class _SignInState extends State<SignIn> {
     }
   }
 
-  void onGithub() async {
-    setState(() {
-      processing = true;
-    });
-    final success = await DI().get<AuthService>().signInWithGithub();
-    if (success && mounted) {
-      context.go(HomePage.route);
-    } else {
-      if (mounted) {
-        context.showError(L10n.of(context).invalidUserAccess);
-      }
-      setState(() {
-        processing = false;
-      });
-    }
-  }
-
   @override
   void dispose() {
     emailController.dispose();
     passwordController.dispose();
-    authSubscription?.cancel();
     super.dispose();
   }
 }

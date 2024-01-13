@@ -26,11 +26,11 @@ enum WalletType {
     };
   }
 
-  static WalletType? tryParse(String? value) {
-    if (value != null) {
-      final theValue = value.trim();
+  static WalletType? tryParse(Object? raw) {
+    if (raw is String) {
+      final value = raw.trim();
       for (var walletType in values) {
-        if (theValue == walletType.name) {
+        if (value == walletType.name) {
           return walletType;
         }
       }

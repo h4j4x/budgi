@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
-import 'package:rxdart/rxdart.dart';
 
 import '../../app/icon.dart';
 import '../../model/domain/user.dart';
@@ -27,8 +26,6 @@ const _fetchedAtField = 'fetchedAt';
 class AuthSpringService extends AuthService {
   final StorageService storageService;
   final ApiHttpClient _httpClient;
-  final StreamController<bool> _streamController;
-  final http.Client? httpClient;
 
   AppToken? _token;
   _User? _user;
@@ -36,25 +33,17 @@ class AuthSpringService extends AuthService {
   AuthSpringService({
     required this.storageService,
     required SpringConfig config,
-    this.httpClient,
-  })  : _httpClient = ApiHttpClient(
-            httpClient: httpClient, baseUrl: '${config.url}/auth'),
-        _streamController = BehaviorSubject<bool>();
+    http.Client? httpClient,
+  }) : _httpClient = ApiHttpClient(
+            httpClient: httpClient, baseUrl: '${config.url}/auth');
 
   Future<void> initialize() async {
     final json = await storageService.readString(authTokenKey);
     if (json != null) {
       final map = jsonDecode(json) as Map<String, dynamic>;
       _token = _Token.parseMap(map);
-      if (_token?.isValid ?? false) {
-        await _updateUser(false);
-      }
+      await _updateUser();
     }
-    debugPrint('Auth token $_token');
-    if (_user == null) {
-      await _signOut();
-    }
-    _streamController.add(_token?.isValid ?? false);
   }
 
   @override
@@ -74,7 +63,7 @@ class AuthSpringService extends AuthService {
       _token = _Token.parseMap(response);
       await storageService.writeString(
           authTokenKey, _token!.isValid ? _token!.asJson : null);
-      _streamController.add(_token!.isValid);
+      await _updateUser();
       return _token!.isValid;
     } on SocketException catch (_) {
       throw NoServerError();
@@ -87,29 +76,11 @@ class AuthSpringService extends AuthService {
   }
 
   @override
-  Future<bool> signInWithGithub() {
-    return Future.value(false);
-  }
-
-  @override
-  Stream<bool> authenticatedStream() {
-    return _streamController.stream;
-  }
-
-  @override
   AppUser? user() {
     if (_token?.isValid ?? false) {
       return _user;
     }
     return null;
-  }
-
-  @override
-  Future<AppUser> fetchUser<T>({required T errorIfMissing}) async {
-    if (_token?.isValid ?? false) {
-      await _updateUser();
-    }
-    return super.fetchUser(errorIfMissing: errorIfMissing);
   }
 
   @override
@@ -119,18 +90,18 @@ class AuthSpringService extends AuthService {
 
   @override
   Future<void> signOut() async {
-    await _signOut();
-    _streamController.add(false);
-    return Future.value();
-  }
-
-  Future<void> _signOut() async {
     _token = null;
     return storageService.writeString(authTokenKey, null);
   }
 
-  Future<void> _updateUser([bool signOutIf401 = true]) async {
-    if (_user?.fetchedLessThanHoursAgo(6) ?? false) {
+  @override
+  Future<bool> checkUser() async {
+    await _updateUser();
+    return _user != null;
+  }
+
+  Future<void> _updateUser() async {
+    if (_user != null && _user!.fetchedLessThanHoursAgo(6)) {
       return Future.value();
     }
     try {
@@ -139,9 +110,8 @@ class AuthSpringService extends AuthService {
         path: '/me',
       );
       _user = _User.parseMap(response);
-      await storageService.writeString(authTokenKey, _user!.asJson);
     } on HttpError catch (e) {
-      if (e.statusCode == 401 && signOutIf401) {
+      if (e.statusCode == 401) {
         await signOut();
       }
     } catch (e) {

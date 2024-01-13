@@ -6,6 +6,7 @@ import '../di.dart';
 import '../l10n/l10n.dart';
 import '../model/data_page.dart';
 import '../model/domain/wallet.dart';
+import '../model/fetch_mode.dart';
 import '../model/item_action.dart';
 import '../service/wallet.dart';
 import '../widget/domain/wallet_list.dart';
@@ -33,19 +34,20 @@ class _WalletsPageState extends State<WalletsPage> {
     super.initState();
     Future.delayed(Duration.zero, () {
       _scrollController.addListener(_scrollListener);
-      loadData();
+      loadData(FetchMode.clear);
     });
   }
 
-  void loadData() async {
+  void loadData(FetchMode fetchMode) async {
     if (loading) {
       return;
     }
     setState(() {
       loading = true;
     });
+    dataPage.apply(fetchMode);
     final newDataPage = await DI().get<WalletService>().listWallets(
-          page: dataPage.pageNumber + 1,
+          page: dataPage.pageNumber,
           pageSize: dataPage.pageSize,
         );
     dataPage.add(newDataPage);
@@ -55,10 +57,9 @@ class _WalletsPageState extends State<WalletsPage> {
   }
 
   void _scrollListener() {
-    if (_scrollController.offset >=
-            _scrollController.position.maxScrollExtent &&
+    if (_scrollController.offset >= _scrollController.position.maxScrollExtent &&
         !_scrollController.position.outOfRange) {
-      loadData();
+      loadData(FetchMode.nextPage);
     }
   }
 
@@ -88,7 +89,9 @@ class _WalletsPageState extends State<WalletsPage> {
     return SliverAppBar(
       actions: [
         IconButton(
-          onPressed: loadData,
+          onPressed: () {
+            loadData(FetchMode.clear);
+          },
           icon: AppIcon.reload,
         ),
       ],
@@ -114,14 +117,14 @@ class _WalletsPageState extends State<WalletsPage> {
           break;
         }
     }
-    loadData();
+    loadData(FetchMode.refreshPage);
   }
 
   Widget addButton() {
     return FloatingActionButton(
       onPressed: () async {
         await context.push(WalletPage.route);
-        loadData();
+        loadData(FetchMode.refreshPage);
       },
       tooltip: L10n.of(context).addAction,
       child: AppIcon.add,

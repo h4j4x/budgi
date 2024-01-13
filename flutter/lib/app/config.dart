@@ -1,5 +1,4 @@
 enum DataProvider {
-  supabase,
   spring;
 
   static DataProvider tryParse(String? value) {
@@ -33,12 +32,6 @@ class AppConfig {
     this.apiToken,
   });
 
-  bool hasSupabaseProvider() {
-    return dataProvider == DataProvider.supabase &&
-        (apiUrl?.isNotEmpty ?? false) &&
-        (apiToken?.isNotEmpty ?? false);
-  }
-
   bool hasSpringProvider() {
     return dataProvider == DataProvider.spring && (apiUrl?.isNotEmpty ?? false);
   }
@@ -51,10 +44,7 @@ class AppConfig {
 
     String? apiUrl;
     String? apiToken;
-    if (dataProvider == DataProvider.supabase) {
-      apiUrl = const String.fromEnvironment('SUPABASE_URL');
-      apiToken = const String.fromEnvironment('SUPABASE_TOKEN');
-    } else if (dataProvider == DataProvider.spring) {
+    if (dataProvider == DataProvider.spring) {
       apiUrl = const String.fromEnvironment('SPRING_URL');
     }
 

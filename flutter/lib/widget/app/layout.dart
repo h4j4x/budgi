@@ -31,8 +31,6 @@ class AppScaffold extends StatefulWidget {
 }
 
 class _AppScaffoldState extends State<AppScaffold> {
-  StreamSubscription<bool>? authSubscription;
-
   String version = '';
   bool menuCollapsed = false;
 
@@ -248,21 +246,13 @@ class _AppScaffoldState extends State<AppScaffold> {
     await DI().get<AuthService>().signOut();
   }
 
-  void checkUser() {
+  void checkUser() async {
     if (DI().has<AuthService>()) {
-      authSubscription =
-          DI().get<AuthService>().authenticatedStream().listen(redirect);
-      try {
-        DI().get<AuthService>().fetchUser(errorIfMissing: '');
-      } catch (_) {}
-    }
-  }
-
-  void redirect(bool isAuthenticated) {
-    if (!isAuthenticated && mounted) {
-      authSubscription?.cancel();
-      debugPrint('Home redirecting to SignIn');
-      context.go(SignInPage.route);
+      final hasUser = await DI().get<AuthService>().checkUser();
+      if (!hasUser && mounted) {
+        debugPrint('Home redirecting to SignIn');
+        context.go(SignInPage.route);
+      }
     }
   }
 }

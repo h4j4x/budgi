@@ -33,12 +33,13 @@ class WalletSpringService implements WalletService {
     int? pageSize,
   }) async {
     try {
-      return _httpClient.jsonGetPage<Wallet>(
+      final v = await _httpClient.jsonGetPage<Wallet>(
         authService: authService,
         page: page,
         pageSize: pageSize,
         mapper: _SpringWallet.from,
       );
+      return v;
     } on SocketException catch (_) {
       throw NoServerError();
     }
@@ -127,7 +128,7 @@ class _SpringWallet implements Wallet {
   static _SpringWallet? from(dynamic raw) {
     if (raw is Map<String, dynamic>) {
       final code = raw[codeField] as String?;
-      final walletType = WalletType.tryParse(raw[walletTypeField] as String?);
+      final walletType = WalletType.tryParse(raw[walletTypeField]);
       final name = raw[nameField] as String?;
       if (code != null && walletType != null && name != null) {
         return _SpringWallet()

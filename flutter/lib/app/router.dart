@@ -134,7 +134,8 @@ final _shellNavigatorKey = GlobalKey<NavigatorState>();
 final _menuRoutes = _routes.where((route) {
   return route.hasMenu;
 }).toList();
-final _redirectRoute = _routes.firstWhere((route) => route.anon).path;
+final _redirectAnonRoute = _routes.firstWhere((route) => route.anon).path;
+final _redirectAuthRoute = _routes.firstWhere((route) => !route.anon).path;
 
 // https://pub.dev/documentation/go_router/latest/topics/Get%20started-topic.html
 final router = GoRouter(
@@ -178,10 +179,10 @@ final router = GoRouter(
   redirect: (context, state) {
     if (DI().has<AuthService>()) {
       final route = _routes.where((r) => r.path == state.matchedLocation);
-      if (route.isNotEmpty &&
-          !route.first.anon &&
-          DI().get<AuthService>().user() == null) {
-        return _redirectRoute;
+      final hasUser = DI().get<AuthService>().user() != null;
+      final redirectRoute = hasUser ? _redirectAuthRoute : _redirectAnonRoute;
+      if (route.isNotEmpty && route.first.anon == hasUser) {
+        return redirectRoute;
       }
     }
     return null;
