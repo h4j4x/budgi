@@ -6,6 +6,7 @@ import com.sp1ke.budgi.api.category.domain.JpaCategory;
 import com.sp1ke.budgi.api.category.repo.CategoryRepo;
 import com.sp1ke.budgi.api.common.StringUtil;
 import com.sp1ke.budgi.api.common.ValidatorUtil;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
 import java.util.Optional;
@@ -58,6 +59,7 @@ public class JpaCategoryService implements CategoryService {
     }
 
     @Override
+    @Transactional
     public void deleteByCode(@NotNull Long userId, @NotNull String code) {
         categoryRepo.deleteByUserIdAndCode(userId, code);
     }

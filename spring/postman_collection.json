@@ -227,7 +227,84 @@
 			"response": []
 		},
 		{
-			"name": "006-wallet-add",
+			"name": "006-category-update",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200', () => {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"pm.test('Body contains data', () => {",
+							"  var json = pm.response.json();",
+							"  pm.expect(json).to.have.ownProperty('code');",
+							"  pm.expect(json).to.have.ownProperty('name');",
+							"",
+							"  pm.expect(json.code).to.equal(pm.variables.get('categoryCode'));",
+							"  pm.expect(json.name).to.equal(pm.variables.get('categoryName') + 'A');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"code\": \"{{categoryCode}}\",\n    \"name\": \"{{categoryName}}A\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{categoryUrl}}/{{categoryCode}}",
+					"host": [
+						"{{categoryUrl}}"
+					],
+					"path": [
+						"{{categoryCode}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "007-category-delete",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200', () => {",
+							"  pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{categoryUrl}}/{{categoryCode}}",
+					"host": [
+						"{{categoryUrl}}"
+					],
+					"path": [
+						"{{categoryCode}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "008-wallet-add",
 			"event": [
 				{
 					"listen": "test",
@@ -272,7 +349,7 @@
 			"response": []
 		},
 		{
-			"name": "007-wallet-list",
+			"name": "009-wallet-list",
 			"event": [
 				{
 					"listen": "test",

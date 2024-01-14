@@ -20,10 +20,6 @@ abstract class WalletService {
     required String code,
   });
 
-  Future<Wallet> fetchWalletByCode(String code);
-
-  Future<Wallet?> fetchWalletById(int id);
-
   /// Obtains wallets balance for given period.
   ///
   /// period dates are inclusive.

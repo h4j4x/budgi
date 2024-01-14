@@ -84,16 +84,6 @@ class WalletMemoryService implements WalletService {
   }
 
   @override
-  Future<Wallet> fetchWalletByCode(String code) {
-    return Future.value(_wallets[code]);
-  }
-
-  @override
-  Future<Wallet?> fetchWalletById(int id) {
-    return Future.value();
-  }
-
-  @override
   Future<void> updateWalletBalance({
     required String code,
     required Period period,

@@ -21,8 +21,7 @@ class ApiHttpClient {
     String path = '',
   }) async {
     final uri = Uri.parse('$baseUrl$path');
-    final response =
-        await httpClient.get(uri, headers: _headers(authService.token()));
+    final response = await httpClient.get(uri, headers: _headers(authService.token(), isJson: true));
     if (_is2xxStatus(response.statusCode)) {
       return jsonDecode(response.body) as T;
     }
@@ -42,8 +41,7 @@ class ApiHttpClient {
     Map<String, String>? data,
   }) async {
     final uri = _queryUri('$baseUrl$path', data, page, pageSize);
-    final response =
-        await httpClient.get(uri, headers: _headers(authService.token()));
+    final response = await httpClient.get(uri, headers: _headers(authService.token(), isJson: true));
     if (_is2xxStatus(response.statusCode)) {
       final map = jsonDecode(response.body) as Map<String, dynamic>;
       return _from<T>(map, mapper: mapper)!;
@@ -63,7 +61,7 @@ class ApiHttpClient {
     final response = await httpClient.post(
       Uri.parse('$baseUrl$path'),
       body: data != null ? jsonEncode(data) : null,
-      headers: _headers(authService.token()),
+      headers: _headers(authService.token(), isJson: true),
     );
     if (_is2xxStatus(response.statusCode)) {
       return jsonDecode(response.body) as T;
@@ -75,10 +73,29 @@ class ApiHttpClient {
     );
   }
 
-  Map<String, String> _headers(AppToken? appToken) {
-    final headers = <String, String>{
-      HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
-    };
+  Future<void> delete({
+    required AuthService authService,
+    String path = '',
+  }) async {
+    final response = await httpClient.delete(
+      Uri.parse('$baseUrl$path'),
+      headers: _headers(authService.token(), isJson: false),
+    );
+    if (_is2xxStatus(response.statusCode)) {
+      return;
+    }
+    await _check401Status(authService, response.statusCode);
+    throw HttpError(
+      statusCode: response.statusCode,
+      reasonPhrase: response.reasonPhrase,
+    );
+  }
+
+  Map<String, String> _headers(AppToken? appToken, {required bool isJson}) {
+    final headers = <String, String>{};
+    if (isJson) {
+      headers[HttpHeaders.contentTypeHeader] = ContentType.json.mimeType;
+    }
     if (appToken != null) {
       headers[HttpHeaders.authorizationHeader] = appToken.tokenHeader;
     }
@@ -89,19 +106,14 @@ class ApiHttpClient {
     return code >= 200 && code < 300;
   }
 
-  static DataPage<T>? _from<T>(Map<String, dynamic> map,
-      {required DataMapper mapper}) {
+  static DataPage<T>? _from<T>(Map<String, dynamic> map, {required DataMapper mapper}) {
     final content = map['content'] as List<dynamic>?;
     final pageable = (map['pageable'] as Map<String, dynamic>?) ?? {};
     final pageNumber = pageable['pageNumber'] as int?;
     final pageSize = pageable['pageSize'] as int?;
     final totalElements = map['totalElements'] as int?;
     final totalPages = map['totalPages'] as int?;
-    if (content != null &&
-        pageNumber != null &&
-        pageSize != null &&
-        totalElements != null &&
-        totalPages != null) {
+    if (content != null && pageNumber != null && pageSize != null && totalElements != null && totalPages != null) {
       final list = content.map(mapper).whereType<T>().toList();
       return DataPage<T>(
         content: list,
@@ -114,8 +126,7 @@ class ApiHttpClient {
     return null;
   }
 
-  Uri _queryUri(String url, Map<String, String>? data,
-      [int? page, int? pageSize]) {
+  Uri _queryUri(String url, Map<String, String>? data, [int? page, int? pageSize]) {
     final params = <String, String>{};
     if (data?.isNotEmpty ?? false) {
       params.addAll(data!);
@@ -128,12 +139,7 @@ class ApiHttpClient {
     }
     final uri = Uri.parse(url);
     if (params.isNotEmpty) {
-      return Uri(
-          scheme: uri.scheme,
-          host: uri.host,
-          port: uri.port,
-          path: uri.path,
-          queryParameters: params);
+      return Uri(scheme: uri.scheme, host: uri.host, port: uri.port, path: uri.path, queryParameters: params);
     }
     return uri;
   }

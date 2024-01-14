@@ -6,9 +6,12 @@ import '../di.dart';
 import '../l10n/l10n.dart';
 import '../model/data_page.dart';
 import '../model/domain/wallet.dart';
+import '../model/error/validation.dart';
+import '../model/error/wallet.dart';
 import '../model/fetch_mode.dart';
 import '../model/item_action.dart';
 import '../service/wallet.dart';
+import '../util/ui.dart';
 import '../widget/domain/wallet_list.dart';
 import 'wallet.dart';
 
@@ -38,14 +41,14 @@ class _WalletsPageState extends State<WalletsPage> {
     });
   }
 
-  void loadData(FetchMode fetchMode) async {
+  void loadData(FetchMode fetchMode, [int? pageNumber]) async {
     if (loading) {
       return;
     }
     setState(() {
       loading = true;
     });
-    dataPage.apply(fetchMode);
+    dataPage.apply(fetchMode, pageNumber);
     final newDataPage = await DI().get<WalletService>().listWallets(
           page: dataPage.nextPageNumber,
           pageSize: dataPage.pageSize,
@@ -58,8 +61,7 @@ class _WalletsPageState extends State<WalletsPage> {
 
   void _scrollListener() {
     if (dataPage.hasNextPage &&
-        _scrollController.offset >=
-            _scrollController.position.maxScrollExtent - 10 &&
+        _scrollController.offset >= _scrollController.position.maxScrollExtent - 10 &&
         !_scrollController.position.outOfRange) {
       loadData(FetchMode.nextPage);
     }
@@ -106,21 +108,25 @@ class _WalletsPageState extends State<WalletsPage> {
     Wallet item,
     ItemAction action,
   ) async {
-    switch (action) {
-      case ItemAction.select:
-        {
-          await context.push(WalletPage.route, extra: item);
-          break;
-        }
-      case ItemAction.delete:
-        {
-          await DI().get<WalletService>().deleteWallet(
-                code: item.code,
-              );
-          break;
-        }
+    try {
+      switch (action) {
+        case ItemAction.select:
+          {
+            await context.push(WalletPage.route, extra: item);
+            break;
+          }
+        case ItemAction.delete:
+          {
+            await DI().get<WalletService>().deleteWallet(code: item.code);
+            break;
+          }
+      }
+    } on ValidationError<WalletError> catch (e) {
+      if (e.errors.containsKey('wallet') && mounted) {
+        context.showError(e.errors['wallet']!.l10n(context));
+      }
     }
-    loadData(FetchMode.refreshPage);
+    loadData(FetchMode.refreshPage, dataPage.pageNumberOfElement(item));
   }
 
   Widget addButton() {

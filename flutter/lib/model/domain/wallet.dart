@@ -45,6 +45,19 @@ abstract class Wallet {
   WalletType get walletType;
 
   String get name;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    return other is Wallet && runtimeType == other.runtimeType && code == other.code;
+  }
+
+  @override
+  int get hashCode {
+    return code.hashCode;
+  }
 }
 
 abstract class WalletBalance {

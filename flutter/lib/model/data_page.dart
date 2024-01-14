@@ -61,7 +61,7 @@ class DataPage<T> {
     return DataPage<T>(content: <T>[]);
   }
 
-  void apply(FetchMode fetchMode) {
+  void apply(FetchMode fetchMode, [int? forPageNumber]) {
     if (fetchMode == FetchMode.clear) {
       content.clear();
       pageNumber = -1;
@@ -69,7 +69,12 @@ class DataPage<T> {
       totalPages = 0;
       _nextPageStep = 1;
     } else if (fetchMode == FetchMode.refreshPage) {
-      _nextPageStep = 0;
+      if (forPageNumber != null && forPageNumber >= 0 && forPageNumber < totalPages) {
+        _nextPageStep = pageNumber - forPageNumber;
+        pageNumber = forPageNumber;
+      } else {
+        _nextPageStep = 0;
+      }
     } else if (fetchMode == FetchMode.nextPage) {
       _nextPageStep = 1;
     }
@@ -77,6 +82,11 @@ class DataPage<T> {
 
   bool indexIsLastPageItem(int index) {
     return (index + 1) % pageSize == 0;
+  }
+
+  int pageNumberOfElement(T element) {
+    final index = content.indexOf(element);
+    return pageNumberOfIndex(index);
   }
 
   int pageNumberOfIndex(int index) {

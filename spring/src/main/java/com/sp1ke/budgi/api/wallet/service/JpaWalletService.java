@@ -6,6 +6,7 @@ import com.sp1ke.budgi.api.wallet.ApiWallet;
 import com.sp1ke.budgi.api.wallet.WalletService;
 import com.sp1ke.budgi.api.wallet.domain.JpaWallet;
 import com.sp1ke.budgi.api.wallet.repo.WalletRepo;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
 import java.util.Optional;
@@ -57,6 +58,7 @@ public class JpaWalletService implements WalletService {
     }
 
     @Override
+    @Transactional
     public void deleteByCode(Long userId, String code) {
         walletRepo.deleteByUserIdAndCode(userId, code);
     }

@@ -72,7 +72,7 @@ class WalletList extends StatelessWidget {
 
   Widget listItem(BuildContext context, Wallet item) {
     return ListTile(
-      leading: item.walletType.icon(),
+      leading: Text(item.code),//item.walletType.icon(),
       title: Text(item.name),
       subtitle: Text(item.walletType.l10n(context)),
       trailing: IconButton(

@@ -1,6 +1,8 @@
+- on list delete item must load from item page onward
 - Fix wallets balance by period (not using previous period balance)
 - Help dialog on transactions explained:
-  x All transactions have payment status completed except with CreditCard.
+  x All transactions have payment status completed except with Credit Card.
   x Deferred transactions will create multiple transactions.
   x Transfers to Credit Cards mark older pending transactions as completed.
 - User profile page
+- list with select for multiple items actions

@@ -46,10 +46,7 @@ class WalletSpringService implements WalletService {
   }
 
   @override
-  Future<Wallet> saveWallet(
-      {String? code,
-      required WalletType walletType,
-      required String name}) async {
+  Future<Wallet> saveWallet({String? code, required WalletType walletType, required String name}) async {
     final wallet = _SpringWallet()
       ..code = code ?? ''
       ..name = name
@@ -61,6 +58,7 @@ class WalletSpringService implements WalletService {
     try {
       final response = await _httpClient.jsonPost<Map<String, dynamic>>(
         authService: authService,
+        path: code != null ? '/$code' : '',
         data: wallet.toMap(),
       );
       return _SpringWallet.from(response)!;
@@ -75,33 +73,27 @@ class WalletSpringService implements WalletService {
   }
 
   @override
-  Future<void> deleteWallet({required String code}) {
-    // TODO: implement deleteWallet
-    return Future.value();
+  Future<void> deleteWallet({required String code}) async {
+    try {
+      await _httpClient.delete(authService: authService, path: '/$code');
+    } on SocketException catch (_) {
+      throw NoServerError();
+    } catch (e) {
+      debugPrint('Unexpected error $e');
+      throw ValidationError({
+        'wallet': WalletError.invalidWallet,
+      });
+    }
   }
 
   @override
-  Future<Wallet> fetchWalletByCode(String code) {
-    // TODO: implement fetchWalletByCode
-    return Future.value(_SpringWallet());
-  }
-
-  @override
-  Future<Wallet?> fetchWalletById(int id) {
-    // TODO: implement fetchWalletById
-    return Future.value();
-  }
-
-  @override
-  Future<void> updateWalletBalance(
-      {required String code, required Period period}) {
+  Future<void> updateWalletBalance({required String code, required Period period}) {
     // TODO: implement updateWalletBalance
     return Future.value();
   }
 
   @override
-  Future<Map<Wallet, double>> walletsBalance(
-      {required Period period, bool showZeroBalance = false}) {
+  Future<Map<Wallet, double>> walletsBalance({required Period period, bool showZeroBalance = false}) {
     // TODO: implement walletsBalance
     return Future.value({});
   }
@@ -138,20 +130,5 @@ class _SpringWallet implements Wallet {
       }
     }
     return null;
-  }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) {
-      return true;
-    }
-    return other is _SpringWallet &&
-        runtimeType == other.runtimeType &&
-        code == other.code;
-  }
-
-  @override
-  int get hashCode {
-    return code.hashCode;
   }
 }
