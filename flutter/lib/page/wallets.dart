@@ -12,7 +12,7 @@ import '../model/fetch_mode.dart';
 import '../model/item_action.dart';
 import '../service/wallet.dart';
 import '../util/ui.dart';
-import '../widget/domain/wallet_list.dart';
+import '../widget/common/domain_list.dart';
 import 'wallet.dart';
 
 class WalletsPage extends StatefulWidget {
@@ -78,30 +78,92 @@ class _WalletsPageState extends State<WalletsPage> {
   }
 
   Widget body() {
-    return CustomScrollView(
-      controller: _scrollController,
-      slivers: [
-        toolbar(),
-        WalletList(
-          data: dataPage,
-          initialLoading: initialLoading,
-          loadingNextPage: loading,
-          onItemAction: onItemAction,
-        ),
+    final l10n = L10n.of(context);
+    return DomainList<Wallet>(
+      scrollController: _scrollController,
+      actions: actions(),
+      data: dataPage,
+      dataColumns: <DataColumn>[
+        const DataColumn(label: Text('')),
+        DataColumn(label: Text(l10n.code)),
+        DataColumn(label: Text(l10n.walletType)),
+        DataColumn(label: Text(l10n.walletName)),
+        const DataColumn(label: Text('')),
       ],
+      initialLoading: initialLoading,
+      loadingNextPage: loading,
+      itemBuilder: listItem,
+      itemRowBuilder: rowItem,
+      onItemAction: onItemAction,
     );
   }
 
-  Widget toolbar() {
-    return SliverAppBar(
-      actions: [
-        IconButton(
-          onPressed: () {
-            loadData(FetchMode.clear);
-          },
-          icon: AppIcon.reload,
-        ),
-      ],
+  List<Widget> actions() {
+    return <Widget>[
+      IconButton(
+        onPressed: () {
+          loadData(FetchMode.clear);
+        },
+        icon: AppIcon.reload,
+      ),
+    ];
+  }
+
+  Widget listItem(BuildContext context, Wallet item, _) {
+    return ListTile(
+      leading: item.walletType.icon(),
+      title: Text(item.name),
+      subtitle: Row(
+        children: [
+          itemCodeWidget(item),
+          Text(' ${item.walletType.l10n(context)}'),
+        ],
+      ),
+      trailing: IconButton(
+        icon: AppIcon.delete(context),
+        onPressed: !loading
+            ? () async {
+                final l10n = L10n.of(context);
+                final confirm = await context.confirm(
+                  title: l10n.walletDelete,
+                  description: l10n.walletDeleteConfirm(item.name),
+                );
+                if (confirm && context.mounted) {
+                  onItemAction(context, item, ItemAction.delete);
+                }
+              }
+            : null,
+      ),
+      onTap: !loading
+          ? () {
+              onItemAction(context, item, ItemAction.select);
+            }
+          : null,
+    );
+  }
+
+  DataRow rowItem(int index) {
+    final item = dataPage[index];
+    return DataRow(cells: [
+      DataCell(item.walletType.icon()),
+      DataCell(itemCodeWidget(item)),
+      DataCell(Text(item.walletType.l10n(context))),
+      DataCell(Text(item.name)),
+      DataCell(Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(icon: AppIcon.edit, onPressed: () {}),
+          IconButton(icon: AppIcon.delete(context), onPressed: () {}),
+        ],
+      )), //TODO
+    ]);
+  }
+
+  Widget itemCodeWidget(Wallet item) {
+    return Text(
+      item.code,
+      textScaler: const TextScaler.linear(0.7),
+      style: TextStyle(color: Theme.of(context).disabledColor),
     );
   }
 

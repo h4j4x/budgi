@@ -39,6 +39,12 @@ class DataPage<T> {
     return nextPage;
   }
 
+  int get pageLength {
+    final offset = pageNumber * pageSize;
+    final limit = min(offset + pageSize, content.length);
+    return limit - offset;
+  }
+
   void add(DataPage<T> dataPage) {
     if (pageNumber < dataPage.pageNumber) {
       content.addAll(dataPage.content);

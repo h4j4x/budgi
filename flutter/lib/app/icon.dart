@@ -36,6 +36,10 @@ class AppIcon {
     return _Icon(FontAwesomeIcons.trash, color: color);
   }
 
+  static Widget get edit {
+    return const _Icon(FontAwesomeIcons.penToSquare);
+  }
+
   static Widget get filter {
     return const _Icon(FontAwesomeIcons.filter);
   }

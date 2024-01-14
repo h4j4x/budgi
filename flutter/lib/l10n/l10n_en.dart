@@ -73,6 +73,9 @@ class L10nEn extends L10n {
   String get categoryNameHint => 'Enter category name...';
 
   @override
+  String get code => 'Code';
+
+  @override
   String get copyingPreviousPeriod => 'Copying previous period amounts. Please wait...';
 
   @override
@@ -338,6 +341,9 @@ class L10nEn extends L10n {
 
   @override
   String get walletsBalance => 'Wallets balance';
+
+  @override
+  String get walletType => 'Wallet type';
 
   @override
   String get walletTypeCash => 'Cash';

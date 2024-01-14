@@ -211,6 +211,12 @@ abstract class L10n {
   /// **'Enter category name...'**
   String get categoryNameHint;
 
+  /// No description provided for @code.
+  ///
+  /// In en, this message translates to:
+  /// **'Code'**
+  String get code;
+
   /// No description provided for @copyingPreviousPeriod.
   ///
   /// In en, this message translates to:
@@ -684,6 +690,12 @@ abstract class L10n {
   /// In en, this message translates to:
   /// **'Wallets balance'**
   String get walletsBalance;
+
+  /// No description provided for @walletType.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet type'**
+  String get walletType;
 
   /// No description provided for @walletTypeCash.
   ///
