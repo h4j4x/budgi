@@ -33,13 +33,12 @@ class WalletSpringService implements WalletService {
     int? pageSize,
   }) async {
     try {
-      final v = await _httpClient.jsonGetPage<Wallet>(
+      return _httpClient.jsonGetPage<Wallet>(
         authService: authService,
         page: page,
         pageSize: pageSize,
         mapper: _SpringWallet.from,
       );
-      return v;
     } on SocketException catch (_) {
       throw NoServerError();
     }
@@ -56,11 +55,19 @@ class WalletSpringService implements WalletService {
       throw ValidationError(errors);
     }
     try {
-      final response = await _httpClient.jsonPost<Map<String, dynamic>>(
-        authService: authService,
-        path: code != null ? '/$code' : '',
-        data: wallet.toMap(),
-      );
+      Map<String, dynamic> response;
+      if (code != null) {
+        response = await _httpClient.jsonPut<Map<String, dynamic>>(
+          authService: authService,
+          path: '/$code',
+          data: wallet.toMap(),
+        );
+      } else {
+        response = await _httpClient.jsonPost<Map<String, dynamic>>(
+          authService: authService,
+          data: wallet.toMap(),
+        );
+      }
       return _SpringWallet.from(response)!;
     } on SocketException catch (_) {
       throw NoServerError();

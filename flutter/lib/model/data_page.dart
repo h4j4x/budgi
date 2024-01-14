@@ -62,21 +62,37 @@ class DataPage<T> {
   }
 
   void apply(FetchMode fetchMode, [int? forPageNumber]) {
-    if (fetchMode == FetchMode.clear) {
-      content.clear();
-      pageNumber = -1;
-      totalElements = 0;
-      totalPages = 0;
-      _nextPageStep = 1;
-    } else if (fetchMode == FetchMode.refreshPage) {
-      if (forPageNumber != null && forPageNumber >= 0 && forPageNumber < totalPages) {
-        _nextPageStep = pageNumber - forPageNumber;
-        pageNumber = forPageNumber;
-      } else {
-        _nextPageStep = 0;
-      }
-    } else if (fetchMode == FetchMode.nextPage) {
-      _nextPageStep = 1;
+    if (forPageNumber != null && (forPageNumber < 0 || forPageNumber >= totalPages)) {
+      forPageNumber = null;
+    }
+    switch (fetchMode) {
+      case FetchMode.clear:
+        {
+          content.clear();
+          pageNumber = -1;
+          totalElements = 0;
+          totalPages = 0;
+          _nextPageStep = 1;
+          break;
+        }
+      case FetchMode.refreshPage:
+        {
+          if (forPageNumber != null) {
+            final offset = forPageNumber * pageSize;
+            final limit = offset + pageSize;
+            if (limit < content.length) {
+              content.removeRange(limit, content.length);
+            }
+            pageNumber = forPageNumber;
+          }
+          _nextPageStep = 0;
+          break;
+        }
+      case FetchMode.nextPage:
+        {
+          _nextPageStep = 1;
+          break;
+        }
     }
   }
 
@@ -90,6 +106,6 @@ class DataPage<T> {
   }
 
   int pageNumberOfIndex(int index) {
-    return (index ~/ pageSize) + 1;
+    return index ~/ pageSize;
   }
 }

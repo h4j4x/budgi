@@ -73,6 +73,26 @@ class ApiHttpClient {
     );
   }
 
+  Future<T> jsonPut<T>({
+    required AuthService authService,
+    String path = '',
+    Map<String, Object>? data,
+  }) async {
+    final response = await httpClient.put(
+      Uri.parse('$baseUrl$path'),
+      body: data != null ? jsonEncode(data) : null,
+      headers: _headers(authService.token(), isJson: true),
+    );
+    if (_is2xxStatus(response.statusCode)) {
+      return jsonDecode(response.body) as T;
+    }
+    await _check401Status(authService, response.statusCode);
+    throw HttpError(
+      statusCode: response.statusCode,
+      reasonPhrase: response.reasonPhrase,
+    );
+  }
+
   Future<void> delete({
     required AuthService authService,
     String path = '',

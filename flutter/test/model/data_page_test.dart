@@ -17,8 +17,7 @@ void main() {
     /// Add page
     final list2 = <String>['f', 'g', 'h', 'i', 'j'];
     final contentLength = list1.length + list2.length;
-    page.add(DataPage<String>(
-        content: list2, pageNumber: 1, totalElements: contentLength));
+    page.add(DataPage<String>(content: list2, pageNumber: 1, totalElements: contentLength));
     expect(page.length, equals(contentLength));
     expect(page.pageSize, equals(list1.length));
     expect(page.totalElements, equals(contentLength));
@@ -31,8 +30,7 @@ void main() {
 
     /// Replace page
     final list3 = <String>['k', 'l', 'm', 'n', 'o'];
-    page.add(DataPage<String>(
-        content: list3, pageNumber: 1, totalElements: contentLength));
+    page.add(DataPage<String>(content: list3, pageNumber: 1, totalElements: contentLength));
     expect(page.length, equals(contentLength));
     expect(page.pageSize, equals(list1.length));
     expect(page.totalElements, equals(contentLength));
@@ -74,5 +72,27 @@ void main() {
     expect(page.length, equals(list1.length));
     expect(page.totalElements, equals(list1.length));
     expect(page.pageSize, equals(list1.length));
+  });
+
+  test('.pageNumberOfElement() gets correct page number', () {
+    final page = DataPage.empty<String>();
+    final lists = <List<String>>[
+      <String>['a', 'b', 'c', 'd', 'e'],
+      <String>['f', 'g', 'h', 'i', 'j'],
+      <String>['k', 'l', 'm', 'n', 'o'],
+    ];
+    for (var index = 0; index < lists.length; index++) {
+      final list = lists[index];
+      page.add(DataPage<String>(content: list, pageNumber: index));
+      for (var element in list) {
+        final pageNumber = page.pageNumberOfElement(element);
+        expect(pageNumber, equals(index));
+      }
+    }
+    final list = <String>[lists[0][2], lists[1][4], lists[2][3]];
+    for (var index = 0; index < list.length; index++) {
+      final pageNumber = page.pageNumberOfElement(list[index]);
+      expect(pageNumber, equals(index));
+    }
   });
 }

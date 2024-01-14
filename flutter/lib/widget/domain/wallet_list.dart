@@ -45,6 +45,12 @@ class WalletList extends StatelessWidget {
         if (index < data.length) {
           return listItem(context, data[index]);
         }
+        if (index == data.length) {
+          return TextDivider(
+            color: Theme.of(context).primaryColor,
+            text: L10n.of(context).pageInfo(data.pageNumber + 1, data.totalElements),
+          );
+        }
         return ListTile(
           leading: AppIcon.loadingOfSize(18),
           title: Text(
@@ -66,15 +72,24 @@ class WalletList extends StatelessWidget {
         }
         return const Divider();
       },
-      itemCount: data.length + (loadingNextPage ? 1 : 0),
+      itemCount: data.length + (loadingNextPage ? 2 : 1),
     );
   }
 
   Widget listItem(BuildContext context, Wallet item) {
     return ListTile(
-      leading: Text(item.code),//item.walletType.icon(),
+      leading: item.walletType.icon(),
       title: Text(item.name),
-      subtitle: Text(item.walletType.l10n(context)),
+      subtitle: Row(
+        children: [
+          Text(
+            item.code,
+            textScaler: const TextScaler.linear(0.7),
+            style: TextStyle(color: Theme.of(context).disabledColor),
+          ),
+          Text(' ${item.walletType.l10n(context)}'),
+        ],
+      ),
       trailing: IconButton(
         icon: AppIcon.delete(context),
         onPressed: () async {

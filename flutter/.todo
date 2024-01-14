@@ -1,4 +1,3 @@
-- on list delete item must load from item page onward
 - Fix wallets balance by period (not using previous period balance)
 - Help dialog on transactions explained:
   x All transactions have payment status completed except with Credit Card.

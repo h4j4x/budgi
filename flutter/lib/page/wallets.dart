@@ -125,8 +125,9 @@ class _WalletsPageState extends State<WalletsPage> {
       if (e.errors.containsKey('wallet') && mounted) {
         context.showError(e.errors['wallet']!.l10n(context));
       }
+    } finally {
+      loadData(FetchMode.refreshPage, dataPage.pageNumberOfElement(item));
     }
-    loadData(FetchMode.refreshPage, dataPage.pageNumberOfElement(item));
   }
 
   Widget addButton() {
