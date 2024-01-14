@@ -30,6 +30,7 @@ class _WalletsPageState extends State<WalletsPage> {
   final dataPage = DataPage.empty<Wallet>();
   final _scrollController = ScrollController();
 
+  bool initialLoading = true;
   bool loading = false;
 
   @override
@@ -55,6 +56,7 @@ class _WalletsPageState extends State<WalletsPage> {
         );
     dataPage.add(newDataPage);
     setState(() {
+      initialLoading = false;
       loading = false;
     });
   }
@@ -82,7 +84,7 @@ class _WalletsPageState extends State<WalletsPage> {
         toolbar(),
         WalletList(
           data: dataPage,
-          enabled: !loading,
+          initialLoading: initialLoading,
           loadingNextPage: loading,
           onItemAction: onItemAction,
         ),

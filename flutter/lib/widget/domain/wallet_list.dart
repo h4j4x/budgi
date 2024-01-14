@@ -12,21 +12,21 @@ import '../common/text_divider.dart';
 
 class WalletList extends StatelessWidget {
   final DataPage<Wallet> data;
-  final bool enabled;
+  final bool initialLoading;
   final bool loadingNextPage;
   final TypedContextItemAction<Wallet> onItemAction;
 
   const WalletList({
     super.key,
     required this.data,
-    required this.enabled,
+    required this.initialLoading,
     required this.loadingNextPage,
     required this.onItemAction,
   });
 
   @override
   Widget build(BuildContext context) {
-    if (!enabled) {
+    if (initialLoading) {
       return const SliverCenter(
         child: CircularProgressIndicator.adaptive(),
       );
@@ -35,7 +35,7 @@ class WalletList extends StatelessWidget {
   }
 
   Widget body(BuildContext context) {
-    if (data.isEmpty) {
+    if (data.isEmpty && !loadingNextPage && !initialLoading) {
       return SliverCenter(
         child: Text(L10n.of(context).nothingHere),
       );
@@ -51,16 +51,7 @@ class WalletList extends StatelessWidget {
             text: L10n.of(context).pageInfo(data.pageNumber + 1, data.totalElements),
           );
         }
-        return ListTile(
-          leading: AppIcon.loadingOfSize(18),
-          title: Text(
-            L10n.of(context).loadingNextPage,
-            textScaler: const TextScaler.linear(0.75),
-            style: TextStyle(
-              color: Theme.of(context).disabledColor,
-            ),
-          ),
-        );
+        return loadingItem(context);
       },
       separatorBuilder: (_, index) {
         final isLastPageItem = data.indexIsLastPageItem(index);
@@ -72,7 +63,7 @@ class WalletList extends StatelessWidget {
         }
         return const Divider();
       },
-      itemCount: data.length + (loadingNextPage ? 2 : 1),
+      itemCount: data.length + (loadingNextPage && !initialLoading ? 2 : 1),
     );
   }
 
@@ -92,20 +83,37 @@ class WalletList extends StatelessWidget {
       ),
       trailing: IconButton(
         icon: AppIcon.delete(context),
-        onPressed: () async {
-          final l10n = L10n.of(context);
-          final confirm = await context.confirm(
-            title: l10n.walletDelete,
-            description: l10n.walletDeleteConfirm(item.name),
-          );
-          if (confirm && context.mounted) {
-            onItemAction(context, item, ItemAction.delete);
-          }
-        },
+        onPressed: !loadingNextPage
+            ? () async {
+                final l10n = L10n.of(context);
+                final confirm = await context.confirm(
+                  title: l10n.walletDelete,
+                  description: l10n.walletDeleteConfirm(item.name),
+                );
+                if (confirm && context.mounted) {
+                  onItemAction(context, item, ItemAction.delete);
+                }
+              }
+            : null,
       ),
-      onTap: () {
-        onItemAction(context, item, ItemAction.select);
-      },
+      onTap: !loadingNextPage
+          ? () {
+              onItemAction(context, item, ItemAction.select);
+            }
+          : null,
+    );
+  }
+
+  Widget loadingItem(BuildContext context) {
+    return ListTile(
+      leading: AppIcon.loadingOfSize(18),
+      title: Text(
+        L10n.of(context).loadingNextPage,
+        textScaler: const TextScaler.linear(0.75),
+        style: TextStyle(
+          color: Theme.of(context).disabledColor,
+        ),
+      ),
     );
   }
 }
