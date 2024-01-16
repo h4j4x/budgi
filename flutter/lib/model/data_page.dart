@@ -45,6 +45,12 @@ class DataPage<T> {
     return limit - offset;
   }
 
+  List<T> get pageContent {
+    final offset = pageNumber * pageSize;
+    final limit = min(offset + pageSize, content.length);
+    return content.sublist(offset, limit);
+  }
+
   void add(DataPage<T> dataPage) {
     if (pageNumber < dataPage.pageNumber) {
       content.addAll(dataPage.content);
