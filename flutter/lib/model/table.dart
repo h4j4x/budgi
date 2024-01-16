@@ -1,16 +1,20 @@
 import 'dart:math';
 
+import 'package:flutter/painting.dart';
+
 class TableColumn {
   final String key;
   final String label;
   final double? widthPercent;
   final double? fixedWidth;
+  final Alignment? alignment;
 
   TableColumn({
     String? key,
     required this.label,
     this.widthPercent,
     this.fixedWidth,
+    this.alignment,
   }) : key = key ?? label;
 }
 

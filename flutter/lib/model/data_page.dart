@@ -39,16 +39,22 @@ class DataPage<T> {
     return nextPage;
   }
 
+  int get _pageIndexStart {
+    final index = pageNumber * pageSize;
+    return max(index, 0);
+  }
+
+  int get _pageIndexEnd {
+    final index = _pageIndexStart + pageSize;
+    return min(index, content.length);
+  }
+
   int get pageLength {
-    final offset = pageNumber * pageSize;
-    final limit = min(offset + pageSize, content.length);
-    return limit - offset;
+    return _pageIndexEnd - _pageIndexStart;
   }
 
   List<T> get pageContent {
-    final offset = pageNumber * pageSize;
-    final limit = min(offset + pageSize, content.length);
-    return content.sublist(offset, limit);
+    return content.sublist(_pageIndexStart, _pageIndexEnd);
   }
 
   void add(DataPage<T> dataPage) {
@@ -56,9 +62,9 @@ class DataPage<T> {
       content.addAll(dataPage.content);
       pageNumber = dataPage.pageNumber;
     } else {
-      final offset = dataPage.pageNumber * pageSize;
-      final limit = min(offset + pageSize, content.length);
-      content.replaceRange(offset, limit, dataPage.content);
+      final pageIndexStart = dataPage.pageNumber * dataPage.pageSize;
+      final pageIndexEnd = min(pageIndexStart + dataPage.pageSize, content.length);
+      content.replaceRange(pageIndexStart, pageIndexEnd, dataPage.content);
     }
     pageSize = dataPage.pageSize;
     totalElements = dataPage.totalElements;
@@ -70,7 +76,7 @@ class DataPage<T> {
   }
 
   static DataPage<T> empty<T>() {
-    return DataPage<T>(content: <T>[]);
+    return DataPage<T>(content: <T>[], pageSize: 10);
   }
 
   void apply(FetchMode fetchMode, [int? forPageNumber]) {
@@ -90,10 +96,10 @@ class DataPage<T> {
       case FetchMode.refreshPage:
         {
           if (forPageNumber != null) {
-            final offset = forPageNumber * pageSize;
-            final limit = offset + pageSize;
-            if (limit < content.length) {
-              content.removeRange(limit, content.length);
+            final pageIndexStart = max(forPageNumber * pageSize, 0);
+            final pageIndexEnd = pageIndexStart + pageSize;
+            if (pageIndexEnd < content.length) {
+              content.removeRange(pageIndexEnd, content.length);
             }
             pageNumber = forPageNumber;
           }

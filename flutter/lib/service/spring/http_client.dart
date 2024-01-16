@@ -155,7 +155,7 @@ class ApiHttpClient {
       params['page'] = page.toString();
     }
     if (pageSize != null && pageSize > 0) {
-      params['pageSize'] = pageSize.toString();
+      params['size'] = pageSize.toString();
     }
     final uri = Uri.parse(url);
     if (params.isNotEmpty) {

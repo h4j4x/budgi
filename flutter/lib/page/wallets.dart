@@ -10,6 +10,7 @@ import '../model/error/validation.dart';
 import '../model/error/wallet.dart';
 import '../model/fetch_mode.dart';
 import '../model/item_action.dart';
+import '../model/table.dart';
 import '../service/wallet.dart';
 import '../util/ui.dart';
 import '../widget/common/domain_list.dart';
@@ -25,6 +26,11 @@ class WalletsPage extends StatefulWidget {
     return _WalletsPageState();
   }
 }
+
+const _tableIconCell = 'icon';
+const _tableCodeCell = 'code';
+const _tableTypeCell = 'type';
+const _tableNameCell = 'name';
 
 class _WalletsPageState extends State<WalletsPage> {
   final dataPage = DataPage.empty<Wallet>();
@@ -83,17 +89,17 @@ class _WalletsPageState extends State<WalletsPage> {
       scrollController: _scrollController,
       actions: actions(),
       data: dataPage,
-      dataColumns: <DataColumn>[
-        const DataColumn(label: Text('')),
-        DataColumn(label: Text(l10n.code)),
-        DataColumn(label: Text(l10n.walletType)),
-        DataColumn(label: Text(l10n.walletName)),
-        const DataColumn(label: Text('')),
+      tableColumns: <TableColumn>[
+        TableColumn(key: _tableIconCell, label: '', fixedWidth: 50, alignment: Alignment.center),
+        TableColumn(key: _tableCodeCell, label: l10n.code, widthPercent: 10),
+        TableColumn(key: _tableTypeCell, label: l10n.walletType, widthPercent: 20),
+        TableColumn(key: _tableNameCell, label: l10n.walletName),
+        TableColumn(key: 'icons', label: '', fixedWidth: 100, alignment: Alignment.center),
       ],
       initialLoading: initialLoading,
       loadingNextPage: loading,
       itemBuilder: listItem,
-      itemRowBuilder: rowItem,
+      itemCellBuilder: rowItem,
       onItemAction: onItemAction,
     );
   }
@@ -101,9 +107,11 @@ class _WalletsPageState extends State<WalletsPage> {
   List<Widget> actions() {
     return <Widget>[
       IconButton(
-        onPressed: () {
-          loadData(FetchMode.clear);
-        },
+        onPressed: !loading
+            ? () {
+                loadData(FetchMode.clear);
+              }
+            : null,
         icon: AppIcon.reload,
       ),
     ];
@@ -142,21 +150,20 @@ class _WalletsPageState extends State<WalletsPage> {
     );
   }
 
-  DataRow rowItem(int index) {
-    final item = dataPage[index];
-    return DataRow(cells: [
-      DataCell(item.walletType.icon()),
-      DataCell(itemCodeWidget(item)),
-      DataCell(Text(item.walletType.l10n(context))),
-      DataCell(Text(item.name)),
-      DataCell(Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          IconButton(icon: AppIcon.edit, onPressed: () {}),
-          IconButton(icon: AppIcon.delete(context), onPressed: () {}),
-        ],
-      )), //TODO
-    ]);
+  Widget rowItem(String key, Wallet wallet) {
+    return switch (key) {
+      _tableIconCell => wallet.walletType.icon(),
+      _tableCodeCell => itemCodeWidget(wallet),
+      _tableTypeCell => Text(wallet.walletType.l10n(context)),
+      _tableNameCell => Text(wallet.name),
+      _ => Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            IconButton(icon: AppIcon.edit, onPressed: () {}),
+            IconButton(icon: AppIcon.delete(context), onPressed: () {}),
+          ],
+        ),
+    };
   }
 
   Widget itemCodeWidget(Wallet item) {

@@ -6,7 +6,7 @@ void main() {
   test('.add() puts data on its place', () {
     final page = DataPage.empty<String>();
     final list1 = <String>['a', 'b', 'c', 'd', 'e'];
-    page.add(DataPage<String>(content: list1, pageNumber: 0));
+    page.add(DataPage<String>(content: list1, pageSize: 5, pageNumber: 0));
     expect(page.length, equals(list1.length));
     expect(page.pageSize, equals(list1.length));
     expect(page.totalElements, equals(list1.length));
@@ -17,7 +17,7 @@ void main() {
     /// Add page
     final list2 = <String>['f', 'g', 'h', 'i', 'j'];
     final contentLength = list1.length + list2.length;
-    page.add(DataPage<String>(content: list2, pageNumber: 1, totalElements: contentLength));
+    page.add(DataPage<String>(content: list2, pageNumber: 1, pageSize: 5, totalElements: contentLength));
     expect(page.length, equals(contentLength));
     expect(page.pageSize, equals(list1.length));
     expect(page.totalElements, equals(contentLength));
@@ -30,7 +30,7 @@ void main() {
 
     /// Replace page
     final list3 = <String>['k', 'l', 'm', 'n', 'o'];
-    page.add(DataPage<String>(content: list3, pageNumber: 1, totalElements: contentLength));
+    page.add(DataPage<String>(content: list3, pageNumber: 1, pageSize: 5, totalElements: contentLength));
     expect(page.length, equals(contentLength));
     expect(page.pageSize, equals(list1.length));
     expect(page.totalElements, equals(contentLength));

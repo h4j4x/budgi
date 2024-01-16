@@ -3,22 +3,23 @@ import 'package:flutter/material.dart';
 import '../../app/icon.dart';
 import '../../l10n/l10n.dart';
 import '../../model/data_page.dart';
+import '../../model/table.dart';
 import '../../util/function.dart';
 import '../common/text_divider.dart';
 import 'responsive.dart';
+import 'table.dart';
 
 typedef ItemBuilder<T> = Widget Function(BuildContext, T item, int index);
-typedef ItemRowBuilder = DataRow Function(int index);
 
 class DomainList<T> extends StatelessWidget {
   final ScrollController scrollController;
   final List<Widget> actions;
   final DataPage<T> data;
-  final List<DataColumn> dataColumns;
+  final List<TableColumn> tableColumns;
   final bool initialLoading;
   final bool loadingNextPage;
   final ItemBuilder<T> itemBuilder;
-  final ItemRowBuilder itemRowBuilder;
+  final RowCellBuilder<T> itemCellBuilder;
   final TypedContextItemAction<T> onItemAction;
 
   const DomainList({
@@ -26,11 +27,11 @@ class DomainList<T> extends StatelessWidget {
     required this.scrollController,
     required this.actions,
     required this.data,
-    required this.dataColumns,
+    required this.tableColumns,
     required this.initialLoading,
     required this.loadingNextPage,
     required this.itemBuilder,
-    required this.itemRowBuilder,
+    required this.itemCellBuilder,
     required this.onItemAction,
   });
 
@@ -76,7 +77,7 @@ class DomainList<T> extends StatelessWidget {
             if (isLastPageItem) {
               return TextDivider(
                 color: Theme.of(context).primaryColor,
-                text: L10n.of(context).pageEnd(data.pageNumberOfIndex(index)),
+                text: L10n.of(context).pageEnd(data.pageNumberOfIndex(index) + 1),
               );
             }
             return const Divider();
@@ -88,13 +89,11 @@ class DomainList<T> extends StatelessWidget {
   }
 
   Widget desktop(BuildContext context) {
-    return PaginatedDataTable(
-      header: toolbar(),
-      source: _DataTableSource(data: data, itemRowBuilder: itemRowBuilder),
-      columns: dataColumns,
-      rowsPerPage: data.pageLength,
-      showFirstLastButtons: true,
-      showCheckboxColumn: false, // TODO
+    return AppTable<T>(
+      header: sliverToolbar(),
+      columns: tableColumns,
+      elements: data.pageContent,
+      rowCellBuilder: itemCellBuilder,
     );
   }
 
@@ -112,46 +111,16 @@ class DomainList<T> extends StatelessWidget {
   }
 
   Widget sliverToolbar() {
+    final items = <Widget>[];
+    if (loadingNextPage || initialLoading) {
+      items.add(Padding(padding: const EdgeInsets.only(right: 8.0), child: AppIcon.loadingOfSize(14.0)));
+    }
     if (actions.isNotEmpty) {
-      return SliverAppBar(actions: actions);
+      items.addAll(actions);
+    }
+    if (items.isNotEmpty) {
+      return SliverAppBar(actions: items, elevation: .0, backgroundColor: Colors.transparent);
     }
     return Container();
-  }
-
-  Widget toolbar() {
-    if (actions.isNotEmpty) {
-      return AppBar(actions: actions, elevation: 0, backgroundColor: Colors.transparent);
-    }
-    return Container();
-  }
-}
-
-class _DataTableSource<T> extends DataTableSource {
-  final DataPage<T> data;
-  final ItemRowBuilder itemRowBuilder;
-
-  _DataTableSource({
-    required this.data,
-    required this.itemRowBuilder,
-  });
-
-  @override
-  bool get isRowCountApproximate {
-    return false;
-  }
-
-  @override
-  int get rowCount {
-    return data.pageLength;
-  }
-
-  @override
-  int get selectedRowCount {
-    return 0; // TODO
-  }
-
-  @override
-  DataRow getRow(int index) {
-    return itemRowBuilder(index);
   }
 }
