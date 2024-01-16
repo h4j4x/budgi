@@ -44,6 +44,22 @@ class AppIcon {
     return const _Icon(FontAwesomeIcons.filter);
   }
 
+  static Widget get goFirstPage {
+    return const _Icon(FontAwesomeIcons.circleChevronLeft);
+  }
+
+  static Widget get goLastPage {
+    return const _Icon(FontAwesomeIcons.circleChevronRight);
+  }
+
+  static Widget get goNextPage {
+    return const _Icon(FontAwesomeIcons.chevronRight);
+  }
+
+  static Widget get goPreviousPage {
+    return const _Icon(FontAwesomeIcons.chevronLeft);
+  }
+
   static Widget get home {
     return const _Icon(FontAwesomeIcons.house);
   }

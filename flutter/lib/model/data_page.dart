@@ -39,22 +39,22 @@ class DataPage<T> {
     return nextPage;
   }
 
-  int get _pageIndexStart {
+  int get pageIndexStart {
     final index = pageNumber * pageSize;
     return max(index, 0);
   }
 
-  int get _pageIndexEnd {
-    final index = _pageIndexStart + pageSize;
+  int get pageIndexEnd {
+    final index = pageIndexStart + pageSize;
     return min(index, content.length);
   }
 
   int get pageLength {
-    return _pageIndexEnd - _pageIndexStart;
+    return pageIndexEnd - pageIndexStart;
   }
 
   List<T> get pageContent {
-    return content.sublist(_pageIndexStart, _pageIndexEnd);
+    return content.sublist(pageIndexStart, pageIndexEnd);
   }
 
   void add(DataPage<T> dataPage) {

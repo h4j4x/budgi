@@ -88,7 +88,7 @@ class _WalletsPageState extends State<WalletsPage> {
     return DomainList<Wallet>(
       scrollController: _scrollController,
       actions: actions(),
-      data: dataPage,
+      dataPage: dataPage,
       tableColumns: <TableColumn>[
         TableColumn(key: _tableIconCell, label: '', fixedWidth: 50, alignment: Alignment.center),
         TableColumn(key: _tableCodeCell, label: l10n.code, widthPercent: 10),
@@ -101,6 +101,9 @@ class _WalletsPageState extends State<WalletsPage> {
       itemBuilder: listItem,
       itemCellBuilder: rowItem,
       onItemAction: onItemAction,
+      onPageNavigation: (page) {
+        loadData(FetchMode.refreshPage, page);
+      },
     );
   }
 

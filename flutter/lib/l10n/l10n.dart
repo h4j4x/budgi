@@ -397,6 +397,12 @@ abstract class L10n {
   /// **'{pageNumber} page(s). {totalElements} total element(s).'**
   String pageInfo(int pageNumber, int totalElements);
 
+  /// No description provided for @paginationInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'{startIndex} to {endIndex} of {totalElements}'**
+  String paginationInfo(int startIndex, int endIndex, int totalElements);
+
   /// No description provided for @prefixWithDate.
   ///
   /// In en, this message translates to:

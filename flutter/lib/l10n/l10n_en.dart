@@ -183,6 +183,11 @@ class L10nEn extends L10n {
   }
 
   @override
+  String paginationInfo(int startIndex, int endIndex, int totalElements) {
+    return '$startIndex to $endIndex of $totalElements';
+  }
+
+  @override
   String prefixWithDate(String prefix, DateTime date) {
     final intl.DateFormat dateDateFormat = intl.DateFormat.yMMMd(localeName);
     final String dateString = dateDateFormat.format(date);

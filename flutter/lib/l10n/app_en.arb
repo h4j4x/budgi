@@ -127,6 +127,20 @@
       }
     }
   },
+  "paginationInfo": "{startIndex} to {endIndex} of {totalElements}",
+  "@paginationInfo": {
+    "placeholders": {
+      "startIndex": {
+        "type": "int"
+      },
+      "endIndex": {
+        "type": "int"
+      },
+      "totalElements": {
+        "type": "int"
+      }
+    }
+  },
   "prefixWithDate": "{prefix}{date}",
   "@prefixWithDate": {
     "placeholders": {

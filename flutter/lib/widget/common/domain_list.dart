@@ -14,25 +14,27 @@ typedef ItemBuilder<T> = Widget Function(BuildContext, T item, int index);
 class DomainList<T> extends StatelessWidget {
   final ScrollController scrollController;
   final List<Widget> actions;
-  final DataPage<T> data;
+  final DataPage<T> dataPage;
   final List<TableColumn> tableColumns;
   final bool initialLoading;
   final bool loadingNextPage;
   final ItemBuilder<T> itemBuilder;
   final RowCellBuilder<T> itemCellBuilder;
   final TypedContextItemAction<T> onItemAction;
+  final Function(int) onPageNavigation;
 
   const DomainList({
     super.key,
     required this.scrollController,
     required this.actions,
-    required this.data,
+    required this.dataPage,
     required this.tableColumns,
     required this.initialLoading,
     required this.loadingNextPage,
     required this.itemBuilder,
     required this.itemCellBuilder,
     required this.onItemAction,
+    required this.onPageNavigation,
   });
 
   @override
@@ -46,7 +48,7 @@ class DomainList<T> extends StatelessWidget {
   }
 
   Widget body(BuildContext context) {
-    if (data.isEmpty && !loadingNextPage && !initialLoading) {
+    if (dataPage.isEmpty && !loadingNextPage && !initialLoading) {
       return Center(
         child: Text(L10n.of(context).nothingHere),
       );
@@ -61,28 +63,28 @@ class DomainList<T> extends StatelessWidget {
         sliverToolbar(),
         SliverList.separated(
           itemBuilder: (_, index) {
-            if (index < data.length) {
-              return itemBuilder(context, data[index], index);
+            if (index < dataPage.length) {
+              return itemBuilder(context, dataPage[index], index);
             }
-            if (index == data.length) {
+            if (index == dataPage.length) {
               return TextDivider(
                 color: Theme.of(context).primaryColor,
-                text: L10n.of(context).pageInfo(data.pageNumber + 1, data.totalElements),
+                text: L10n.of(context).pageInfo(dataPage.pageNumber + 1, dataPage.totalElements),
               );
             }
             return loadingItem(context);
           },
           separatorBuilder: (_, index) {
-            final isLastPageItem = data.indexIsLastPageItem(index);
+            final isLastPageItem = dataPage.indexIsLastPageItem(index);
             if (isLastPageItem) {
               return TextDivider(
                 color: Theme.of(context).primaryColor,
-                text: L10n.of(context).pageEnd(data.pageNumberOfIndex(index) + 1),
+                text: L10n.of(context).pageEnd(dataPage.pageNumberOfIndex(index) + 1),
               );
             }
             return const Divider();
           },
-          itemCount: data.length + (loadingNextPage && !initialLoading ? 2 : 1),
+          itemCount: dataPage.length + (loadingNextPage && !initialLoading ? 2 : 1),
         ),
       ],
     );
@@ -92,8 +94,10 @@ class DomainList<T> extends StatelessWidget {
     return AppTable<T>(
       header: sliverToolbar(),
       columns: tableColumns,
-      elements: data.pageContent,
+      dataPage: dataPage,
       rowCellBuilder: itemCellBuilder,
+      loading: loadingNextPage || initialLoading,
+      onPageNavigation: onPageNavigation,
     );
   }
 
