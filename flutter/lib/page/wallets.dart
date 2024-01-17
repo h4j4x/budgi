@@ -100,7 +100,6 @@ class _WalletsPageState extends State<WalletsPage> {
       loadingNextPage: loading,
       itemBuilder: listItem,
       itemCellBuilder: rowItem,
-      onItemAction: onItemAction,
       onPageNavigation: (page) {
         loadData(FetchMode.refreshPage, page);
       },
@@ -133,15 +132,8 @@ class _WalletsPageState extends State<WalletsPage> {
       trailing: IconButton(
         icon: AppIcon.delete(context),
         onPressed: !loading
-            ? () async {
-                final l10n = L10n.of(context);
-                final confirm = await context.confirm(
-                  title: l10n.walletDelete,
-                  description: l10n.walletDeleteConfirm(item.name),
-                );
-                if (confirm && context.mounted) {
-                  onItemAction(context, item, ItemAction.delete);
-                }
+            ? () {
+                deleteItem(item);
               }
             : null,
       ),
@@ -153,17 +145,31 @@ class _WalletsPageState extends State<WalletsPage> {
     );
   }
 
-  Widget rowItem(String key, Wallet wallet) {
+  Widget rowItem(String key, Wallet item) {
     return switch (key) {
-      _tableIconCell => wallet.walletType.icon(),
-      _tableCodeCell => itemCodeWidget(wallet),
-      _tableTypeCell => Text(wallet.walletType.l10n(context)),
-      _tableNameCell => Text(wallet.name),
+      _tableIconCell => item.walletType.icon(),
+      _tableCodeCell => itemCodeWidget(item),
+      _tableTypeCell => Text(item.walletType.l10n(context)),
+      _tableNameCell => Text(item.name),
       _ => Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            IconButton(icon: AppIcon.edit, onPressed: () {}),
-            IconButton(icon: AppIcon.delete(context), onPressed: () {}),
+            IconButton(
+              icon: AppIcon.edit,
+              onPressed: !loading
+                  ? () {
+                      onItemAction(context, item, ItemAction.select);
+                    }
+                  : null,
+            ),
+            IconButton(
+              icon: AppIcon.delete(context),
+              onPressed: !loading
+                  ? () {
+                      deleteItem(item);
+                    }
+                  : null,
+            ),
           ],
         ),
     };
@@ -201,6 +207,17 @@ class _WalletsPageState extends State<WalletsPage> {
       }
     } finally {
       loadData(FetchMode.refreshPage, dataPage.pageNumberOfElement(item));
+    }
+  }
+
+  void deleteItem(Wallet item) async {
+    final l10n = L10n.of(context);
+    final confirm = await context.confirm(
+      title: l10n.walletDelete,
+      description: l10n.walletDeleteConfirm(item.name),
+    );
+    if (confirm && context.mounted) {
+      onItemAction(context, item, ItemAction.delete);
     }
   }
 

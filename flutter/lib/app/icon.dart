@@ -45,19 +45,19 @@ class AppIcon {
   }
 
   static Widget get goFirstPage {
-    return const _Icon(FontAwesomeIcons.circleChevronLeft);
+    return const _Icon(FontAwesomeIcons.backward);
   }
 
   static Widget get goLastPage {
-    return const _Icon(FontAwesomeIcons.circleChevronRight);
+    return const _Icon(FontAwesomeIcons.forward);
   }
 
   static Widget get goNextPage {
-    return const _Icon(FontAwesomeIcons.chevronRight);
+    return const _Icon(FontAwesomeIcons.forwardStep);
   }
 
   static Widget get goPreviousPage {
-    return const _Icon(FontAwesomeIcons.chevronLeft);
+    return const _Icon(FontAwesomeIcons.backwardStep);
   }
 
   static Widget get home {

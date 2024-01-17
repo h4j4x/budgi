@@ -4,7 +4,6 @@ import '../../app/icon.dart';
 import '../../l10n/l10n.dart';
 import '../../model/data_page.dart';
 import '../../model/table.dart';
-import '../../util/function.dart';
 import '../common/text_divider.dart';
 import 'responsive.dart';
 import 'table.dart';
@@ -20,7 +19,6 @@ class DomainList<T> extends StatelessWidget {
   final bool loadingNextPage;
   final ItemBuilder<T> itemBuilder;
   final RowCellBuilder<T> itemCellBuilder;
-  final TypedContextItemAction<T> onItemAction;
   final Function(int) onPageNavigation;
 
   const DomainList({
@@ -33,7 +31,6 @@ class DomainList<T> extends StatelessWidget {
     required this.loadingNextPage,
     required this.itemBuilder,
     required this.itemCellBuilder,
-    required this.onItemAction,
     required this.onPageNavigation,
   });
 

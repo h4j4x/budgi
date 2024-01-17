@@ -247,6 +247,30 @@ abstract class L10n {
   /// **'From date'**
   String get fromDate;
 
+  /// No description provided for @goFirstPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Go first page'**
+  String get goFirstPage;
+
+  /// No description provided for @goLastPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Go last page'**
+  String get goLastPage;
+
+  /// No description provided for @goNextPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Go next page'**
+  String get goNextPage;
+
+  /// No description provided for @goPreviousPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Go previous page'**
+  String get goPreviousPage;
+
   /// No description provided for @home.
   ///
   /// In en, this message translates to:

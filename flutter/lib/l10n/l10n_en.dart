@@ -96,6 +96,18 @@ class L10nEn extends L10n {
   String get fromDate => 'From date';
 
   @override
+  String get goFirstPage => 'Go first page';
+
+  @override
+  String get goLastPage => 'Go last page';
+
+  @override
+  String get goNextPage => 'Go next page';
+
+  @override
+  String get goPreviousPage => 'Go previous page';
+
+  @override
   String get home => 'Home';
 
   @override

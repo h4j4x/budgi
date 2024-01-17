@@ -131,37 +131,45 @@ class AppTable<T> extends StatelessWidget {
           ),
         ),
         IconButton(
-            onPressed: !loading && dataPage.pageNumber > 0
-                ? () {
-                    onPageNavigation(0);
-                  }
-                : null,
-            icon: AppIcon.goFirstPage),
+          onPressed: !loading && dataPage.pageNumber > 0
+              ? () {
+                  onPageNavigation(0);
+                }
+              : null,
+          icon: AppIcon.goFirstPage,
+          tooltip: l10n.goFirstPage,
+        ),
         IconButton(
-            onPressed: !loading && dataPage.pageNumber > 0
-                ? () {
-                    onPageNavigation(dataPage.pageNumber - 1);
-                  }
-                : null,
-            icon: AppIcon.goPreviousPage),
+          onPressed: !loading && dataPage.pageNumber > 0
+              ? () {
+                  onPageNavigation(dataPage.pageNumber - 1);
+                }
+              : null,
+          icon: AppIcon.goPreviousPage,
+          tooltip: l10n.goPreviousPage,
+        ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 6.0),
           child: loading ? AppIcon.loading : Text((dataPage.pageNumber + 1).toString()),
         ),
         IconButton(
-            onPressed: !loading && dataPage.pageNumber > 0
-                ? () {
-                    onPageNavigation(dataPage.pageNumber + 1);
-                  }
-                : null,
-            icon: AppIcon.goNextPage),
+          onPressed: !loading && dataPage.pageNumber < dataPage.totalPages - 1
+              ? () {
+                  onPageNavigation(dataPage.pageNumber + 1);
+                }
+              : null,
+          icon: AppIcon.goNextPage,
+          tooltip: l10n.goNextPage,
+        ),
         IconButton(
-            onPressed: !loading && dataPage.pageNumber > 0
-                ? () {
-                    onPageNavigation(dataPage.totalPages - 1);
-                  }
-                : null,
-            icon: AppIcon.goLastPage),
+          onPressed: !loading && dataPage.pageNumber < dataPage.totalPages - 1
+              ? () {
+                  onPageNavigation(dataPage.totalPages - 1);
+                }
+              : null,
+          icon: AppIcon.goLastPage,
+          tooltip: l10n.goLastPage,
+        ),
       ],
     );
   }
