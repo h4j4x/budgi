@@ -64,6 +64,12 @@ public class JpaCategoryService implements CategoryService {
         categoryRepo.deleteByUserIdAndCode(userId, code);
     }
 
+    @Override
+    @Transactional
+    public void deleteByCodes(Long userId, String[] codes) {
+        categoryRepo.deleteByUserIdAndCodeIn(userId, codes);
+    }
+
     @NotNull
     private ApiCategory mapToApiCategory(@NotNull JpaCategory category) {
         return ApiCategory.builder()

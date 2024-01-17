@@ -348,6 +348,9 @@ class L10nEn extends L10n {
   }
 
   @override
+  String get walletDeleteSelectedConfirm => 'Confirm to delete selected wallets.';
+
+  @override
   String get walletName => 'Wallet name';
 
   @override
@@ -358,6 +361,9 @@ class L10nEn extends L10n {
 
   @override
   String get walletsBalance => 'Wallets balance';
+
+  @override
+  String get walletsDelete => 'Delete wallets';
 
   @override
   String get walletType => 'Wallet type';

@@ -5,28 +5,45 @@ import '../../l10n/l10n.dart';
 import '../../model/data_page.dart';
 import '../../model/table.dart';
 import '../../util/collection.dart';
+import '../../util/string.dart';
 
-typedef RowCellBuilder<T> = Widget Function(String key, T item);
+typedef RowCellBuilder<T> = Widget Function(String key, T element);
+typedef KeyFinder<T, K> = K Function(T element);
 
 const _cellHeight = 46.0;
 
-class AppTable<T> extends StatelessWidget {
+class AppTable<T, K> extends StatelessWidget {
   final Widget? header;
   final List<TableColumn> columns;
   final DataPage<T> dataPage;
   final RowCellBuilder<T> rowCellBuilder;
   final bool loading;
   final Function(int) onPageNavigation;
+  final Set<K>? selectedKeys;
+  final Function(K, bool)? onKeySelect;
+  final KeyFinder<T, K>? keyOf;
 
-  const AppTable({
+  final bool _hasSelect;
+  final String _selectCellKey;
+
+  AppTable({
     super.key,
     this.header,
-    required this.columns,
+    required List<TableColumn> columns,
     required this.dataPage,
     required this.rowCellBuilder,
     required this.loading,
     required this.onPageNavigation,
-  });
+    this.selectedKeys,
+    this.onKeySelect,
+    this.keyOf,
+  })  : columns = List<TableColumn>.of(columns),
+        _hasSelect = selectedKeys != null && onKeySelect != null && keyOf != null,
+        _selectCellKey = randomString(10) {
+    if (_hasSelect) {
+      this.columns.insert(0, TableColumn(key: _selectCellKey, label: '', fixedWidth: 50, alignment: Alignment.center));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,6 +98,12 @@ class AppTable<T> extends StatelessWidget {
     return Row(
       children: columns.mapIndexed((index, column) {
         final alignment = column.alignment ?? Alignment.centerLeft;
+        Widget cell;
+        if (column.key == _selectCellKey) {
+          cell = _selectCell(element);
+        } else {
+          cell = rowCellBuilder(column.key, element);
+        }
         return Container(
           alignment: alignment,
           width: widths[index],
@@ -88,10 +111,21 @@ class AppTable<T> extends StatelessWidget {
           decoration: _cellDecoration(context, index),
           child: Padding(
             padding: _paddingOf(alignment),
-            child: rowCellBuilder(column.key, element),
+            child: cell,
           ),
         );
       }).toList(),
+    );
+  }
+
+  Widget _selectCell(T element) {
+    final elementKey = keyOf!(element);
+    final selected = selectedKeys!.contains(elementKey);
+    return Checkbox(
+      value: selected,
+      onChanged: (value) {
+        onKeySelect!(elementKey, value ?? false);
+      },
     );
   }
 

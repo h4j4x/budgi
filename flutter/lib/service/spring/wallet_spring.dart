@@ -94,6 +94,23 @@ class WalletSpringService implements WalletService {
   }
 
   @override
+  Future<void> deleteWallets({required Set<String> codes}) async {
+    if (codes.isEmpty) {
+      return Future.value();
+    }
+    try {
+      await _httpClient.delete(authService: authService, path: '/batch?codes=${codes.join(',')}');
+    } on SocketException catch (_) {
+      throw NoServerError();
+    } catch (e) {
+      debugPrint('Unexpected error $e');
+      throw ValidationError({
+        'wallet': WalletError.invalidWallet,
+      });
+    }
+  }
+
+  @override
   Future<void> updateWalletBalance({required String code, required Period period}) {
     // TODO: implement updateWalletBalance
     return Future.value();

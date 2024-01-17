@@ -15,4 +15,6 @@ public interface CrudService<T> {
     Optional<T> findByCode(@NotNull Long userId, @NotNull String code);
 
     void deleteByCode(@NotNull Long userId, @NotNull String code);
+
+    void deleteByCodes(@NotNull Long userId, @NotNull String[] codes);
 }

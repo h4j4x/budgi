@@ -10,7 +10,7 @@ import 'table.dart';
 
 typedef ItemBuilder<T> = Widget Function(BuildContext, T item, int index);
 
-class DomainList<T> extends StatelessWidget {
+class DomainList<T, K> extends StatelessWidget {
   final ScrollController scrollController;
   final List<Widget> actions;
   final DataPage<T> dataPage;
@@ -20,6 +20,9 @@ class DomainList<T> extends StatelessWidget {
   final ItemBuilder<T> itemBuilder;
   final RowCellBuilder<T> itemCellBuilder;
   final Function(int) onPageNavigation;
+  final Set<K>? selectedKeys;
+  final Function(K, bool)? onKeySelect;
+  final KeyFinder<T, K>? keyOf;
 
   const DomainList({
     super.key,
@@ -32,6 +35,9 @@ class DomainList<T> extends StatelessWidget {
     required this.itemBuilder,
     required this.itemCellBuilder,
     required this.onPageNavigation,
+    this.selectedKeys,
+    this.onKeySelect,
+    this.keyOf,
   });
 
   @override
@@ -88,13 +94,16 @@ class DomainList<T> extends StatelessWidget {
   }
 
   Widget desktop(BuildContext context) {
-    return AppTable<T>(
+    return AppTable<T, K>(
       header: sliverToolbar(),
       columns: tableColumns,
       dataPage: dataPage,
       rowCellBuilder: itemCellBuilder,
       loading: loadingNextPage || initialLoading,
       onPageNavigation: onPageNavigation,
+      selectedKeys: selectedKeys,
+      onKeySelect: onKeySelect,
+      keyOf: keyOf,
     );
   }
 

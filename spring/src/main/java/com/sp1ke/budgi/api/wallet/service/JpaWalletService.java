@@ -63,6 +63,12 @@ public class JpaWalletService implements WalletService {
         walletRepo.deleteByUserIdAndCode(userId, code);
     }
 
+    @Override
+    @Transactional
+    public void deleteByCodes(Long userId, String[] codes) {
+        walletRepo.deleteByUserIdAndCodeIn(userId, codes);
+    }
+
     @NotNull
     private ApiWallet mapToApiWallet(@NotNull JpaWallet wallet) {
         return ApiWallet.builder()

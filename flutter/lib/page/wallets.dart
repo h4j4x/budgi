@@ -9,7 +9,6 @@ import '../model/domain/wallet.dart';
 import '../model/error/validation.dart';
 import '../model/error/wallet.dart';
 import '../model/fetch_mode.dart';
-import '../model/item_action.dart';
 import '../model/table.dart';
 import '../service/wallet.dart';
 import '../util/ui.dart';
@@ -34,7 +33,8 @@ const _tableNameCell = 'name';
 
 class _WalletsPageState extends State<WalletsPage> {
   final dataPage = DataPage.empty<Wallet>();
-  final _scrollController = ScrollController();
+  final scrollController = ScrollController();
+  final selectedCodes = <String>{};
 
   bool initialLoading = true;
   bool loading = false;
@@ -43,7 +43,7 @@ class _WalletsPageState extends State<WalletsPage> {
   void initState() {
     super.initState();
     Future.delayed(Duration.zero, () {
-      _scrollController.addListener(_scrollListener);
+      scrollController.addListener(_scrollListener);
       loadData(FetchMode.clear);
     });
   }
@@ -69,8 +69,8 @@ class _WalletsPageState extends State<WalletsPage> {
 
   void _scrollListener() {
     if (dataPage.hasNextPage &&
-        _scrollController.offset >= _scrollController.position.maxScrollExtent - 10 &&
-        !_scrollController.position.outOfRange) {
+        scrollController.offset >= scrollController.position.maxScrollExtent - 10 &&
+        !scrollController.position.outOfRange) {
       loadData(FetchMode.nextPage);
     }
   }
@@ -85,8 +85,8 @@ class _WalletsPageState extends State<WalletsPage> {
 
   Widget body() {
     final l10n = L10n.of(context);
-    return DomainList<Wallet>(
-      scrollController: _scrollController,
+    return DomainList<Wallet, String>(
+      scrollController: scrollController,
       actions: actions(),
       dataPage: dataPage,
       tableColumns: <TableColumn>[
@@ -99,15 +99,27 @@ class _WalletsPageState extends State<WalletsPage> {
       initialLoading: initialLoading,
       loadingNextPage: loading,
       itemBuilder: listItem,
-      itemCellBuilder: rowItem,
+      itemCellBuilder: cellItem,
       onPageNavigation: (page) {
         loadData(FetchMode.refreshPage, page);
+      },
+      selectedKeys: selectedCodes,
+      onKeySelect: (code, selected) {
+        if (selected) {
+          selectedCodes.add(code);
+        } else {
+          selectedCodes.remove(code);
+        }
+        setState(() {});
+      },
+      keyOf: (wallet) {
+        return wallet.code;
       },
     );
   }
 
   List<Widget> actions() {
-    return <Widget>[
+    final actions = <Widget>[
       IconButton(
         onPressed: !loading
             ? () {
@@ -117,40 +129,54 @@ class _WalletsPageState extends State<WalletsPage> {
         icon: AppIcon.reload,
       ),
     ];
+    if (selectedCodes.isNotEmpty) {
+      actions.addAll(<Widget>[
+        const VerticalDivider(),
+        IconButton(
+          onPressed: !loading
+              ? () {
+                  deleteSelected();
+                }
+              : null,
+          icon: AppIcon.delete(context),
+        ),
+      ]);
+    }
+    return actions;
   }
 
-  Widget listItem(BuildContext context, Wallet item, _) {
+  Widget listItem(BuildContext context, Wallet wallet, _) {
     return ListTile(
-      leading: item.walletType.icon(),
-      title: Text(item.name),
+      leading: wallet.walletType.icon(),
+      title: Text(wallet.name),
       subtitle: Row(
         children: [
-          itemCodeWidget(item),
-          Text(' ${item.walletType.l10n(context)}'),
+          walletCodeWidget(wallet),
+          Text(' ${wallet.walletType.l10n(context)}'),
         ],
       ),
       trailing: IconButton(
         icon: AppIcon.delete(context),
         onPressed: !loading
             ? () {
-                deleteItem(item);
+                deleteWallet(wallet);
               }
             : null,
       ),
       onTap: !loading
           ? () {
-              onItemAction(context, item, ItemAction.select);
+              editWallet(wallet);
             }
           : null,
     );
   }
 
-  Widget rowItem(String key, Wallet item) {
+  Widget cellItem(String key, Wallet wallet) {
     return switch (key) {
-      _tableIconCell => item.walletType.icon(),
-      _tableCodeCell => itemCodeWidget(item),
-      _tableTypeCell => Text(item.walletType.l10n(context)),
-      _tableNameCell => Text(item.name),
+      _tableIconCell => wallet.walletType.icon(),
+      _tableCodeCell => walletCodeWidget(wallet),
+      _tableTypeCell => Text(wallet.walletType.l10n(context)),
+      _tableNameCell => Text(wallet.name),
       _ => Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -158,7 +184,7 @@ class _WalletsPageState extends State<WalletsPage> {
               icon: AppIcon.edit,
               onPressed: !loading
                   ? () {
-                      onItemAction(context, item, ItemAction.select);
+                      editWallet(wallet);
                     }
                   : null,
             ),
@@ -166,7 +192,7 @@ class _WalletsPageState extends State<WalletsPage> {
               icon: AppIcon.delete(context),
               onPressed: !loading
                   ? () {
-                      deleteItem(item);
+                      deleteWallet(wallet);
                     }
                   : null,
             ),
@@ -175,49 +201,65 @@ class _WalletsPageState extends State<WalletsPage> {
     };
   }
 
-  Widget itemCodeWidget(Wallet item) {
+  void editWallet(Wallet wallet) async {
+    await context.push(WalletPage.route, extra: wallet);
+    loadData(FetchMode.refreshPage, dataPage.pageNumberOfElement(wallet));
+  }
+
+  Widget walletCodeWidget(Wallet wallet) {
     return Text(
-      item.code,
+      wallet.code,
       textScaler: const TextScaler.linear(0.7),
       style: TextStyle(color: Theme.of(context).disabledColor),
     );
   }
 
-  void onItemAction(
-    BuildContext context,
-    Wallet item,
-    ItemAction action,
-  ) async {
+  void deleteWallet(Wallet wallet) async {
+    final l10n = L10n.of(context);
+    final confirm = await context.confirm(
+      title: l10n.walletDelete,
+      description: l10n.walletDeleteConfirm(wallet.name),
+    );
+    if (confirm && context.mounted) {
+      doDeleteWallet(wallet);
+    }
+  }
+
+  void doDeleteWallet(Wallet wallet) async {
     try {
-      switch (action) {
-        case ItemAction.select:
-          {
-            await context.push(WalletPage.route, extra: item);
-            break;
-          }
-        case ItemAction.delete:
-          {
-            await DI().get<WalletService>().deleteWallet(code: item.code);
-            break;
-          }
-      }
+      await DI().get<WalletService>().deleteWallet(code: wallet.code);
     } on ValidationError<WalletError> catch (e) {
       if (e.errors.containsKey('wallet') && mounted) {
         context.showError(e.errors['wallet']!.l10n(context));
       }
     } finally {
-      loadData(FetchMode.refreshPage, dataPage.pageNumberOfElement(item));
+      loadData(FetchMode.refreshPage, dataPage.pageNumberOfElement(wallet));
     }
   }
 
-  void deleteItem(Wallet item) async {
+  void deleteSelected() async {
     final l10n = L10n.of(context);
     final confirm = await context.confirm(
-      title: l10n.walletDelete,
-      description: l10n.walletDeleteConfirm(item.name),
+      title: l10n.walletsDelete,
+      description: l10n.walletDeleteSelectedConfirm,
     );
     if (confirm && context.mounted) {
-      onItemAction(context, item, ItemAction.delete);
+      doDeleteSelected();
+    }
+  }
+
+  void doDeleteSelected() async {
+    try {
+      await DI().get<WalletService>().deleteWallets(codes: selectedCodes);
+    } on ValidationError<WalletError> catch (e) {
+      if (e.errors.containsKey('wallet') && mounted) {
+        context.showError(e.errors['wallet']!.l10n(context));
+      }
+    } finally {
+      setState(() {
+        selectedCodes.clear();
+      });
+      loadData(FetchMode.refreshPage);
     }
   }
 
@@ -234,7 +276,7 @@ class _WalletsPageState extends State<WalletsPage> {
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    scrollController.dispose();
     super.dispose();
   }
 }

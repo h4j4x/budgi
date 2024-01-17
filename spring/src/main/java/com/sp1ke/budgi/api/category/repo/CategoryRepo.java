@@ -14,4 +14,6 @@ public interface CategoryRepo extends CrudRepository<JpaCategory, Long> {
     Optional<JpaCategory> findByUserIdAndCode(Long userId, String code);
 
     void deleteByUserIdAndCode(Long userId, String code);
+
+    void deleteByUserIdAndCodeIn(Long userId, String[] codes);
 }

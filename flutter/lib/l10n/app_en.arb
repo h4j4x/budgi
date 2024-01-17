@@ -229,10 +229,12 @@
       }
     }
   },
+  "walletDeleteSelectedConfirm": "Confirm to delete selected wallets.",
   "walletName": "Wallet name",
   "walletNameHint": "Enter wallet name...",
   "wallets": "Wallets",
   "walletsBalance": "Wallets balance",
+  "walletsDelete": "Delete wallets",
   "walletType": "Wallet type",
   "walletTypeCash": "Cash",
   "walletTypeCreditCard": "Credit card",

@@ -20,6 +20,10 @@ abstract class WalletService {
     required String code,
   });
 
+  Future<void> deleteWallets({
+    required Set<String> codes,
+  });
+
   /// Obtains wallets balance for given period.
   ///
   /// period dates are inclusive.

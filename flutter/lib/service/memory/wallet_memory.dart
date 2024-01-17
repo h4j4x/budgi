@@ -64,6 +64,14 @@ class WalletMemoryService implements WalletService {
   }
 
   @override
+  Future<void> deleteWallets({required Set<String> codes}) {
+    _wallets.removeWhere((code, _) {
+      return codes.contains(code);
+    });
+    return Future.value();
+  }
+
+  @override
   Future<Map<Wallet, double>> walletsBalance({
     required Period period,
     bool showZeroBalance = false,
@@ -90,17 +98,14 @@ class WalletMemoryService implements WalletService {
   }) async {
     if (_wallets.containsKey(code)) {
       final wallet = _wallets[code]!;
-      final transactions =
-          await DI().get<TransactionService>().listTransactions(
-                period: period,
-                wallet: wallet,
-              );
+      final transactions = await DI().get<TransactionService>().listTransactions(
+            period: period,
+            wallet: wallet,
+          );
       final previousPeriod = period.previous;
       double balance = 0;
       if (_balances.containsKey(previousPeriod.toString())) {
-        final previousBalance = _balances[period.toString()]!
-            .where((element) => element.wallet == wallet)
-            .firstOrNull;
+        final previousBalance = _balances[period.toString()]!.where((element) => element.wallet == wallet).firstOrNull;
         balance = previousBalance?.balance ?? 0;
       }
       for (var transaction in transactions) {
@@ -137,9 +142,7 @@ class _Wallet implements Wallet {
     if (identical(this, other)) {
       return true;
     }
-    return other is _Wallet &&
-        runtimeType == other.runtimeType &&
-        code == other.code;
+    return other is _Wallet && runtimeType == other.runtimeType && code == other.code;
   }
 
   @override

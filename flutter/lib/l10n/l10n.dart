@@ -697,6 +697,12 @@ abstract class L10n {
   /// **'Confirm to delete wallet {name}.'**
   String walletDeleteConfirm(String name);
 
+  /// No description provided for @walletDeleteSelectedConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm to delete selected wallets.'**
+  String get walletDeleteSelectedConfirm;
+
   /// No description provided for @walletName.
   ///
   /// In en, this message translates to:
@@ -720,6 +726,12 @@ abstract class L10n {
   /// In en, this message translates to:
   /// **'Wallets balance'**
   String get walletsBalance;
+
+  /// No description provided for @walletsDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete wallets'**
+  String get walletsDelete;
 
   /// No description provided for @walletType.
   ///

@@ -14,4 +14,6 @@ public interface WalletRepo extends CrudRepository<JpaWallet, Long> {
     Optional<JpaWallet> findByUserIdAndCode(Long userId, String code);
 
     void deleteByUserIdAndCode(Long userId, String code);
+
+    void deleteByUserIdAndCodeIn(Long userId, String[] codes);
 }

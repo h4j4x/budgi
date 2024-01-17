@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,6 +58,13 @@ public class WalletController {
     ResponseEntity<Void> deleteByCode(@AuthenticationPrincipal AuthUser principal,
                                       @PathVariable String code) {
         walletService.deleteByCode(principal.userId(), code);
+        return ResponseEntity.ok(null);
+    }
+
+    @DeleteMapping("/wallet/batch")
+    ResponseEntity<Void> deleteByCodes(@AuthenticationPrincipal AuthUser principal,
+                                       @RequestParam String codes) {
+        walletService.deleteByCodes(principal.userId(), codes.split(","));
         return ResponseEntity.ok(null);
     }
 }
