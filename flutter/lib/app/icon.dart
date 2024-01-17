@@ -86,6 +86,10 @@ class AppIcon {
     return const _Icon(FontAwesomeIcons.rotate);
   }
 
+  static Widget get selected {
+    return const _Icon(FontAwesomeIcons.solidCircleCheck);
+  }
+
   static Widget get signIn {
     return const _Icon(FontAwesomeIcons.arrowRightToBracket);
   }

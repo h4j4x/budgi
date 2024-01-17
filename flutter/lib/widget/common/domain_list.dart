@@ -8,7 +8,7 @@ import '../common/text_divider.dart';
 import 'responsive.dart';
 import 'table.dart';
 
-typedef ItemBuilder<T> = Widget Function(BuildContext, T item, int index);
+typedef ItemBuilder<T> = Widget Function(BuildContext, T, int, bool);
 
 class DomainList<T, K> extends StatelessWidget {
   final ScrollController scrollController;
@@ -67,7 +67,9 @@ class DomainList<T, K> extends StatelessWidget {
         SliverList.separated(
           itemBuilder: (_, index) {
             if (index < dataPage.length) {
-              return itemBuilder(context, dataPage[index], index);
+              final item = dataPage[index];
+              final selected = selectedKeys != null && keyOf != null && selectedKeys!.contains(keyOf!(item));
+              return itemBuilder(context, item, index, selected);
             }
             if (index == dataPage.length) {
               return TextDivider(

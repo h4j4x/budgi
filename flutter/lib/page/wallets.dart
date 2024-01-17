@@ -135,6 +135,16 @@ class _WalletsPageState extends State<WalletsPage> {
         IconButton(
           onPressed: !loading
               ? () {
+                  setState(() {
+                    selectedCodes.clear();
+                  });
+                }
+              : null,
+          icon: AppIcon.clear,
+        ),
+        IconButton(
+          onPressed: !loading
+              ? () {
                   deleteSelected();
                 }
               : null,
@@ -145,9 +155,10 @@ class _WalletsPageState extends State<WalletsPage> {
     return actions;
   }
 
-  Widget listItem(BuildContext context, Wallet wallet, _) {
+  Widget listItem(BuildContext context, Wallet wallet, _, bool selected) {
     return ListTile(
-      leading: wallet.walletType.icon(),
+      selected: selected,
+      leading: selected ? AppIcon.selected : wallet.walletType.icon(),
       title: Text(wallet.name),
       subtitle: Row(
         children: [
@@ -166,6 +177,16 @@ class _WalletsPageState extends State<WalletsPage> {
       onTap: !loading
           ? () {
               editWallet(wallet);
+            }
+          : null,
+      onLongPress: !loading
+          ? () {
+              if (selectedCodes.contains(wallet.code)) {
+                selectedCodes.remove(wallet.code);
+              } else {
+                selectedCodes.add(wallet.code);
+              }
+              setState(() {});
             }
           : null,
     );
