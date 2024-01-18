@@ -187,6 +187,12 @@ abstract class L10n {
   /// **'Cancel'**
   String get cancelAction;
 
+  /// No description provided for @categoriesDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete categories'**
+  String get categoriesDelete;
+
   /// No description provided for @categoriesExpenses.
   ///
   /// In en, this message translates to:
@@ -198,6 +204,24 @@ abstract class L10n {
   /// In en, this message translates to:
   /// **'Category'**
   String get category;
+
+  /// No description provided for @categoryDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete category'**
+  String get categoryDelete;
+
+  /// No description provided for @categoryDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm to delete category {name}.'**
+  String categoryDeleteConfirm(String name);
+
+  /// No description provided for @categoryDeleteSelectedConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm to delete selected categories.'**
+  String get categoryDeleteSelectedConfirm;
 
   /// No description provided for @categoryName.
   ///

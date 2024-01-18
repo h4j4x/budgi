@@ -14,6 +14,7 @@ import 'service/memory/category_memory.dart';
 import 'service/memory/transaction_memory.dart';
 import 'service/memory/wallet_memory.dart';
 import 'service/spring/auth_spring.dart';
+import 'service/spring/category_spring.dart';
 import 'service/spring/config.dart';
 import 'service/spring/wallet_spring.dart';
 import 'service/storage.dart';
@@ -64,13 +65,17 @@ class DI {
     await authService.initialize();
     _getIt.registerSingleton<AuthService>(authService);
 
+    _getIt.registerSingleton<CategoryService>(CategorySpringService(
+      authService: authService,
+      categoryValidator: CategoryValidator(),
+      config: springConfig,
+    ));
+
     // TODO: implement service
-    final categoryService = CategoryMemoryService(
+    _getIt.registerSingleton<CategoryAmountService>(CategoryMemoryService(
       categoryValidator: CategoryValidator(),
       amountValidator: CategoryAmountValidator(),
-    );
-    _getIt.registerSingleton<CategoryService>(categoryService);
-    _getIt.registerSingleton<CategoryAmountService>(categoryService);
+    ));
 
     final walletService = WalletSpringService(
       authService: authService,

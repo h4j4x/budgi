@@ -1,4 +1,5 @@
 {
+  "@@locale": "en",
   "addAction": "Add",
   "appAbout": "v{version} - Sp1k_e {year}",
   "@appAbout": {
@@ -39,8 +40,19 @@
   "budgetsCategoriesAmounts": "Budgets categories amounts",
   "budgetsCategoryAmount": "Budget category amount",
   "cancelAction": "Cancel",
+  "categoriesDelete": "Delete categories",
   "categoriesExpenses": "Categories expenses",
   "category": "Category",
+  "categoryDelete": "Delete category",
+  "categoryDeleteConfirm": "Confirm to delete category {name}.",
+  "@categoryDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "categoryDeleteSelectedConfirm": "Confirm to delete selected categories.",
   "categoryName": "Category name",
   "categoryNameHint": "Enter category name...",
   "code": "Code",

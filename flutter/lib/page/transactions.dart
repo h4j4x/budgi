@@ -82,9 +82,11 @@ class _TransactionsPageState extends State<TransactionsPage> {
   }
 
   void loadCategories() async {
-    final list = await DI().get<CategoryService>().listCategories();
+    final list = await DI().get<CategoryService>().listCategories(
+          pageSize: 1000, // TODO: select with filter & pagination
+        );
     setState(() {
-      categories = list;
+      categories = list.content;
     });
   }
 

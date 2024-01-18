@@ -97,12 +97,15 @@ class _TransactionEditState extends State<TransactionEdit> {
   void loadCategories() async {
     final lastCategory =
         await DI().get<StorageService>().readString(_lastCategoryKey);
-    final list = await DI().get<CategoryService>().listCategories();
+    final list = await DI().get<CategoryService>().listCategories(
+          pageSize: 1000, // TODO: select with filter & pagination
+        );
     if (category == null && lastCategory != null) {
-      category = list.where((item) => item.code == lastCategory).firstOrNull;
+      category =
+          list.content.where((item) => item.code == lastCategory).firstOrNull;
     }
     setState(() {
-      categories = list;
+      categories = list.content;
     });
   }
 

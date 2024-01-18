@@ -54,10 +54,10 @@ class _CategoryAmountEditState extends State<CategoryAmountEdit> {
 
   void loadCategories() async {
     final list = await DI().get<CategoryService>().listCategories(
-          period: widget.period,
+          pageSize: 1000, // TODO: select with filter & pagination
         );
     setState(() {
-      categories = list;
+      categories = list.content;
     });
   }
 

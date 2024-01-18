@@ -43,7 +43,7 @@ class _WalletsPageState extends State<WalletsPage> {
   void initState() {
     super.initState();
     Future.delayed(Duration.zero, () {
-      scrollController.addListener(_scrollListener);
+      scrollController.addListener(scrollListener);
       loadData(FetchMode.clear);
     });
   }
@@ -67,9 +67,10 @@ class _WalletsPageState extends State<WalletsPage> {
     });
   }
 
-  void _scrollListener() {
+  void scrollListener() {
     if (dataPage.hasNextPage &&
-        scrollController.offset >= scrollController.position.maxScrollExtent - 10 &&
+        scrollController.offset >=
+            scrollController.position.maxScrollExtent - 10 &&
         !scrollController.position.outOfRange) {
       loadData(FetchMode.nextPage);
     }
@@ -90,11 +91,20 @@ class _WalletsPageState extends State<WalletsPage> {
       actions: actions(),
       dataPage: dataPage,
       tableColumns: <TableColumn>[
-        TableColumn(key: _tableIconCell, label: '', fixedWidth: 50, alignment: Alignment.center),
+        TableColumn(
+            key: _tableIconCell,
+            label: '',
+            fixedWidth: 50,
+            alignment: Alignment.center),
         TableColumn(key: _tableCodeCell, label: l10n.code, widthPercent: 10),
-        TableColumn(key: _tableTypeCell, label: l10n.walletType, widthPercent: 20),
+        TableColumn(
+            key: _tableTypeCell, label: l10n.walletType, widthPercent: 20),
         TableColumn(key: _tableNameCell, label: l10n.walletName),
-        TableColumn(key: 'icons', label: '', fixedWidth: 100, alignment: Alignment.center),
+        TableColumn(
+            key: 'icons',
+            label: '',
+            fixedWidth: 100,
+            alignment: Alignment.center),
       ],
       initialLoading: initialLoading,
       loadingNextPage: loading,

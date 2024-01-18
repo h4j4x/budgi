@@ -1,4 +1,5 @@
 import '../../di.dart';
+import '../../model/data_page.dart';
 import '../../model/domain/category.dart';
 import '../../model/domain/category_amount.dart';
 import '../../model/domain/transaction.dart';
@@ -43,29 +44,22 @@ class CategoryMemoryService implements CategoryService, CategoryAmountService {
   }
 
   @override
-  Future<List<Category>> listCategories({
-    bool withAmount = false,
-    Period? period,
+  Future<DataPage<Category>> listCategories({
     List<String>? excludingCodes,
+    int? page,
+    int? pageSize,
   }) {
-    final list = _categories.values.toList();
-    if (period != null) {
-      final amountsCategories =
-          (_values[period.toString()] ?? <CategoryAmount>{})
-              .map((amount) => amount.category.code)
-              .toList();
-      list.removeWhere((category) {
-        if (excludingCodes != null && excludingCodes.contains(category.code)) {
-          return true;
-        }
-        final match = amountsCategories.contains(category.code);
-        if (withAmount) {
-          return !match;
-        }
-        return match;
+    var list = _categories.values.toList();
+    if (excludingCodes?.isNotEmpty ?? false) {
+      list.removeWhere((wallet) {
+        return excludingCodes!.contains(wallet.code);
       });
     }
-    return Future.value(list);
+    if (page != null && page >= 0 && pageSize != null && pageSize > 0) {
+      final offset = page * pageSize;
+      list = list.sublist(offset, offset + pageSize);
+    }
+    return Future.value(DataPage(content: list));
   }
 
   @override
@@ -73,6 +67,14 @@ class CategoryMemoryService implements CategoryService, CategoryAmountService {
     required String code,
   }) {
     _categories.remove(code);
+    return Future.value();
+  }
+
+  @override
+  Future<void> deleteCategories({required Set<String> codes}) {
+    _categories.removeWhere((code, _) {
+      return codes.contains(code);
+    });
     return Future.value();
   }
 
@@ -216,16 +218,6 @@ class CategoryMemoryService implements CategoryService, CategoryAmountService {
       }
     }
     return map;
-  }
-
-  @override
-  Future<Category> fetchCategoryByCode(String code) {
-    return Future.value(_categories[code]);
-  }
-
-  @override
-  Future<Category?> fetchCategoryById(int id) {
-    return Future.value();
   }
 }
 

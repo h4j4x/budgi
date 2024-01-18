@@ -60,4 +60,11 @@ public class CategoryController {
         categoryService.deleteByCode(principal.userId(), code);
         return ResponseEntity.ok(null);
     }
+
+    @DeleteMapping("/category/batch")
+    ResponseEntity<Void> deleteByCodes(@AuthenticationPrincipal AuthUser principal,
+                                       @RequestParam String codes) {
+        categoryService.deleteByCodes(principal.userId(), codes.split(","));
+        return ResponseEntity.ok(null);
+    }
 }

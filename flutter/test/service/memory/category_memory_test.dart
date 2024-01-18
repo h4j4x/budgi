@@ -37,7 +37,6 @@ void main() {
     final service = CategoryMemoryService();
 
     final category1 = await service.saveCategory(name: 'cat1');
-    final category2 = await service.saveCategory(name: 'cat2');
 
     final fromDate = DateTime.now();
     final toDate = fromDate.add(const Duration(days: 2));
@@ -50,22 +49,6 @@ void main() {
     );
     var list = await service.listCategories();
     expect(list.length, equals(2));
-
-    // WITH AMOUNTS
-    list = await service.listCategories(
-      withAmount: true,
-      period: period,
-    );
-    expect(list.length, equals(1));
-    expect(list[0].code, equals(category1.code));
-
-    // WITHOUT AMOUNTS
-    list = await service.listCategories(
-      withAmount: false,
-      period: period,
-    );
-    expect(list.length, equals(1));
-    expect(list[0].code, equals(category2.code));
   });
 
   test('.saveAmount(), .listAmounts(), .removeAmount()', () async {

@@ -1,5 +1,5 @@
+import '../model/data_page.dart';
 import '../model/domain/category.dart';
-import '../model/period.dart';
 
 abstract class CategoryService {
   /// @throws ValidationError
@@ -8,23 +8,15 @@ abstract class CategoryService {
     required String name,
   });
 
-  Future<Category> fetchCategoryByCode(String code);
-
-  Future<Category?> fetchCategoryById(int id);
-
-  /// If period is not given, withAmount if ignored.
-  /// If period is given, response categories are filtered by
-  /// withAmounts (true will get categories with registered amounts between the
-  /// given interval).
-  ///
-  /// period dates are inclusive.
-  Future<List<Category>> listCategories({
-    bool withAmount = false,
-    Period? period,
+  Future<DataPage<Category>> listCategories({
     List<String>? excludingCodes,
+    int? page,
+    int? pageSize,
   });
 
   Future<void> deleteCategory({
     required String code,
   });
+
+  Future<void> deleteCategories({required Set<String> codes});
 }

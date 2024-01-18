@@ -1,43 +1,40 @@
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
-
 import '../../model/data_page.dart';
-import '../../model/domain/wallet.dart';
+import '../../model/domain/category.dart';
+import '../../model/error/category.dart';
 import '../../model/error/http.dart';
 import '../../model/error/validation.dart';
-import '../../model/error/wallet.dart';
 import '../../model/fields.dart';
-import '../../model/period.dart';
 import '../auth.dart';
+import '../category.dart';
 import '../validator.dart';
-import '../wallet.dart';
 import 'config.dart';
 import 'http_client.dart';
 
-class WalletSpringService implements WalletService {
+class CategorySpringService implements CategoryService {
   final AuthService authService;
-  final Validator<Wallet, WalletError> walletValidator;
+  final Validator<Category, CategoryError> categoryValidator;
   final ApiHttpClient _httpClient;
 
-  WalletSpringService({
+  CategorySpringService({
     required this.authService,
-    required this.walletValidator,
+    required this.categoryValidator,
     required SpringConfig config,
-  }) : _httpClient = ApiHttpClient(baseUrl: '${config.url}/wallet');
+  }) : _httpClient = ApiHttpClient(baseUrl: '${config.url}/category');
 
   @override
-  Future<DataPage<Wallet>> listWallets({
+  Future<DataPage<Category>> listCategories({
     List<String>? excludingCodes,
     int? page,
     int? pageSize,
-  }) async {
+  }) {
     try {
-      return _httpClient.jsonGetPage<Wallet>(
+      return _httpClient.jsonGetPage<Category>(
         authService: authService,
         page: page,
         pageSize: pageSize,
-        mapper: _SpringWallet.from,
+        mapper: _SpringCategory.from,
       );
     } on SocketException catch (_) {
       throw NoServerError();
@@ -45,16 +42,14 @@ class WalletSpringService implements WalletService {
   }
 
   @override
-  Future<Wallet> saveWallet({
+  Future<Category> saveCategory({
     String? code,
-    required WalletType walletType,
     required String name,
   }) async {
-    final wallet = _SpringWallet()
+    final category = _SpringCategory()
       ..code = code ?? ''
-      ..name = name
-      ..walletType = walletType;
-    final errors = walletValidator.validate(wallet);
+      ..name = name;
+    final errors = categoryValidator.validate(category);
     if (errors.isNotEmpty) {
       throw ValidationError(errors);
     }
@@ -64,41 +59,39 @@ class WalletSpringService implements WalletService {
         response = await _httpClient.jsonPut<Map<String, dynamic>>(
           authService: authService,
           path: '/$code',
-          data: wallet.toMap(),
+          data: category.toMap(),
         );
       } else {
         response = await _httpClient.jsonPost<Map<String, dynamic>>(
           authService: authService,
-          data: wallet.toMap(),
+          data: category.toMap(),
         );
       }
-      return _SpringWallet.from(response)!;
+      return _SpringCategory.from(response)!;
     } on SocketException catch (_) {
       throw NoServerError();
     } catch (e) {
-      debugPrint('Unexpected error $e');
       throw ValidationError({
-        'wallet': WalletError.invalidWallet,
+        'category': CategoryError.invalidCategory,
       });
     }
   }
 
   @override
-  Future<void> deleteWallet({required String code}) async {
+  Future<void> deleteCategory({required String code}) async {
     try {
       await _httpClient.delete(authService: authService, path: '/$code');
     } on SocketException catch (_) {
       throw NoServerError();
     } catch (e) {
-      debugPrint('Unexpected error $e');
       throw ValidationError({
-        'wallet': WalletError.invalidWallet,
+        'category': CategoryError.invalidCategory,
       });
     }
   }
 
   @override
-  Future<void> deleteWallets({required Set<String> codes}) async {
+  Future<void> deleteCategories({required Set<String> codes}) async {
     if (codes.isEmpty) {
       return Future.value();
     }
@@ -108,34 +101,16 @@ class WalletSpringService implements WalletService {
     } on SocketException catch (_) {
       throw NoServerError();
     } catch (e) {
-      debugPrint('Unexpected error $e');
       throw ValidationError({
-        'wallet': WalletError.invalidWallet,
+        'category': CategoryError.invalidCategory,
       });
     }
   }
-
-  @override
-  Future<void> updateWalletBalance(
-      {required String code, required Period period}) {
-    // TODO: implement updateWalletBalance
-    return Future.value();
-  }
-
-  @override
-  Future<Map<Wallet, double>> walletsBalance(
-      {required Period period, bool showZeroBalance = false}) {
-    // TODO: implement walletsBalance
-    return Future.value({});
-  }
 }
 
-class _SpringWallet implements Wallet {
+class _SpringCategory implements Category {
   @override
   String code = '';
-
-  @override
-  WalletType walletType = WalletType.cash;
 
   @override
   String name = '';
@@ -143,21 +118,18 @@ class _SpringWallet implements Wallet {
   Map<String, Object> toMap() {
     return <String, Object>{
       codeField: code,
-      walletTypeField: walletType.name,
       nameField: name,
     };
   }
 
-  static _SpringWallet? from(dynamic raw) {
+  static _SpringCategory? from(dynamic raw) {
     if (raw is Map<String, dynamic>) {
       final code = raw[codeField] as String?;
-      final walletType = WalletType.tryParse(raw[walletTypeField]);
       final name = raw[nameField] as String?;
-      if (code != null && walletType != null && name != null) {
-        return _SpringWallet()
+      if (code != null && name != null) {
+        return _SpringCategory()
           ..code = code
-          ..name = name
-          ..walletType = walletType;
+          ..name = name;
       }
     }
     return null;

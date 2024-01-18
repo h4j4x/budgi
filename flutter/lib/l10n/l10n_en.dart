@@ -61,10 +61,24 @@ class L10nEn extends L10n {
   String get cancelAction => 'Cancel';
 
   @override
+  String get categoriesDelete => 'Delete categories';
+
+  @override
   String get categoriesExpenses => 'Categories expenses';
 
   @override
   String get category => 'Category';
+
+  @override
+  String get categoryDelete => 'Delete category';
+
+  @override
+  String categoryDeleteConfirm(String name) {
+    return 'Confirm to delete category $name.';
+  }
+
+  @override
+  String get categoryDeleteSelectedConfirm => 'Confirm to delete selected categories.';
 
   @override
   String get categoryName => 'Category name';
