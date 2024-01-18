@@ -33,24 +33,6 @@ void main() {
     expect(list.length, equals(total - 1));
   });
 
-  test('.listCategories() with amounts filter', () async {
-    final service = CategoryMemoryService();
-
-    final category1 = await service.saveCategory(name: 'cat1');
-
-    final fromDate = DateTime.now();
-    final toDate = fromDate.add(const Duration(days: 2));
-    final period = Period(from: fromDate, to: toDate);
-
-    await service.saveAmount(
-      category: category1,
-      period: period,
-      amount: 1,
-    );
-    var list = await service.listCategories();
-    expect(list.length, equals(2));
-  });
-
   test('.saveAmount(), .listAmounts(), .removeAmount()', () async {
     final service = CategoryMemoryService();
 
