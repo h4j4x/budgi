@@ -21,7 +21,7 @@ enum TransactionError {
       invalidTransactionType => l10n.invalidTransactionType,
       invalidWallet => l10n.invalidTransactionWallet,
       invalidWalletTarget => l10n.invalidTransactionTargetWallet,
-      invalidCategory => l10n.invalidBudgetCategory,
+      invalidCategory => l10n.invalidCategory,
       invalidAmount => l10n.invalidTransactionAmount,
       invalidDescription =>
         l10n.invalidTransactionDescription(AppConfig.textFieldMaxLength),

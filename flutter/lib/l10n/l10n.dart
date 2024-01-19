@@ -139,35 +139,11 @@ abstract class L10n {
   /// **'Enter budget amount...'**
   String get budgetAmountHint;
 
-  /// No description provided for @budgetCategory.
-  ///
-  /// In en, this message translates to:
-  /// **'Budget category'**
-  String get budgetCategory;
-
-  /// No description provided for @budgetCategoryDelete.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete category'**
-  String get budgetCategoryDelete;
-
-  /// No description provided for @budgetCategoryDeleteConfirm.
-  ///
-  /// In en, this message translates to:
-  /// **'Confirm to delete category {name}.'**
-  String budgetCategoryDeleteConfirm(String name);
-
   /// No description provided for @budgetsAmounts.
   ///
   /// In en, this message translates to:
   /// **'Budgets amounts'**
   String get budgetsAmounts;
-
-  /// No description provided for @budgetsCategories.
-  ///
-  /// In en, this message translates to:
-  /// **'Budgets categories'**
-  String get budgetsCategories;
 
   /// No description provided for @budgetsCategoriesAmounts.
   ///
@@ -186,6 +162,12 @@ abstract class L10n {
   /// In en, this message translates to:
   /// **'Cancel'**
   String get cancelAction;
+
+  /// No description provided for @categories.
+  ///
+  /// In en, this message translates to:
+  /// **'Categories'**
+  String get categories;
 
   /// No description provided for @categoriesDelete.
   ///
@@ -307,17 +289,17 @@ abstract class L10n {
   /// **'Invalid budget amount. Enter a non negative number for amount.'**
   String get invalidBudgetAmount;
 
-  /// No description provided for @invalidBudgetCategory.
+  /// No description provided for @invalidCategory.
   ///
   /// In en, this message translates to:
   /// **'Invalid category.'**
-  String get invalidBudgetCategory;
+  String get invalidCategory;
 
-  /// No description provided for @invalidBudgetCategoryName.
+  /// No description provided for @invalidCategoryName.
   ///
   /// In en, this message translates to:
-  /// **'Invalid budget category name. Enter a non empty name with no more than {maxLength} characters.'**
-  String invalidBudgetCategoryName(int maxLength);
+  /// **'Invalid category name. Enter a non empty name with no more than {maxLength} characters.'**
+  String invalidCategoryName(int maxLength);
 
   /// No description provided for @invalidTransactionAmount.
   ///

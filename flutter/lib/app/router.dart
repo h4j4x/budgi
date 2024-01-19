@@ -55,7 +55,7 @@ final _routes = <AppRoute>[
     path: CategoriesPage.route,
     icon: AppIcon.category,
     menuTextBuilder: (context) {
-      return L10n.of(context).budgetsCategories;
+      return L10n.of(context).categories;
     },
     pageBuilder: (_, __) {
       return const CategoriesPage();

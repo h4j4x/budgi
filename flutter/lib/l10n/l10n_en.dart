@@ -35,21 +35,7 @@ class L10nEn extends L10n {
   String get budgetAmountHint => 'Enter budget amount...';
 
   @override
-  String get budgetCategory => 'Budget category';
-
-  @override
-  String get budgetCategoryDelete => 'Delete category';
-
-  @override
-  String budgetCategoryDeleteConfirm(String name) {
-    return 'Confirm to delete category $name.';
-  }
-
-  @override
   String get budgetsAmounts => 'Budgets amounts';
-
-  @override
-  String get budgetsCategories => 'Budgets categories';
 
   @override
   String get budgetsCategoriesAmounts => 'Budgets categories amounts';
@@ -59,6 +45,9 @@ class L10nEn extends L10n {
 
   @override
   String get cancelAction => 'Cancel';
+
+  @override
+  String get categories => 'Categories';
 
   @override
   String get categoriesDelete => 'Delete categories';
@@ -128,11 +117,11 @@ class L10nEn extends L10n {
   String get invalidBudgetAmount => 'Invalid budget amount. Enter a non negative number for amount.';
 
   @override
-  String get invalidBudgetCategory => 'Invalid category.';
+  String get invalidCategory => 'Invalid category.';
 
   @override
-  String invalidBudgetCategoryName(int maxLength) {
-    return 'Invalid budget category name. Enter a non empty name with no more than $maxLength characters.';
+  String invalidCategoryName(int maxLength) {
+    return 'Invalid category name. Enter a non empty name with no more than $maxLength characters.';
   }
 
   @override

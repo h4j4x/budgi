@@ -25,21 +25,11 @@
     }
   },
   "budgetAmountHint": "Enter budget amount...",
-  "budgetCategory": "Budget category",
-  "budgetCategoryDelete": "Delete category",
-  "budgetCategoryDeleteConfirm": "Confirm to delete category {name}.",
-  "@budgetCategoryDeleteConfirm": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
   "budgetsAmounts": "Budgets amounts",
-  "budgetsCategories": "Budgets categories",
   "budgetsCategoriesAmounts": "Budgets categories amounts",
   "budgetsCategoryAmount": "Budget category amount",
   "cancelAction": "Cancel",
+  "categories": "Categories",
   "categoriesDelete": "Delete categories",
   "categoriesExpenses": "Categories expenses",
   "category": "Category",
@@ -75,9 +65,9 @@
   "goPreviousPage": "Go previous page",
   "home": "Home",
   "invalidBudgetAmount": "Invalid budget amount. Enter a non negative number for amount.",
-  "invalidBudgetCategory": "Invalid category.",
-  "invalidBudgetCategoryName": "Invalid budget category name. Enter a non empty name with no more than {maxLength} characters.",
-  "@invalidBudgetCategoryName": {
+  "invalidCategory": "Invalid category.",
+  "invalidCategoryName": "Invalid category name. Enter a non empty name with no more than {maxLength} characters.",
+  "@invalidCategoryName": {
     "placeholders": {
       "maxLength": {
         "type": "int"
