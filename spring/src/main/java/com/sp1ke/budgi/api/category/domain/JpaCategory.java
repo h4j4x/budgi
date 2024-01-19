@@ -13,7 +13,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Table(name = "categories", indexes = {
-    @Index(name = "categories_user_id_code_UNQ", columnList = "userId, code", unique = true)
+    @Index(name = "categories_user_id_code_UNQ", columnList = "userId, code", unique = true),
 })
 @Builder(toBuilder = true)
 @Getter

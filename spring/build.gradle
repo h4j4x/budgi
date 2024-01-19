@@ -23,6 +23,7 @@ repositories {
 
 dependencies {
   implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
+  implementation "org.joda:joda-money:${jodaMoneyVersion}"
   implementation 'org.springframework.boot:spring-boot-starter-actuator'
   implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
   implementation 'org.springframework.boot:spring-boot-starter-freemarker'

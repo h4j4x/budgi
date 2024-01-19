@@ -14,7 +14,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Table(name = "wallets", indexes = {
-    @Index(name = "wallets_user_id_code_UNQ", columnList = "userId, code", unique = true)
+    @Index(name = "wallets_user_id_code_UNQ", columnList = "userId, code", unique = true),
+    @Index(name = "transactions_wallet_type_IDX", columnList = "walletType"),
 })
 @Builder(toBuilder = true)
 @Getter
