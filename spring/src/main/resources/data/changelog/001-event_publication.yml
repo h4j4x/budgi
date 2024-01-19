@@ -1,0 +1,30 @@
+databaseChangeLog:
+- changeSet:
+    id: 001-event_publication-table
+    author: budgi
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+              primaryKeyName: event_publication_pkey
+            name: id
+            type: UUID
+        - column:
+            name: completion_date
+            type: TIMESTAMP WITH TIME ZONE
+        - column:
+            name: event_type
+            type: VARCHAR(255)
+        - column:
+            name: listener_id
+            type: VARCHAR(255)
+        - column:
+            name: publication_date
+            type: TIMESTAMP WITH TIME ZONE
+        - column:
+            name: serialized_event
+            type: VARCHAR(255)
+        tableName: event_publication

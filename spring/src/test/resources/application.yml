@@ -15,4 +15,7 @@ spring:
       failOnEmptyBeans: false
   jpa:
     hibernate:
-      ddlAuto: update
+      ddlAuto: validate
+    open-in-view: false
+  liquibase:
+    changeLog: classpath:data/changelog-master.yml

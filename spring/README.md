@@ -10,6 +10,7 @@ Budg1 Spring project.
 - [SpringBoot 3.2.1](https://spring.io/projects/spring-boot/).
 - [JWT](https://jwt.io/) using [jwtk-jjwt](https://github.com/jwtk/jjwt).
 - [Postgres](https://www.postgresql.org/).
+- [Liquibase](https://docs.liquibase.com/home.html).
 
 ## Development
 
@@ -48,7 +49,6 @@ All configurations should be done in [.env file](./.env), create it if not exist
   DATASOURCE_USERNAME=budgi
   DATASOURCE_PASSWORD=budgi
   DATASOURCE_DRIVER=org.postgresql.Driver
-  DATASOURCE_DDL=create-drop
   ```
 
 ### Generate docker image
