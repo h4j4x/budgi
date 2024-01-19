@@ -5,31 +5,31 @@ import java.util.Collections;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-public abstract class AuthUser implements UserDetails {
-    public abstract Long userId();
+public interface AuthUser extends UserDetails {
+    Long userId();
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
+    default Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.emptyList();
     }
 
     @Override
-    public boolean isAccountNonExpired() {
+    default boolean isAccountNonExpired() {
         return true;
     }
 
     @Override
-    public boolean isAccountNonLocked() {
+    default boolean isAccountNonLocked() {
         return true;
     }
 
     @Override
-    public boolean isCredentialsNonExpired() {
+    default boolean isCredentialsNonExpired() {
         return true;
     }
 
     @Override
-    public boolean isEnabled() {
+    default boolean isEnabled() {
         return true;
     }
 }

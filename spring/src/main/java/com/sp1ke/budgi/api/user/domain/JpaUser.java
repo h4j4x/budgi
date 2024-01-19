@@ -1,33 +1,29 @@
 package com.sp1ke.budgi.api.user.domain;
 
+import com.sp1ke.budgi.api.data.JpaBase;
 import com.sp1ke.budgi.api.user.AuthUser;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Index;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import java.time.OffsetDateTime;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import lombok.experimental.SuperBuilder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity
 @Table(name = "users", indexes = {
-    @Index(name = "users_email_IDX", columnList = "email", unique = true),
+    @Index(name = "users_email_UNQ", columnList = "email", unique = true),
 })
-@Builder
+@SuperBuilder
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class JpaUser extends AuthUser {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(nullable = false)
-    private Long id;
-
+public class JpaUser extends JpaBase implements AuthUser {
     @Email(message = "Valid user email is required")
     @NotNull(message = "Valid user email is required")
     @Column(length = 100, nullable = false)
@@ -43,17 +39,9 @@ public class JpaUser extends AuthUser {
     @Column(nullable = false)
     private String password;
 
-    @CreationTimestamp
-    @Column(updatable = false, name = "created_at")
-    private OffsetDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private OffsetDateTime updatedAt;
-
     @Override
     public Long userId() {
-        return id;
+        return getId();
     }
 
     @Override

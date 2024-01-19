@@ -4,7 +4,6 @@ import com.sp1ke.budgi.api.category.ApiCategory;
 import com.sp1ke.budgi.api.category.CategoryService;
 import com.sp1ke.budgi.api.category.domain.JpaCategory;
 import com.sp1ke.budgi.api.category.repo.CategoryRepo;
-import com.sp1ke.budgi.api.common.StringUtil;
 import com.sp1ke.budgi.api.common.ValidatorUtil;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Validator;
@@ -34,16 +33,15 @@ public class JpaCategoryService implements CategoryService {
     @Override
     @NotNull
     public ApiCategory save(@NotNull Long userId, @NotNull ApiCategory data, boolean throwIfExists) {
-        var code = StringUtil.isNotBlank(data.getCode()) ? data.getCode() : StringUtil.randomString(6);
         var category = categoryRepo
-            .findByUserIdAndCode(userId, code)
+            .findByUserIdAndCode(userId, data.getCode())
             .orElse(new JpaCategory());
         if (throwIfExists && category.getId() != null) {
             throw new HttpClientErrorException(HttpStatus.CONFLICT, "Category code already exists");
         }
         category = category.toBuilder()
             .userId(userId)
-            .code(code)
+            .code(data.getCode())
             .name(data.getName())
             .build();
         ValidatorUtil.validate(validator, category);

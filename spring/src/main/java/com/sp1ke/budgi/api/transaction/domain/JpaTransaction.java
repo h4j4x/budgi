@@ -1,16 +1,17 @@
 package com.sp1ke.budgi.api.transaction.domain;
 
+import com.sp1ke.budgi.api.data.JpaUserBase;
+import com.sp1ke.budgi.api.data.MoneyType;
 import com.sp1ke.budgi.api.transaction.TransactionType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.OffsetDateTime;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.CompositeType;
 import org.joda.money.Money;
 
 @Entity
@@ -21,23 +22,11 @@ import org.joda.money.Money;
     @Index(name = "transactions_transaction_type_IDX", columnList = "transactionType"),
     @Index(name = "transactions_date_time_IDX", columnList = "dateTime"),
 })
-@Builder(toBuilder = true)
+@SuperBuilder(toBuilder = true)
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class JpaTransaction {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-
-    @Size(min = 2, max = 100, message = "Valid transaction code is required (2 to 100 characters)")
-    @NotNull(message = "Valid transaction code is required (2 to 100 characters)")
-    @Column(length = 100, nullable = false)
-    private String code;
-
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
-
+public class JpaTransaction extends JpaUserBase {
     @Column(name = "category_id", nullable = false)
     private Long categoryId;
 
@@ -49,11 +38,9 @@ public class JpaTransaction {
     @Column(name = "transaction_type", length = 50, nullable = false)
     private TransactionType transactionType;
 
-    @AttributeOverrides({
-        @AttributeOverride(name = "amount", column = @Column(name = "amount")),
-        @AttributeOverride(name = "currency", column = @Column(name = "currency"))
-    })
-    @Embedded
+    @AttributeOverride(name = "amount", column = @Column(name = "amount"))
+    @AttributeOverride(name = "currency", column = @Column(name = "currency"))
+    @CompositeType(MoneyType.class)
     private Money amount;
 
     @Size(min = 2, max = 100, message = "Valid transaction description is required (2 to 255 characters)")
@@ -63,12 +50,4 @@ public class JpaTransaction {
 
     @Column(name = "date_time", nullable = false)
     private OffsetDateTime dateTime;
-
-    @CreationTimestamp
-    @Column(updatable = false, name = "created_at")
-    private OffsetDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private OffsetDateTime updatedAt;
 }

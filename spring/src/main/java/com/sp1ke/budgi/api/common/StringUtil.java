@@ -26,4 +26,8 @@ public class StringUtil {
     public static boolean isNotBlank(@Nullable String value) {
         return value != null && !value.isBlank();
     }
+
+    public static boolean isBlank(@Nullable String value) {
+        return value == null || value.isBlank();
+    }
 }
