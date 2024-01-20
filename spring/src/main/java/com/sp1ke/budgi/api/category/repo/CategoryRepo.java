@@ -1,7 +1,9 @@
 package com.sp1ke.budgi.api.category.repo;
 
 import com.sp1ke.budgi.api.category.domain.JpaCategory;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
@@ -16,4 +18,8 @@ public interface CategoryRepo extends CrudRepository<JpaCategory, Long> {
     void deleteByUserIdAndCode(Long userId, String code);
 
     void deleteByUserIdAndCodeIn(Long userId, String[] codes);
+
+    Optional<JpaCategory> findByUserIdAndId(Long userId, Long id);
+
+    List<JpaCategory> findAllByUserIdAndIdIn(Long userId, Set<Long> ids);
 }

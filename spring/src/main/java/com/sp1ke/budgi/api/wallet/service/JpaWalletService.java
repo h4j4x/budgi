@@ -1,15 +1,18 @@
 package com.sp1ke.budgi.api.wallet.service;
 
+import com.sp1ke.budgi.api.common.ApiFilter;
 import com.sp1ke.budgi.api.common.StringUtil;
 import com.sp1ke.budgi.api.common.ValidatorUtil;
+import com.sp1ke.budgi.api.data.JpaBase;
 import com.sp1ke.budgi.api.wallet.ApiWallet;
 import com.sp1ke.budgi.api.wallet.WalletService;
 import com.sp1ke.budgi.api.wallet.domain.JpaWallet;
 import com.sp1ke.budgi.api.wallet.repo.WalletRepo;
+import jakarta.annotation.Nullable;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
-import java.util.Optional;
+import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,13 +28,14 @@ public class JpaWalletService implements WalletService {
     private final Validator validator;
 
     @Override
-    public Page<ApiWallet> fetch(Long userId, Pageable pageable) {
+    public Page<ApiWallet> fetch(@NotNull Long userId, @NotNull Pageable pageable,
+                                 @Nullable ApiFilter<ApiWallet> filter) {
         var page = walletRepo.findAllByUserId(userId, pageable);
         return page.map(this::mapToApiWallet);
     }
 
     @Override
-    public ApiWallet save(Long userId, ApiWallet data, boolean throwIfExists) {
+    public ApiWallet save(@NotNull Long userId, @NotNull ApiWallet data, boolean throwIfExists) {
         var code = StringUtil.isNotBlank(data.getCode()) ? data.getCode() : StringUtil.randomString(6);
         var wallet = walletRepo
             .findByUserIdAndCode(userId, code)
@@ -52,20 +56,20 @@ public class JpaWalletService implements WalletService {
     }
 
     @Override
-    public Optional<ApiWallet> findByCode(Long userId, String code) {
+    public Optional<ApiWallet> findByCode(@NotNull Long userId, @NotNull String code) {
         var wallet = walletRepo.findByUserIdAndCode(userId, code);
         return wallet.map(this::mapToApiWallet);
     }
 
     @Override
     @Transactional
-    public void deleteByCode(Long userId, String code) {
+    public void deleteByCode(@NotNull Long userId, @NotNull String code) {
         walletRepo.deleteByUserIdAndCode(userId, code);
     }
 
     @Override
     @Transactional
-    public void deleteByCodes(Long userId, String[] codes) {
+    public void deleteByCodes(@NotNull Long userId, @NotNull String[] codes) {
         walletRepo.deleteByUserIdAndCodeIn(userId, codes);
     }
 
@@ -76,5 +80,30 @@ public class JpaWalletService implements WalletService {
             .name(wallet.getName())
             .walletType(wallet.getWalletType())
             .build();
+    }
+
+    @Override
+    public Optional<Long> findIdByCode(@NotNull Long userId, @Nullable String code) {
+        return walletRepo.findByUserIdAndCode(userId, code)
+            .map(JpaBase::getId);
+    }
+
+    @Override
+    public Map<Long, String> fetchCodesOf(@NotNull Long userId, @NotNull Set<Long> ids) {
+        if (ids.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        var list = walletRepo.findAllByUserIdAndIdIn(userId, ids);
+        var map = new HashMap<Long, String>();
+        for (var wallet : list) {
+            map.put(wallet.getId(), wallet.getCode());
+        }
+        return map;
+    }
+
+    @Override
+    public Optional<String> findCodeById(@NotNull Long userId, @NotNull Long id) {
+        return walletRepo.findByUserIdAndId(userId, id)
+            .map(JpaBase::getCode);
     }
 }

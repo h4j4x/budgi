@@ -1,7 +1,12 @@
 package com.sp1ke.budgi.api.web.config;
 
+import com.fasterxml.jackson.databind.Module;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.sp1ke.budgi.api.web.converter.MoneyDeserializer;
+import com.sp1ke.budgi.api.web.converter.MoneySerializer;
 import java.util.Arrays;
 import java.util.stream.Stream;
+import org.joda.money.Money;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -31,6 +36,9 @@ public class WebConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http,
                                             AuthenticationProvider authProvider,
                                             JwtAuthFilter jwtAuthFilter) throws Exception {
+        var authPaths = new String[] {
+            "/auth/me", "/category/**", "/wallet/**", "/transaction/**"
+        };
         var staticAnonPaths = new String[] {
             "/", "/*.css", "/*.png", "/*.webmanifest", "/manage/**"
         };
@@ -39,7 +47,7 @@ public class WebConfig {
                     var apiAnonPaths = Arrays.stream(API_POST_ANON_PATHS)
                         .map(path -> REST_BASE_PATH + path)
                         .toArray(String[]::new);
-                    var apiUserPaths = Stream.of("/auth/me", "/category/**", "/wallet/**")
+                    var apiUserPaths = Stream.of(authPaths)
                         .map(path -> REST_BASE_PATH + path)
                         .toArray(String[]::new);
                     registry
@@ -63,5 +71,13 @@ public class WebConfig {
         var source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+
+    @Bean
+    public Module moneyJacksonModule() {
+        var module = new SimpleModule();
+        module.addDeserializer(Money.class, new MoneyDeserializer());
+        module.addSerializer(Money.class, new MoneySerializer());
+        return module;
     }
 }

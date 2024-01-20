@@ -4,11 +4,14 @@ import com.sp1ke.budgi.api.category.ApiCategory;
 import com.sp1ke.budgi.api.category.CategoryService;
 import com.sp1ke.budgi.api.category.domain.JpaCategory;
 import com.sp1ke.budgi.api.category.repo.CategoryRepo;
+import com.sp1ke.budgi.api.common.ApiFilter;
 import com.sp1ke.budgi.api.common.ValidatorUtil;
+import com.sp1ke.budgi.api.data.JpaBase;
+import jakarta.annotation.Nullable;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
-import java.util.Optional;
+import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,7 +28,8 @@ public class JpaCategoryService implements CategoryService {
 
     @Override
     @NotNull
-    public Page<ApiCategory> fetch(@NotNull Long userId, @NotNull Pageable pageable) {
+    public Page<ApiCategory> fetch(@NotNull Long userId, @NotNull Pageable pageable,
+                                   @Nullable ApiFilter<ApiCategory> filter) {
         var page = categoryRepo.findAllByUserId(userId, pageable);
         return page.map(this::mapToApiCategory);
     }
@@ -64,7 +68,7 @@ public class JpaCategoryService implements CategoryService {
 
     @Override
     @Transactional
-    public void deleteByCodes(Long userId, String[] codes) {
+    public void deleteByCodes(@NotNull Long userId, @NotNull String[] codes) {
         categoryRepo.deleteByUserIdAndCodeIn(userId, codes);
     }
 
@@ -74,5 +78,30 @@ public class JpaCategoryService implements CategoryService {
             .code(category.getCode())
             .name(category.getName())
             .build();
+    }
+
+    @Override
+    public Optional<Long> findIdByCode(@NotNull Long userId, @Nullable String code) {
+        return categoryRepo.findByUserIdAndCode(userId, code)
+            .map(JpaBase::getId);
+    }
+
+    @Override
+    public Map<Long, String> fetchCodesOf(@NotNull Long userId, @NotNull Set<Long> ids) {
+        if (ids.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        var list = categoryRepo.findAllByUserIdAndIdIn(userId, ids);
+        var map = new HashMap<Long, String>();
+        for (var category : list) {
+            map.put(category.getId(), category.getCode());
+        }
+        return map;
+    }
+
+    @Override
+    public Optional<String> findCodeById(@NotNull Long userId, @NotNull Long id) {
+        return categoryRepo.findByUserIdAndId(userId, id)
+            .map(JpaBase::getCode);
     }
 }
