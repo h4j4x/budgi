@@ -1,12 +1,10 @@
 package com.sp1ke.budgi.api.web.config;
 
 import com.fasterxml.jackson.databind.Module;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.sp1ke.budgi.api.web.converter.MoneyDeserializer;
-import com.sp1ke.budgi.api.web.converter.MoneySerializer;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr310.ser.OffsetDateTimeSerializer;
 import java.util.Arrays;
 import java.util.stream.Stream;
-import org.joda.money.Money;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -74,10 +72,9 @@ public class WebConfig {
     }
 
     @Bean
-    public Module moneyJacksonModule() {
-        var module = new SimpleModule();
-        module.addDeserializer(Money.class, new MoneyDeserializer());
-        module.addSerializer(Money.class, new MoneySerializer());
+    public Module javaTimeModule() {
+        var module = new JavaTimeModule();
+        module.addSerializer(OffsetDateTimeSerializer.INSTANCE);
         return module;
     }
 }

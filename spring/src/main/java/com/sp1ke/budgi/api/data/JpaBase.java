@@ -34,7 +34,7 @@ public abstract class JpaBase {
     private OffsetDateTime updatedAt;
 
     @PrePersist
-    void prePersist() {
+    protected void prePersist() {
         if (StringUtil.isBlank(code)) {
             code = StringUtil.randomString(6);
         }

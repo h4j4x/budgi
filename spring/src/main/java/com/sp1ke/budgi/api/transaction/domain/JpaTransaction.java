@@ -1,18 +1,18 @@
 package com.sp1ke.budgi.api.transaction.domain;
 
 import com.sp1ke.budgi.api.data.JpaUserBase;
-import com.sp1ke.budgi.api.data.MoneyType;
 import com.sp1ke.budgi.api.transaction.TransactionType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.Currency;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.CompositeType;
-import org.joda.money.Money;
 
 @Entity
 @Table(name = "transactions", indexes = {
@@ -38,10 +38,12 @@ public class JpaTransaction extends JpaUserBase {
     @Column(name = "transaction_type", length = 50, nullable = false)
     private TransactionType transactionType;
 
-    @AttributeOverride(name = "amount", column = @Column(name = "amount"))
-    @AttributeOverride(name = "currency", column = @Column(name = "currency"))
-    @CompositeType(MoneyType.class)
-    private Money amount;
+    @Column(length = 3, nullable = false)
+    private Currency currency;
+
+    @PositiveOrZero(message = "Positive or zero amount is required")
+    @Column(nullable = false, precision = 38, scale = 2)
+    private BigDecimal amount;
 
     @Size(min = 2, max = 100, message = "Valid transaction description is required (2 to 255 characters)")
     @NotNull(message = "Valid transaction description is required (2 to 255 characters)")
@@ -50,4 +52,16 @@ public class JpaTransaction extends JpaUserBase {
 
     @Column(name = "date_time", nullable = false)
     private OffsetDateTime dateTime;
+
+    @Override
+    @PrePersist
+    protected void prePersist() {
+        super.prePersist();
+        if (currency == null) {
+            currency = Currency.getInstance("USD");
+        }
+        if (dateTime == null) {
+            dateTime = OffsetDateTime.now();
+        }
+    }
 }

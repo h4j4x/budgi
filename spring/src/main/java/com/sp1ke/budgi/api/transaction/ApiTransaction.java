@@ -1,10 +1,11 @@
 package com.sp1ke.budgi.api.transaction;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.Currency;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.joda.money.Money;
 
 @Builder
 @Getter
@@ -18,7 +19,9 @@ public class ApiTransaction {
 
     private TransactionType transactionType;
 
-    private Money amount;
+    private Currency currency;
+
+    private BigDecimal amount;
 
     private String description;
 

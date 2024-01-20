@@ -2,6 +2,7 @@ package com.sp1ke.budgi.api.web;
 
 import com.sp1ke.budgi.api.category.domain.JpaCategory;
 import com.sp1ke.budgi.api.category.repo.CategoryRepo;
+import com.sp1ke.budgi.api.helper.AssertHelper;
 import com.sp1ke.budgi.api.helper.AuthHelper;
 import com.sp1ke.budgi.api.helper.RestResponsePage;
 import com.sp1ke.budgi.api.transaction.ApiTransaction;
@@ -14,8 +15,8 @@ import com.sp1ke.budgi.api.wallet.domain.JpaWallet;
 import com.sp1ke.budgi.api.wallet.repo.WalletRepo;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import org.joda.money.CurrencyUnit;
-import org.joda.money.Money;
+import java.util.Currency;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +27,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.RestClient;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class TransactionControllerTests {
@@ -67,6 +67,54 @@ public class TransactionControllerTests {
     }
 
     @Test
+    void createValidWithoutCodeAndCurrencyAndDatetimeReturnsCodeAndCurrencyAndDatetime() {
+        var authTokenPair = AuthHelper.fetchAuthToken(userRepo, passwordEncoder, restClient);
+
+        var category = categoryRepo.save(JpaCategory.builder()
+            .userId(authTokenPair.getFirst())
+            .name("test")
+            .build());
+        var wallet = walletRepo.save(JpaWallet.builder()
+            .userId(authTokenPair.getFirst())
+            .name("test")
+            .walletType(WalletType.CASH)
+            .build());
+        var transaction = ApiTransaction.builder()
+            .categoryCode(category.getCode())
+            .walletCode(wallet.getCode())
+            .transactionType(TransactionType.INCOME)
+            .amount(BigDecimal.valueOf(15.68))
+            .description("test")
+            .build();
+
+        var response = restClient.post()
+            .uri("/transaction")
+            .header("Authorization", "Bearer " + authTokenPair.getSecond())
+            .body(transaction)
+            .retrieve()
+            .toEntity(ApiTransaction.class);
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        var apiTransaction = response.getBody();
+        assertNotNull(apiTransaction);
+        assertNotNull(apiTransaction.getCode());
+        assertNotNull(apiTransaction.getCurrency());
+        assertNotNull(apiTransaction.getDateTime());
+        assertEquals(transaction.getTransactionType(), apiTransaction.getTransactionType());
+        assertEquals(transaction.getAmount(), apiTransaction.getAmount());
+        assertEquals(transaction.getDescription(), apiTransaction.getDescription());
+
+        Optional<JpaTransaction> byCode = transactionRepo
+            .findByUserIdAndCode(authTokenPair.getFirst(), apiTransaction.getCode());
+        assertTrue(byCode.isPresent());
+        assertEquals(apiTransaction.getTransactionType(), byCode.get().getTransactionType());
+        assertEquals(apiTransaction.getCurrency(), byCode.get().getCurrency());
+        AssertHelper.assertOffsetDateTimeEquals(apiTransaction.getDateTime(), byCode.get().getDateTime());
+        assertEquals(apiTransaction.getAmount(), byCode.get().getAmount());
+        assertEquals(apiTransaction.getDescription(), byCode.get().getDescription());
+    }
+
+    @Test
     void fetchPageReturnsUserItems() {
         var authTokenPair = AuthHelper.fetchAuthToken(userRepo, passwordEncoder, restClient);
         var category = categoryRepo.save(JpaCategory.builder()
@@ -81,15 +129,18 @@ public class TransactionControllerTests {
 
         var listSize = 9;
         var transactionType = TransactionType.INCOME;
-        var amount = Money.of(CurrencyUnit.USD, BigDecimal.valueOf(10.0));
+        var currency = Currency.getInstance("USD");
+        var amount = BigDecimal.valueOf(10.0);
+        var dateTime = OffsetDateTime.now();
         for (int i = 0; i < listSize; i++) {
             var transaction = JpaTransaction.builder()
                 .userId(authTokenPair.getFirst())
                 .categoryId(category.getId())
                 .walletId(wallet.getId())
                 .transactionType(transactionType)
+                .currency(currency)
                 .amount(amount)
-                .dateTime(OffsetDateTime.now())
+                .dateTime(dateTime)
                 .description("test")
                 .build();
             transactionRepo.save(transaction);
@@ -110,7 +161,9 @@ public class TransactionControllerTests {
             assertEquals(transactionType, transaction.getTransactionType());
             assertEquals(category.getCode(), transaction.getCategoryCode());
             assertEquals(wallet.getCode(), transaction.getWalletCode());
-            assertEquals(amount, transaction.getAmount());
+            assertEquals(currency, transaction.getCurrency());
+            assertEquals(0, amount.compareTo(transaction.getAmount()));
+            AssertHelper.assertOffsetDateTimeEquals(dateTime, transaction.getDateTime());
             assertEquals("test", transaction.getDescription());
         }
     }

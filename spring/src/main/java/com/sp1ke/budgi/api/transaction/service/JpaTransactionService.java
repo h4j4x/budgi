@@ -57,7 +57,7 @@ public class JpaTransactionService implements TransactionService {
 
         var categoryId = categoryService.findIdByCode(userId, data.getCategoryCode())
             .orElseThrow(() -> new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Invalid category"));
-        var walletId = walletService.findIdByCode(userId, data.getCategoryCode())
+        var walletId = walletService.findIdByCode(userId, data.getWalletCode())
             .orElseThrow(() -> new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Invalid wallet"));
 
         transaction = transaction.toBuilder()
@@ -108,6 +108,7 @@ public class JpaTransactionService implements TransactionService {
             .categoryCode(categoryCode(transaction, categoriesIdToCode))
             .walletCode(walletCode(transaction, walletsIdToCode))
             .transactionType(transaction.getTransactionType())
+            .currency(transaction.getCurrency())
             .amount(transaction.getAmount())
             .description(transaction.getDescription())
             .dateTime(transaction.getDateTime())

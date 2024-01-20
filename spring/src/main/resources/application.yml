@@ -24,6 +24,7 @@ spring:
       failOnUnknownProperties: false
     serialization:
       failOnEmptyBeans: false
+      writeDatesAsTimestamps: false
   jpa:
     hibernate:
       ddlAuto: validate
