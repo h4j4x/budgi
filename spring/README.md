@@ -22,7 +22,7 @@ Budg1 Spring project.
 - [Postman](https://www.postman.com/).
 - [Newman](https://github.com/postmanlabs/newman).
 
-You can use [DevEnv](https://devenv.sh/) for a portable dev environment. Launch the shell to have Java 21 and Newman:
+You can use [DevEnv](https://devenv.sh/) for a portable dev environment. Launch the shell to have Java 21, Newman and Liquibase:
 ```shell
 devenv shell
 ```
