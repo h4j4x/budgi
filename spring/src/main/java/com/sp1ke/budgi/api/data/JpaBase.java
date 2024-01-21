@@ -4,6 +4,7 @@ import com.sp1ke.budgi.api.common.StringUtil;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import java.time.OffsetDateTime;
+import javax.annotation.OverridingMethodsMustInvokeSuper;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,6 +35,7 @@ public abstract class JpaBase {
     private OffsetDateTime updatedAt;
 
     @PrePersist
+    @OverridingMethodsMustInvokeSuper
     protected void prePersist() {
         if (StringUtil.isBlank(code)) {
             code = StringUtil.randomString(6);

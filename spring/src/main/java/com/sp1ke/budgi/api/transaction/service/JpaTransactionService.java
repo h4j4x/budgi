@@ -1,7 +1,6 @@
 package com.sp1ke.budgi.api.transaction.service;
 
 import com.sp1ke.budgi.api.category.CategoryService;
-import com.sp1ke.budgi.api.common.ApiFilter;
 import com.sp1ke.budgi.api.common.ValidatorUtil;
 import com.sp1ke.budgi.api.transaction.ApiTransaction;
 import com.sp1ke.budgi.api.transaction.TransactionFilter;
@@ -10,6 +9,7 @@ import com.sp1ke.budgi.api.transaction.domain.JpaTransaction;
 import com.sp1ke.budgi.api.transaction.repo.TransactionRepo;
 import com.sp1ke.budgi.api.wallet.WalletService;
 import jakarta.annotation.Nullable;
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
@@ -18,7 +18,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.query.QueryUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -34,16 +36,54 @@ public class JpaTransactionService implements TransactionService {
 
     private final WalletService walletService;
 
+    private final EntityManager entityManager;
+
     @Override
     @NotNull
     public Page<ApiTransaction> fetch(@NotNull Long userId, @NotNull Pageable pageable,
                                       @Nullable TransactionFilter filter) {
-        var page = transactionRepo.findAllByUserId(userId, pageable); // TODO: filter
+        var page = fetchPage(userId, pageable, filter);
         var categoriesIdToCode = categoryService
             .fetchCodesOf(userId, page.get().map(JpaTransaction::getCategoryId).collect(Collectors.toSet()));
         var walletsIdToCode = walletService
             .fetchCodesOf(userId, page.get().map(JpaTransaction::getWalletId).collect(Collectors.toSet()));
         return page.map(transaction -> mapToApiTransaction(transaction, categoriesIdToCode, walletsIdToCode));
+    }
+
+    private Page<JpaTransaction> fetchPage(@NotNull Long userId, @NotNull Pageable pageable,
+                                           @Nullable TransactionFilter filter) {
+        if (filter == null || filter.isEmpty()) {
+            return transactionRepo.findAllByUserId(userId, pageable);
+        }
+
+        var criteriaBuilder = entityManager.getCriteriaBuilder();
+        var listQuery = criteriaBuilder.createQuery(JpaTransaction.class);
+        var countQuery = criteriaBuilder.createQuery(Long.class);
+        var root = listQuery.from(JpaTransaction.class);
+        var listRoot = countQuery.from(JpaTransaction.class);
+
+        var where = criteriaBuilder.greaterThan(root.get("id"), 0);
+        var searchLike = filter.getSearchLike();
+        if (searchLike != null) {
+            where = criteriaBuilder.and(where, criteriaBuilder.like(root.get("description"), searchLike));
+        }
+        if (filter.getTransactionTypes() != null && !filter.getTransactionTypes().isEmpty()) {
+            var inClause = criteriaBuilder.in(root.get("transactionType"));
+            for (var transactionType : filter.getTransactionTypes()) {
+                inClause.value(transactionType);
+            }
+            where = criteriaBuilder.and(where, inClause);
+        }
+
+        listQuery.distinct(true).where(where)
+            .orderBy(QueryUtils.toOrders(pageable.getSort(), root, criteriaBuilder));
+        countQuery.select(criteriaBuilder.count(listRoot)).where(where);
+        var list = entityManager.createQuery(listQuery)
+            .setFirstResult(pageable.getPageNumber())
+            .setMaxResults(pageable.getPageSize())
+            .getResultList();
+        var count = entityManager.createQuery(countQuery).getSingleResult();
+        return new PageImpl<>(list, pageable, count);
     }
 
     @Override

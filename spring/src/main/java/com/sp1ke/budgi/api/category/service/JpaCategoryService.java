@@ -1,10 +1,10 @@
 package com.sp1ke.budgi.api.category.service;
 
 import com.sp1ke.budgi.api.category.ApiCategory;
+import com.sp1ke.budgi.api.category.CategoryFilter;
 import com.sp1ke.budgi.api.category.CategoryService;
 import com.sp1ke.budgi.api.category.domain.JpaCategory;
 import com.sp1ke.budgi.api.category.repo.CategoryRepo;
-import com.sp1ke.budgi.api.common.ApiFilter;
 import com.sp1ke.budgi.api.common.ValidatorUtil;
 import com.sp1ke.budgi.api.data.JpaBase;
 import jakarta.annotation.Nullable;
@@ -29,7 +29,7 @@ public class JpaCategoryService implements CategoryService {
     @Override
     @NotNull
     public Page<ApiCategory> fetch(@NotNull Long userId, @NotNull Pageable pageable,
-                                   @Nullable ApiFilter<ApiCategory> filter) {
+                                   @Nullable CategoryFilter filter) {
         var page = categoryRepo.findAllByUserId(userId, pageable);
         return page.map(this::mapToApiCategory);
     }

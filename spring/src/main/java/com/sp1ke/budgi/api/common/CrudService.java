@@ -6,14 +6,14 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-public interface CrudService<T> {
+public interface CrudService<T, F extends ApiFilter<T>> {
     @NotNull
     default Page<T> fetch(@NotNull Long userId, @NotNull Pageable pageable) {
         return fetch(userId, pageable, null);
     }
 
     @NotNull
-    Page<T> fetch(@NotNull Long userId, @NotNull Pageable pageable, @Nullable ApiFilter<T> filter);
+    Page<T> fetch(@NotNull Long userId, @NotNull Pageable pageable, @Nullable F filter);
 
     @NotNull
     T save(@NotNull Long userId, @NotNull T data, boolean throwIfExists);

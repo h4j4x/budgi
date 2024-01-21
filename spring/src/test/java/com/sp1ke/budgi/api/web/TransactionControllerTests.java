@@ -167,4 +167,60 @@ public class TransactionControllerTests {
             assertEquals("test", transaction.getDescription());
         }
     }
+
+    @Test
+    void fetchPageReturnsUserItemsWithFilterTransactionType() {
+        var authTokenPair = AuthHelper.fetchAuthToken(userRepo, passwordEncoder, restClient);
+        var category = categoryRepo.save(JpaCategory.builder()
+            .userId(authTokenPair.getFirst())
+            .name("test")
+            .build());
+        var wallet = walletRepo.save(JpaWallet.builder()
+            .userId(authTokenPair.getFirst())
+            .name("test")
+            .walletType(WalletType.CASH)
+            .build());
+
+        var transactionTypeTimes = 3;
+        var listSize = TransactionType.values().length * transactionTypeTimes;
+        var currency = Currency.getInstance("USD");
+        var amount = BigDecimal.valueOf(10.0);
+        var dateTime = OffsetDateTime.now();
+        var transactionTypeIndex = 0;
+        for (int i = 0; i < listSize; i++) {
+            var transaction = JpaTransaction.builder()
+                .userId(authTokenPair.getFirst())
+                .categoryId(category.getId())
+                .walletId(wallet.getId())
+                .transactionType(TransactionType.values()[transactionTypeIndex])
+                .currency(currency)
+                .amount(amount)
+                .dateTime(dateTime)
+                .description("test")
+                .build();
+            transactionRepo.save(transaction);
+            transactionTypeIndex = (transactionTypeIndex + 1) % TransactionType.values().length;
+        }
+
+        var response = restClient.get()
+            .uri("/transaction?transactionTypes=income")
+            .header("Authorization", "Bearer " + authTokenPair.getSecond())
+            .retrieve()
+            .toEntity(new ParameterizedTypeReference<RestResponsePage<ApiTransaction>>() {
+            });
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        var page = response.getBody();
+        assertNotNull(page);
+        assertEquals(transactionTypeTimes, page.getTotalElements());
+        for (var transaction : page) {
+            assertEquals(TransactionType.INCOME, transaction.getTransactionType());
+            assertEquals(category.getCode(), transaction.getCategoryCode());
+            assertEquals(wallet.getCode(), transaction.getWalletCode());
+            assertEquals(currency, transaction.getCurrency());
+            assertEquals(0, amount.compareTo(transaction.getAmount()));
+            AssertHelper.assertOffsetDateTimeEquals(dateTime, transaction.getDateTime());
+            assertEquals("test", transaction.getDescription());
+        }
+    }
 }

@@ -1,10 +1,10 @@
 package com.sp1ke.budgi.api.wallet.service;
 
-import com.sp1ke.budgi.api.common.ApiFilter;
 import com.sp1ke.budgi.api.common.StringUtil;
 import com.sp1ke.budgi.api.common.ValidatorUtil;
 import com.sp1ke.budgi.api.data.JpaBase;
 import com.sp1ke.budgi.api.wallet.ApiWallet;
+import com.sp1ke.budgi.api.wallet.WalletFilter;
 import com.sp1ke.budgi.api.wallet.WalletService;
 import com.sp1ke.budgi.api.wallet.domain.JpaWallet;
 import com.sp1ke.budgi.api.wallet.repo.WalletRepo;
@@ -29,7 +29,7 @@ public class JpaWalletService implements WalletService {
 
     @Override
     public Page<ApiWallet> fetch(@NotNull Long userId, @NotNull Pageable pageable,
-                                 @Nullable ApiFilter<ApiWallet> filter) {
+                                 @Nullable WalletFilter filter) {
         var page = walletRepo.findAllByUserId(userId, pageable);
         return page.map(this::mapToApiWallet);
     }

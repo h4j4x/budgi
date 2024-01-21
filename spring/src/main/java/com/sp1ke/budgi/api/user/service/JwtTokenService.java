@@ -11,6 +11,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.validation.constraints.NotNull;
 import java.util.Calendar;
+import java.util.Date;
 import javax.crypto.SecretKey;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.HttpStatus;
@@ -46,11 +47,13 @@ public class JwtTokenService implements TokenService {
                 .verifyWith(signingKey)
                 .build()
                 .parseSignedClaims(StringUtil.removePrefix(token, TOKEN_TYPE + " "));
-            // TODO: validate expiration
-            return jwt.getPayload().getSubject();
+            if (jwt.getPayload().getExpiration() != null &&
+                jwt.getPayload().getExpiration().after(new Date())) {
+                return jwt.getPayload().getSubject();
+            }
         } catch (Exception ignored) {
-            throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED, "Invalid token");
         }
+        throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED, "Invalid token");
     }
 
     @Override

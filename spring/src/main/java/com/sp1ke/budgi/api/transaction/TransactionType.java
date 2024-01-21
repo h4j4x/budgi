@@ -1,8 +1,8 @@
 package com.sp1ke.budgi.api.transaction;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Nullable;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotNull;
 
 public enum TransactionType {
     @JsonProperty("income")

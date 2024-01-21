@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-public interface WalletService extends CrudService<ApiWallet> {
+public interface WalletService extends CrudService<ApiWallet, WalletFilter> {
     Optional<Long> findIdByCode(@NotNull Long userId, @Nullable String code);
 
     Map<Long, String> fetchCodesOf(@NotNull Long userId, @NotNull Set<Long> ids);
