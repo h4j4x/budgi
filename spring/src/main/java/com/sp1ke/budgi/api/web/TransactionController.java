@@ -1,13 +1,16 @@
 package com.sp1ke.budgi.api.web;
 
 import com.sp1ke.budgi.api.transaction.ApiTransaction;
+import com.sp1ke.budgi.api.transaction.TransactionFilter;
 import com.sp1ke.budgi.api.transaction.TransactionService;
 import com.sp1ke.budgi.api.user.AuthUser;
 import com.sp1ke.budgi.api.web.annot.ApiController;
 import lombok.RequiredArgsConstructor;
+import java.util.Map;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.RequestParam;
 import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,8 +25,10 @@ public class TransactionController {
 
     @GetMapping("/transaction")
     ResponseEntity<Page<ApiTransaction>> list(@AuthenticationPrincipal AuthUser principal,
-                                              @SortDefault(sort = "updatedAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        var itemsPage = transactionService.fetch(principal.userId(), pageable);
+                                              @SortDefault(sort = "updatedAt", direction = Sort.Direction.DESC) Pageable pageable,
+                                              @RequestParam Map<String, String> params) {
+        var filter = TransactionFilter.parseMap(params);
+        var itemsPage = transactionService.fetch(principal.userId(), pageable, filter);
         return ResponseEntity.ok(itemsPage);
     }
 

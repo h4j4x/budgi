@@ -4,6 +4,7 @@ import com.sp1ke.budgi.api.category.CategoryService;
 import com.sp1ke.budgi.api.common.ApiFilter;
 import com.sp1ke.budgi.api.common.ValidatorUtil;
 import com.sp1ke.budgi.api.transaction.ApiTransaction;
+import com.sp1ke.budgi.api.transaction.TransactionFilter;
 import com.sp1ke.budgi.api.transaction.TransactionService;
 import com.sp1ke.budgi.api.transaction.domain.JpaTransaction;
 import com.sp1ke.budgi.api.transaction.repo.TransactionRepo;
@@ -36,8 +37,8 @@ public class JpaTransactionService implements TransactionService {
     @Override
     @NotNull
     public Page<ApiTransaction> fetch(@NotNull Long userId, @NotNull Pageable pageable,
-                                      @Nullable ApiFilter<ApiTransaction> filter) {
-        var page = transactionRepo.findAllByUserId(userId, pageable);
+                                      @Nullable TransactionFilter filter) {
+        var page = transactionRepo.findAllByUserId(userId, pageable); // TODO: filter
         var categoriesIdToCode = categoryService
             .fetchCodesOf(userId, page.get().map(JpaTransaction::getCategoryId).collect(Collectors.toSet()));
         var walletsIdToCode = walletService
