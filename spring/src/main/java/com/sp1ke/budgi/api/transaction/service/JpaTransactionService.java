@@ -10,6 +10,9 @@ import com.sp1ke.budgi.api.transaction.repo.TransactionRepo;
 import com.sp1ke.budgi.api.wallet.WalletService;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
@@ -62,7 +65,26 @@ public class JpaTransactionService implements TransactionService {
         var root = listQuery.from(JpaTransaction.class);
         var listRoot = countQuery.from(JpaTransaction.class);
 
-        var where = criteriaBuilder.greaterThan(root.get("id"), 0);
+        listQuery
+            .distinct(true)
+            .where(where(criteriaBuilder, root, userId, filter))
+            .orderBy(QueryUtils.toOrders(pageable.getSort(), root, criteriaBuilder));
+        countQuery
+            .select(criteriaBuilder.countDistinct(listRoot))
+            .where(where(criteriaBuilder, listRoot, userId, filter));
+        var list = entityManager.createQuery(listQuery)
+            .setFirstResult(pageable.getPageNumber())
+            .setMaxResults(pageable.getPageSize())
+            .getResultList();
+        var count = entityManager.createQuery(countQuery).getSingleResult();
+        return new PageImpl<>(list, pageable, count);
+    }
+
+    private Predicate where(@NotNull CriteriaBuilder criteriaBuilder,
+                            @NotNull Root<JpaTransaction> root,
+                            @NotNull Long userId,
+                            @NotNull TransactionFilter filter) {
+        var where = criteriaBuilder.equal(root.get("userId"), userId);
         var searchLike = filter.getSearchLike();
         if (searchLike != null) {
             where = criteriaBuilder.and(where, criteriaBuilder.like(root.get("description"), searchLike));
@@ -74,16 +96,7 @@ public class JpaTransactionService implements TransactionService {
             }
             where = criteriaBuilder.and(where, inClause);
         }
-
-        listQuery.distinct(true).where(where)
-            .orderBy(QueryUtils.toOrders(pageable.getSort(), root, criteriaBuilder));
-        countQuery.select(criteriaBuilder.count(listRoot)).where(where);
-        var list = entityManager.createQuery(listQuery)
-            .setFirstResult(pageable.getPageNumber())
-            .setMaxResults(pageable.getPageSize())
-            .getResultList();
-        var count = entityManager.createQuery(countQuery).getSingleResult();
-        return new PageImpl<>(list, pageable, count);
+        return where;
     }
 
     @Override

@@ -64,6 +64,7 @@ public class TransactionControllerTests {
         categoryRepo.deleteAll();
         walletRepo.deleteAll();
         userRepo.deleteAll();
+        transactionRepo.deleteAll();
     }
 
     @Test
@@ -188,11 +189,12 @@ public class TransactionControllerTests {
         var dateTime = OffsetDateTime.now();
         var transactionTypeIndex = 0;
         for (int i = 0; i < listSize; i++) {
+            var transactionType = TransactionType.values()[transactionTypeIndex];
             var transaction = JpaTransaction.builder()
                 .userId(authTokenPair.getFirst())
                 .categoryId(category.getId())
                 .walletId(wallet.getId())
-                .transactionType(TransactionType.values()[transactionTypeIndex])
+                .transactionType(transactionType)
                 .currency(currency)
                 .amount(amount)
                 .dateTime(dateTime)
