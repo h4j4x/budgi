@@ -6,6 +6,7 @@ import com.sp1ke.budgi.api.helper.AssertHelper;
 import com.sp1ke.budgi.api.helper.AuthHelper;
 import com.sp1ke.budgi.api.helper.RestResponsePage;
 import com.sp1ke.budgi.api.transaction.ApiTransaction;
+import com.sp1ke.budgi.api.transaction.TransactionStatus;
 import com.sp1ke.budgi.api.transaction.TransactionType;
 import com.sp1ke.budgi.api.transaction.domain.JpaTransaction;
 import com.sp1ke.budgi.api.transaction.repo.TransactionRepo;

@@ -49,6 +49,5 @@ abstract class CategoryAmountService {
     required Period period,
     bool expensesTransactions = true,
     bool showZeroTotal = false,
-    List<WalletType>? walletTypes,
   });
 }

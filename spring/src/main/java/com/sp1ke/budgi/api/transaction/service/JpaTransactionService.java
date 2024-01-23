@@ -87,7 +87,8 @@ public class JpaTransactionService implements TransactionService {
         var where = criteriaBuilder.equal(root.get("userId"), userId);
         var searchLike = filter.getSearchLike();
         if (searchLike != null) {
-            where = criteriaBuilder.and(where, criteriaBuilder.like(root.get("description"), searchLike));
+            var searchWhere = criteriaBuilder.like(root.get("description"), searchLike);
+            where = criteriaBuilder.and(where, searchWhere);
         }
         if (filter.getTransactionTypes() != null && !filter.getTransactionTypes().isEmpty()) {
             var inClause = criteriaBuilder.in(root.get("transactionType"));
@@ -95,6 +96,31 @@ public class JpaTransactionService implements TransactionService {
                 inClause.value(transactionType);
             }
             where = criteriaBuilder.and(where, inClause);
+        }
+        if (filter.getTransactionStatuses() != null && !filter.getTransactionStatuses().isEmpty()) {
+            var inClause = criteriaBuilder.in(root.get("transactionStatus"));
+            for (var transactionStatus : filter.getTransactionStatuses()) {
+                inClause.value(transactionStatus);
+            }
+            where = criteriaBuilder.and(where, inClause);
+        }
+        var categoryId = categoryService.findIdByCode(userId, filter.getCategoryCode());
+        if (categoryId.isPresent()) {
+            var categoryWhere = criteriaBuilder.equal(root.get("categoryId"), categoryId.get());
+            where = criteriaBuilder.and(where, categoryWhere);
+        }
+        var walletId = walletService.findIdByCode(userId, filter.getWalletCode());
+        if (walletId.isPresent()) {
+            var walletWhere = criteriaBuilder.equal(root.get("walletId"), walletId.get());
+            where = criteriaBuilder.and(where, walletWhere);
+        }
+        if (filter.getFrom() != null) {
+            var fromWhere = criteriaBuilder.greaterThanOrEqualTo(root.get("dateTime"), filter.getFrom());
+            where = criteriaBuilder.and(where, fromWhere);
+        }
+        if (filter.getTo() != null) {
+            var toWhere = criteriaBuilder.lessThanOrEqualTo(root.get("dateTime"), filter.getTo());
+            where = criteriaBuilder.and(where, toWhere);
         }
         return where;
     }
@@ -120,6 +146,7 @@ public class JpaTransactionService implements TransactionService {
             .categoryId(categoryId)
             .walletId(walletId)
             .transactionType(data.getTransactionType())
+            .transactionStatus(data.getTransactionStatus())
             .amount(data.getAmount())
             .description(data.getDescription())
             .dateTime(data.getDateTime())
@@ -162,6 +189,7 @@ public class JpaTransactionService implements TransactionService {
             .categoryCode(categoryCode(transaction, categoriesIdToCode))
             .walletCode(walletCode(transaction, walletsIdToCode))
             .transactionType(transaction.getTransactionType())
+            .transactionStatus(transaction.getTransactionStatus())
             .currency(transaction.getCurrency())
             .amount(transaction.getAmount())
             .description(transaction.getDescription())

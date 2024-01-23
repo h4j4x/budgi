@@ -1,6 +1,7 @@
 package com.sp1ke.budgi.api.transaction.domain;
 
 import com.sp1ke.budgi.api.data.JpaUserBase;
+import com.sp1ke.budgi.api.transaction.TransactionStatus;
 import com.sp1ke.budgi.api.transaction.TransactionType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -20,6 +21,7 @@ import lombok.experimental.SuperBuilder;
     @Index(name = "transactions_category_id_IDX", columnList = "categoryId"),
     @Index(name = "transactions_wallet_id_IDX", columnList = "walletId"),
     @Index(name = "transactions_transaction_type_IDX", columnList = "transactionType"),
+    @Index(name = "transactions_transaction_status_IDX", columnList = "transactionStatus"),
     @Index(name = "transactions_date_time_IDX", columnList = "dateTime"),
 })
 @SuperBuilder(toBuilder = true)
@@ -37,6 +39,10 @@ public class JpaTransaction extends JpaUserBase {
     @NotNull(message = "Transaction type is required")
     @Column(name = "transaction_type", length = 50, nullable = false)
     private TransactionType transactionType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "transaction_status", length = 50, nullable = false)
+    private TransactionStatus transactionStatus;
 
     @Column(length = 3, nullable = false)
     private Currency currency;
@@ -57,6 +63,9 @@ public class JpaTransaction extends JpaUserBase {
     @PrePersist
     protected void prePersist() {
         super.prePersist();
+        if (transactionStatus == null) {
+            transactionStatus = TransactionStatus.COMPLETED;
+        }
         if (currency == null) {
             currency = Currency.getInstance("USD");
         }

@@ -19,6 +19,8 @@ public class ApiTransaction {
 
     private TransactionType transactionType;
 
+    private TransactionStatus transactionStatus;
+
     private Currency currency;
 
     private BigDecimal amount;

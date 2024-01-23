@@ -57,6 +57,11 @@ databaseChangeLog:
               - column:
                   constraints:
                     nullable: false
+                  name: transaction_status
+                  type: VARCHAR(50)
+              - column:
+                  constraints:
+                    nullable: false
                   name: wallet_id
                   type: BIGINT
             tableName: transactions
@@ -89,6 +94,16 @@ databaseChangeLog:
               - column:
                   name: transaction_type
             indexName: transactions_transaction_type_idx
+            tableName: transactions
+  - changeSet:
+      id: 005-transactions-status
+      author: budgi
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: transaction_status
+            indexName: transactions_transaction_status_idx
             tableName: transactions
   - changeSet:
       id: 005-transactions-datetime

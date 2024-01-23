@@ -5,6 +5,7 @@ import com.sp1ke.budgi.api.category.CategoryFilter;
 import com.sp1ke.budgi.api.category.CategoryService;
 import com.sp1ke.budgi.api.category.domain.JpaCategory;
 import com.sp1ke.budgi.api.category.repo.CategoryRepo;
+import com.sp1ke.budgi.api.common.StringUtil;
 import com.sp1ke.budgi.api.common.ValidatorUtil;
 import com.sp1ke.budgi.api.data.JpaBase;
 import jakarta.annotation.Nullable;
@@ -82,8 +83,11 @@ public class JpaCategoryService implements CategoryService {
 
     @Override
     public Optional<Long> findIdByCode(@NotNull Long userId, @Nullable String code) {
-        return categoryRepo.findByUserIdAndCode(userId, code)
-            .map(JpaBase::getId);
+        if (StringUtil.isNotBlank(code)) {
+            return categoryRepo.findByUserIdAndCode(userId, code)
+                .map(JpaBase::getId);
+        }
+        return Optional.empty();
     }
 
     @Override
