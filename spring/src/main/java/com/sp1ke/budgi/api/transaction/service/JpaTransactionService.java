@@ -3,6 +3,7 @@ package com.sp1ke.budgi.api.transaction.service;
 import com.sp1ke.budgi.api.category.CategoryService;
 import com.sp1ke.budgi.api.common.ValidatorUtil;
 import com.sp1ke.budgi.api.transaction.ApiTransaction;
+import com.sp1ke.budgi.api.transaction.CreatedTransactionEvent;
 import com.sp1ke.budgi.api.transaction.TransactionFilter;
 import com.sp1ke.budgi.api.transaction.TransactionService;
 import com.sp1ke.budgi.api.transaction.domain.JpaTransaction;
@@ -20,6 +21,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -40,6 +42,8 @@ public class JpaTransactionService implements TransactionService {
     private final WalletService walletService;
 
     private final EntityManager entityManager;
+
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @NotNull
@@ -127,6 +131,7 @@ public class JpaTransactionService implements TransactionService {
 
     @Override
     @NotNull
+    @Transactional
     public ApiTransaction save(@NotNull Long userId, @NotNull ApiTransaction data, boolean throwIfExists) {
         var transaction = transactionRepo
             .findByUserIdAndCode(userId, data.getCode())
@@ -154,7 +159,9 @@ public class JpaTransactionService implements TransactionService {
         ValidatorUtil.validate(validator, transaction);
 
         transaction = transactionRepo.save(transaction);
-        return mapToApiTransaction(transaction);
+        var apiTransaction = mapToApiTransaction(transaction);
+        eventPublisher.publishEvent(new CreatedTransactionEvent(apiTransaction));
+        return apiTransaction;
     }
 
     @Override
@@ -213,7 +220,7 @@ public class JpaTransactionService implements TransactionService {
         if (walletsIdToCode != null && walletsIdToCode.containsKey(transaction.getWalletId())) {
             return walletsIdToCode.get(transaction.getWalletId());
         }
-        return categoryService.findCodeById(transaction.getUserId(), transaction.getWalletId())
+        return walletService.findCodeById(transaction.getUserId(), transaction.getWalletId())
             .orElse(null);
     }
 }

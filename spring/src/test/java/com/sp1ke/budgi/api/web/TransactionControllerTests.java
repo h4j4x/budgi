@@ -6,7 +6,6 @@ import com.sp1ke.budgi.api.helper.AssertHelper;
 import com.sp1ke.budgi.api.helper.AuthHelper;
 import com.sp1ke.budgi.api.helper.RestResponsePage;
 import com.sp1ke.budgi.api.transaction.ApiTransaction;
-import com.sp1ke.budgi.api.transaction.TransactionStatus;
 import com.sp1ke.budgi.api.transaction.TransactionType;
 import com.sp1ke.budgi.api.transaction.domain.JpaTransaction;
 import com.sp1ke.budgi.api.transaction.repo.TransactionRepo;
@@ -26,28 +25,33 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.modulith.test.ApplicationModuleTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.RestClient;
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ApplicationModuleTest(
+    mode = ApplicationModuleTest.BootstrapMode.ALL_DEPENDENCIES,
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class TransactionControllerTests {
-    private final UserRepo userRepo;
+    final UserRepo userRepo;
 
-    private final CategoryRepo categoryRepo;
+    final CategoryRepo categoryRepo;
 
-    private final WalletRepo walletRepo;
+    final WalletRepo walletRepo;
 
-    private final TransactionRepo transactionRepo;
+    final TransactionRepo transactionRepo;
 
-    private final PasswordEncoder passwordEncoder;
+    final PasswordEncoder passwordEncoder;
 
-    private final RestClient restClient;
+    final RestClient restClient;
 
     @Autowired
     public TransactionControllerTests(@LocalServerPort int port,
-                                      UserRepo userRepo, CategoryRepo categoryRepo,
-                                      WalletRepo walletRepo, TransactionRepo transactionRepo,
+                                      UserRepo userRepo,
+                                      CategoryRepo categoryRepo,
+                                      WalletRepo walletRepo,
+                                      TransactionRepo transactionRepo,
                                       PasswordEncoder passwordEncoder) {
         this.userRepo = userRepo;
         this.categoryRepo = categoryRepo;
@@ -132,7 +136,7 @@ public class TransactionControllerTests {
         var listSize = 9;
         var transactionType = TransactionType.INCOME;
         var currency = Currency.getInstance("USD");
-        var amount = BigDecimal.valueOf(10.0);
+        var amount = BigDecimal.TEN;
         var dateTime = OffsetDateTime.now();
         for (int i = 0; i < listSize; i++) {
             var transaction = JpaTransaction.builder()
@@ -186,7 +190,7 @@ public class TransactionControllerTests {
         var transactionTypeTimes = 3;
         var listSize = TransactionType.values().length * transactionTypeTimes;
         var currency = Currency.getInstance("USD");
-        var amount = BigDecimal.valueOf(10.0);
+        var amount = BigDecimal.TEN;
         var dateTime = OffsetDateTime.now();
         var transactionTypeIndex = 0;
         for (int i = 0; i < listSize; i++) {
@@ -225,5 +229,46 @@ public class TransactionControllerTests {
             AssertHelper.assertOffsetDateTimeEquals(dateTime, transaction.getDateTime());
             assertEquals("test", transaction.getDescription());
         }
+    }
+
+    @Test
+    void saveTransactionGeneratesCode() {
+        var authTokenPair = AuthHelper.fetchAuthToken(userRepo, passwordEncoder, restClient);
+        var category = categoryRepo.save(JpaCategory.builder()
+            .userId(authTokenPair.getFirst())
+            .name("test")
+            .build());
+        var wallet = walletRepo.save(JpaWallet.builder()
+            .userId(authTokenPair.getFirst())
+            .name("test")
+            .walletType(WalletType.CASH)
+            .build());
+
+        var transaction = ApiTransaction.builder()
+            .categoryCode(category.getCode())
+            .walletCode(wallet.getCode())
+            .transactionType(TransactionType.INCOME)
+            .amount(BigDecimal.TEN)
+            .description("test")
+            .build();
+        var response = restClient.post()
+            .uri("/transaction")
+            .header("Authorization", "Bearer " + authTokenPair.getSecond())
+            .body(transaction)
+            .retrieve()
+            .toEntity(new ParameterizedTypeReference<ApiTransaction>() {
+            });
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        var apiTransaction = response.getBody();
+        assertNotNull(apiTransaction);
+        assertNotNull(apiTransaction.getTransactionStatus());
+        assertNotNull(apiTransaction.getCurrency());
+        assertNotNull(apiTransaction.getDateTime());
+        assertEquals(category.getCode(), apiTransaction.getCategoryCode());
+        assertEquals(wallet.getCode(), apiTransaction.getWalletCode());
+        assertEquals(transaction.getTransactionType(), apiTransaction.getTransactionType());
+        assertEquals(transaction.getAmount(), apiTransaction.getAmount());
+        assertEquals(transaction.getDescription(), apiTransaction.getDescription());
     }
 }
