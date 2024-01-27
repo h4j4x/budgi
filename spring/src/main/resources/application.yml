@@ -33,6 +33,13 @@ spring:
     changeLog: classpath:data/changelog-master.yml
     databaseChangeLogLockTable: changelog_lock
     databaseChangeLogTable: changelogs
+springdoc:
+  apiDocs:
+    path: /api/v1/docs
+  packagesToScan: com.sp1ke.budgi.api.web
+  swaggerUi:
+    enabled: false
+    path: /api/v1/docs-ui
 logging:
   level:
     root: INFO

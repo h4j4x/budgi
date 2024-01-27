@@ -7,7 +7,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
-import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
@@ -46,7 +45,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
     private boolean isAnonPath(@NotNull String requestURI) {
-        return Arrays.stream(WebConfig.API_POST_ANON_PATHS).anyMatch(requestURI::startsWith);
+        return WebConfig.apiAnonPaths().anyMatch(requestURI::startsWith);
     }
 
     private void processAuthToken(@NotNull HttpServletRequest request, @NotNull String token) {
