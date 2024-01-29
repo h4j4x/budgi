@@ -38,7 +38,7 @@ springdoc:
     path: /api/v1/docs
   packagesToScan: com.sp1ke.budgi.api.web
   swaggerUi:
-    enabled: false
+    disableSwaggerDefaultUrl: true
     path: /api/v1/docs-ui
 logging:
   level:
