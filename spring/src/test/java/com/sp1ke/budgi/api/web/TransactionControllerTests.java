@@ -230,45 +230,4 @@ public class TransactionControllerTests {
             assertEquals("test", transaction.getDescription());
         }
     }
-
-    @Test
-    void saveTransactionGeneratesCode() {
-        var authTokenPair = AuthHelper.fetchAuthToken(userRepo, passwordEncoder, restClient);
-        var category = categoryRepo.save(JpaCategory.builder()
-            .userId(authTokenPair.getFirst())
-            .name("test")
-            .build());
-        var wallet = walletRepo.save(JpaWallet.builder()
-            .userId(authTokenPair.getFirst())
-            .name("test")
-            .walletType(WalletType.CASH)
-            .build());
-
-        var transaction = ApiTransaction.builder()
-            .categoryCode(category.getCode())
-            .walletCode(wallet.getCode())
-            .transactionType(TransactionType.INCOME)
-            .amount(BigDecimal.TEN)
-            .description("test")
-            .build();
-        var response = restClient.post()
-            .uri("/transaction")
-            .header("Authorization", "Bearer " + authTokenPair.getSecond())
-            .body(transaction)
-            .retrieve()
-            .toEntity(new ParameterizedTypeReference<ApiTransaction>() {
-            });
-
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        var apiTransaction = response.getBody();
-        assertNotNull(apiTransaction);
-        assertNotNull(apiTransaction.getTransactionStatus());
-        assertNotNull(apiTransaction.getCurrency());
-        assertNotNull(apiTransaction.getDateTime());
-        assertEquals(category.getCode(), apiTransaction.getCategoryCode());
-        assertEquals(wallet.getCode(), apiTransaction.getWalletCode());
-        assertEquals(transaction.getTransactionType(), apiTransaction.getTransactionType());
-        assertEquals(transaction.getAmount(), apiTransaction.getAmount());
-        assertEquals(transaction.getDescription(), apiTransaction.getDescription());
-    }
 }

@@ -1,0 +1,87 @@
+databaseChangeLog:
+  - changeSet:
+      id: 006-categories_budgets-table
+      author: budgi
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: categories_budgets_pkey
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: code
+                  type: VARCHAR(50)
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITH TIME ZONE
+              - column:
+                  constraints:
+                    nullable: false
+                  name: user_id
+                  type: BIGINT
+              - column:
+                  name: amount
+                  type: numeric(38, 2)
+              - column:
+                  name: currency
+                  type: VARCHAR(3)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: category_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: from_date
+                  type: DATE
+              - column:
+                  constraints:
+                    nullable: false
+                  name: to_date
+                  type: DATE
+            tableName: categories_budgets
+  - changeSet:
+      id: 006-categories_budgets-category
+      author: budgi
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: category_id
+            indexName: categories_budgets_category_id_idx
+            tableName: categories_budgets
+  - changeSet:
+      id: 006-categories_budgets-dates
+      author: budgi
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: from_date
+              - column:
+                  name: to_date
+            indexName: categories_budgets_dates_idx
+            tableName: categories_budgets
+  - changeSet:
+      id: 006-categories_budgets-id
+      author: budgi
+      changes:
+        - createSequence:
+            cacheSize: 1
+            cycle: false
+            dataType: bigint
+            incrementBy: 50
+            maxValue: 9223372036854775807
+            minValue: 1
+            sequenceName: categories_budgets_seq
+            startValue: 1

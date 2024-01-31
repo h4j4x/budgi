@@ -46,7 +46,7 @@ public class WebConfig {
                                             AuthenticationProvider authProvider,
                                             JwtAuthFilter jwtAuthFilter) throws Exception {
         var authPaths = new String[] {
-            "/auth/me", "/category/**", "/wallet/**", "/transaction/**"
+            "/auth/me", "/category/**", "/category-budget/**", "/wallet/**", "/transaction/**"
         };
         var staticAnonPaths = new String[] {
             "/", "/*.css", "/*.png", "/*.webmanifest", "/manage/**"

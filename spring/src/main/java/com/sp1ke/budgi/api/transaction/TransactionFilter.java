@@ -48,8 +48,8 @@ public class TransactionFilter extends ApiFilter<ApiTransaction> {
                 .map(TransactionStatus::parse)
                 .filter(Objects::nonNull).toList();
         }
-        categoryCode = map.get("categoryId");
-        walletCode = map.get("walletId");
+        categoryCode = map.get("categoryCode");
+        walletCode = map.get("walletCode");
         from = DateTimeUtil.parseLocalDate(map.get("from"));
         to = DateTimeUtil.parseLocalDate(map.get("to"));
     }

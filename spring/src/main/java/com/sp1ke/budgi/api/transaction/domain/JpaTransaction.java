@@ -1,15 +1,12 @@
 package com.sp1ke.budgi.api.transaction.domain;
 
-import com.sp1ke.budgi.api.data.JpaUserBase;
+import com.sp1ke.budgi.api.data.JpaUserAmountBase;
 import com.sp1ke.budgi.api.transaction.TransactionStatus;
 import com.sp1ke.budgi.api.transaction.TransactionType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
-import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.util.Currency;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,7 +25,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class JpaTransaction extends JpaUserBase {
+public class JpaTransaction extends JpaUserAmountBase {
     @Column(name = "category_id", nullable = false)
     private Long categoryId;
 
@@ -44,13 +41,6 @@ public class JpaTransaction extends JpaUserBase {
     @Column(name = "transaction_status", length = 50, nullable = false)
     private TransactionStatus transactionStatus;
 
-    @Column(length = 3, nullable = false)
-    private Currency currency;
-
-    @PositiveOrZero(message = "Positive or zero amount is required")
-    @Column(nullable = false, precision = 38, scale = 2)
-    private BigDecimal amount;
-
     @Size(min = 2, max = 100, message = "Valid transaction description is required (2 to 255 characters)")
     @NotNull(message = "Valid transaction description is required (2 to 255 characters)")
     @Column(nullable = false)
@@ -65,9 +55,6 @@ public class JpaTransaction extends JpaUserBase {
         super.prePersist();
         if (transactionStatus == null) {
             transactionStatus = TransactionStatus.COMPLETED;
-        }
-        if (currency == null) {
-            currency = Currency.getInstance("USD");
         }
         if (dateTime == null) {
             dateTime = OffsetDateTime.now();

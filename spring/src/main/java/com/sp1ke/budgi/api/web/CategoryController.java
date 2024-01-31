@@ -1,9 +1,13 @@
 package com.sp1ke.budgi.api.web;
 
 import com.sp1ke.budgi.api.category.ApiCategory;
+import com.sp1ke.budgi.api.category.ApiCategoryBudget;
+import com.sp1ke.budgi.api.category.CategoryBudgetFilter;
+import com.sp1ke.budgi.api.category.CategoryBudgetService;
 import com.sp1ke.budgi.api.category.CategoryService;
 import com.sp1ke.budgi.api.user.AuthUser;
 import com.sp1ke.budgi.api.web.annot.ApiController;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +23,8 @@ import org.springframework.web.client.HttpClientErrorException;
 @RequiredArgsConstructor
 public class CategoryController {
     private final CategoryService categoryService;
+
+    private final CategoryBudgetService categoryBudgetService;
 
     @GetMapping("/category")
     ResponseEntity<Page<ApiCategory>> list(@AuthenticationPrincipal AuthUser principal,
@@ -66,5 +72,14 @@ public class CategoryController {
                                        @RequestParam String codes) {
         categoryService.deleteByCodes(principal.userId(), codes.split(","));
         return ResponseEntity.ok(null);
+    }
+
+    @GetMapping("/category-budget")
+    ResponseEntity<Page<ApiCategoryBudget>> listBudgets(@AuthenticationPrincipal AuthUser principal,
+                                                        @SortDefault(sort = "updatedAt", direction = Sort.Direction.DESC) Pageable pageable,
+                                                        @RequestParam Map<String, String> params) {
+        var filter = CategoryBudgetFilter.parseMap(params);
+        var itemsPage = categoryBudgetService.fetch(principal.userId(), pageable, filter);
+        return ResponseEntity.ok(itemsPage);
     }
 }
