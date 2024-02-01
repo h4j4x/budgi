@@ -1,8 +1,8 @@
 package com.sp1ke.budgi.api.common;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import java.util.Map;
-import javax.annotation.Nullable;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import lombok.Getter;
 

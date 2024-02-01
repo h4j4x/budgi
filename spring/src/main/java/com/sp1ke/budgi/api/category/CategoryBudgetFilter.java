@@ -4,10 +4,8 @@ import com.sp1ke.budgi.api.common.ApiFilter;
 import com.sp1ke.budgi.api.common.DateTimeUtil;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
+import java.time.YearMonth;
 import java.util.Map;
-import java.util.Objects;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -39,5 +37,23 @@ public class CategoryBudgetFilter extends ApiFilter<ApiCategoryBudget> {
     public boolean isEmpty() {
         return super.isEmpty() &&
             categoryCode == null && from == null && to == null;
+    }
+
+    @NotNull
+    public LocalDate fromDate() {
+        if (from != null) {
+            return from;
+        }
+        var now = YearMonth.now();
+        return now.atDay(1);
+    }
+
+    @NotNull
+    public LocalDate toDate() {
+        if (to != null) {
+            return to;
+        }
+        var now = YearMonth.now();
+        return now.atEndOfMonth();
     }
 }

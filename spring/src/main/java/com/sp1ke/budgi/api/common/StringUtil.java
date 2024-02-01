@@ -30,4 +30,14 @@ public class StringUtil {
     public static boolean isBlank(@Nullable String value) {
         return value == null || value.isBlank();
     }
+
+    public static String tail(@Nullable String value, int length) {
+        if (value != null) {
+            if (length >= value.length()) {
+                return value;
+            }
+            return value.substring(value.length() - length);
+        }
+        return null;
+    }
 }

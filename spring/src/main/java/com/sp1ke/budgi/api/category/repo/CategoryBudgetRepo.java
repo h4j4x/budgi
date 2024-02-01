@@ -1,8 +1,8 @@
 package com.sp1ke.budgi.api.category.repo;
 
 import com.sp1ke.budgi.api.category.domain.JpaCategoryBudget;
-
 import java.time.LocalDate;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
@@ -14,10 +14,9 @@ public interface CategoryBudgetRepo extends CrudRepository<JpaCategoryBudget, Lo
                                                                 LocalDate fromDate, LocalDate toDate,
                                                                 Pageable pageable);
 
-    void deleteByUserIdAndCategoryIdAndFromDateAndToDate(Long userId, Long categoryId,
-                                                         LocalDate fromDate, LocalDate toDate);
+    Optional<JpaCategoryBudget> findByUserIdAndCode(Long userId, String code);
 
-    void deleteByUserIdAndFromDateAndToDateAndCategoryIdIn(Long userId,
-                                                           LocalDate fromDate, LocalDate toDate,
-                                                           Long[] categoriesIds);
+    void deleteByUserIdAndCode(Long userId, String code);
+
+    void deleteByUserIdAndCodeIn(Long userId, String[] codes);
 }

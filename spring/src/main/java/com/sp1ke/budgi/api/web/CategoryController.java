@@ -1,10 +1,6 @@
 package com.sp1ke.budgi.api.web;
 
-import com.sp1ke.budgi.api.category.ApiCategory;
-import com.sp1ke.budgi.api.category.ApiCategoryBudget;
-import com.sp1ke.budgi.api.category.CategoryBudgetFilter;
-import com.sp1ke.budgi.api.category.CategoryBudgetService;
-import com.sp1ke.budgi.api.category.CategoryService;
+import com.sp1ke.budgi.api.category.*;
 import com.sp1ke.budgi.api.user.AuthUser;
 import com.sp1ke.budgi.api.web.annot.ApiController;
 import java.util.Map;
@@ -81,5 +77,46 @@ public class CategoryController {
         var filter = CategoryBudgetFilter.parseMap(params);
         var itemsPage = categoryBudgetService.fetch(principal.userId(), pageable, filter);
         return ResponseEntity.ok(itemsPage);
+    }
+
+    @PostMapping("/category-budget")
+    ResponseEntity<ApiCategoryBudget> createBudget(@AuthenticationPrincipal AuthUser principal,
+                                                   @RequestBody ApiCategoryBudget budget) {
+        var apiCategoryBudget = categoryBudgetService.save(principal.userId(), budget, false);
+        return ResponseEntity.status(201).body(apiCategoryBudget);
+    }
+
+    @GetMapping("/category-budget/{code}")
+    ResponseEntity<ApiCategoryBudget> getBudgetByCode(@AuthenticationPrincipal AuthUser principal,
+                                                      @PathVariable String code) {
+        var apiCategoryBudget = categoryBudgetService
+            .findByCode(principal.userId(), code)
+            .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND, "Category Budget code is not valid"));
+        return ResponseEntity.ok(apiCategoryBudget);
+    }
+
+    @PutMapping("/category-budget/{code}")
+    ResponseEntity<ApiCategoryBudget> updateBudgetByCode(@AuthenticationPrincipal AuthUser principal,
+                                                         @PathVariable String code,
+                                                         @RequestBody ApiCategoryBudget budget) {
+        if (budget.getCode() == null) {
+            budget.setCode(code);
+        }
+        var apiCategoryBudget = categoryBudgetService.save(principal.userId(), budget, false);
+        return ResponseEntity.status(200).body(apiCategoryBudget);
+    }
+
+    @DeleteMapping("/category-budget/{code}")
+    ResponseEntity<Void> deleteBudgetByCode(@AuthenticationPrincipal AuthUser principal,
+                                            @PathVariable String code) {
+        categoryBudgetService.deleteByCode(principal.userId(), code);
+        return ResponseEntity.ok(null);
+    }
+
+    @DeleteMapping("/category-budget/batch")
+    ResponseEntity<Void> deleteBudgetsByCodes(@AuthenticationPrincipal AuthUser principal,
+                                              @RequestParam String codes) {
+        categoryBudgetService.deleteByCodes(principal.userId(), codes.split(","));
+        return ResponseEntity.ok(null);
     }
 }

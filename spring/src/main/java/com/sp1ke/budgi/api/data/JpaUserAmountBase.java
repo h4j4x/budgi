@@ -1,14 +1,12 @@
 package com.sp1ke.budgi.api.data;
 
-import java.math.BigDecimal;
-import java.util.Currency;
-
-import javax.annotation.OverridingMethodsMustInvokeSuper;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PrePersist;
 import jakarta.validation.constraints.PositiveOrZero;
+import java.math.BigDecimal;
+import java.util.Currency;
+import javax.annotation.OverridingMethodsMustInvokeSuper;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

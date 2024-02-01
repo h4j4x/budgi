@@ -1,7 +1,10 @@
 package com.sp1ke.budgi.api.category.domain;
 
 import com.sp1ke.budgi.api.data.JpaUserAmountBase;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Index;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;

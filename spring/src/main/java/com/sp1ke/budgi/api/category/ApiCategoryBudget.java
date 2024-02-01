@@ -11,6 +11,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ApiCategoryBudget {
+    private String code;
+
     private String categoryCode;
 
     private Currency currency;
