@@ -386,6 +386,173 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "010-category-budget-add",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 201', () => {",
+							"  pm.response.to.have.status(201);",
+							"});",
+							"pm.test('Body contains data', () => {",
+							"  var json = pm.response.json();",
+							"  pm.expect(json).to.have.ownProperty('code');",
+							"  pm.expect(json).to.have.ownProperty('categoryCode');",
+							"  pm.expect(json).to.have.ownProperty('currency');",
+							"  pm.expect(json).to.have.ownProperty('amount');",
+							"  pm.expect(json).to.have.ownProperty('fromDate');",
+							"  pm.expect(json).to.have.ownProperty('toDate');",
+							"",
+							"  pm.expect(json.categoryCode).to.equal(pm.variables.get('categoryCode'));",
+							"  pm.expect(json.currency).to.equal('USD');",
+							"  pm.expect(json.amount).to.equal(100);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var moment = require('moment');",
+							"pm.variables.set('fromDate', moment().format(('YYYY-MM-01')));",
+							"pm.variables.set('toDate', moment().format(('YYYY-MM-DD')));",
+							"",
+							"pm.sendRequest({",
+							"    url: pm.collectionVariables.get('categoryUrl'),",
+							"    method: 'POST',",
+							"    header: {",
+							"        'Content-Type': 'application/json',",
+							"        'Authorization': 'Bearer ' + pm.collectionVariables.get('authToken'),",
+							"    },",
+							"    body: {",
+							"        mode: 'raw',",
+							"        raw: JSON.stringify({",
+							"            code: pm.collectionVariables.get('categoryCode'),",
+							"            name: pm.collectionVariables.get('categoryName'),",
+							"        })",
+							"    }",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"categoryCode\": \"{{categoryCode}}\",\n    \"amount\": 100,\n    \"fromDate\": \"{{fromDate}}\",\n    \"toDate\": \"{{toDate}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{categoryBudgetUrl}}",
+					"host": [
+						"{{categoryBudgetUrl}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "011-transaction-add",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 201', () => {",
+							"  pm.response.to.have.status(201);",
+							"});",
+							"pm.test('Body contains data', () => {",
+							"  var json = pm.response.json();",
+							"  pm.expect(json).to.have.ownProperty('code');",
+							"  pm.expect(json).to.have.ownProperty('categoryCode');",
+							"  pm.expect(json).to.have.ownProperty('walletCode');",
+							"  pm.expect(json).to.have.ownProperty('currency');",
+							"  pm.expect(json).to.have.ownProperty('amount');",
+							"  pm.expect(json).to.have.ownProperty('dateTime');",
+							"",
+							"  pm.expect(json.categoryCode).to.equal(pm.variables.get('categoryCode'));",
+							"  pm.expect(json.walletCode).to.equal(pm.variables.get('cashWalletCode'));",
+							"  pm.expect(json.currency).to.equal('USD');",
+							"  pm.expect(json.amount).to.equal(100);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"categoryCode\": \"{{categoryCode}}\",\n    \"walletCode\": \"{{cashWalletCode}}\",\n    \"transactionType\": \"expense\",\n    \"amount\": 100,\n    \"description\": \"Test transaction\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{transactionUrl}}",
+					"host": [
+						"{{transactionUrl}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "012-transaction-list",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200', () => {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"pm.test('Body contains data', () => {",
+							"  var json = pm.response.json();",
+							"  pm.expect(json).to.have.ownProperty('content');",
+							"  pm.expect(json.content).to.have.ownProperty('length');",
+							"  pm.expect(json).to.have.ownProperty('totalElements');",
+							"",
+							"  pm.expect(json.content.length).to.equal(1);",
+							"  pm.expect(json.totalElements).to.equal(1);",
+							"  pm.expect(json.content[0].categoryCode).to.equal(pm.variables.get('categoryCode'));",
+							"  pm.expect(json.content[0].walletCode).to.equal(pm.variables.get('cashWalletCode'));",
+							"  pm.expect(json.content[0].currency).to.equal('USD');",
+							"  pm.expect(json.content[0].amount).to.equal(100);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{transactionUrl}}",
+					"host": [
+						"{{transactionUrl}}"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"auth": {
@@ -477,6 +644,16 @@
 		{
 			"key": "cashWalletType",
 			"value": "cash",
+			"type": "string"
+		},
+		{
+			"key": "categoryBudgetUrl",
+			"value": "http://127.0.0.1:8080/api/v1/category-budget",
+			"type": "string"
+		},
+		{
+			"key": "transactionUrl",
+			"value": "http://127.0.0.1:8080/api/v1/transaction",
 			"type": "string"
 		}
 	]

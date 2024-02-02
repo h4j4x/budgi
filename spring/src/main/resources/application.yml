@@ -21,6 +21,7 @@ spring:
   jackson:
     defaultPropertyInclusion: non_null
     deserialization:
+      adjustDatesToContextTimeZone: false
       failOnUnknownProperties: false
     serialization:
       failOnEmptyBeans: false

@@ -2,7 +2,6 @@ package com.sp1ke.budgi.api.web.config;
 
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.datatype.jsr310.ser.OffsetDateTimeSerializer;
 import java.util.Arrays;
 import java.util.stream.Stream;
 import org.springframework.context.annotation.Bean;
@@ -88,8 +87,6 @@ public class WebConfig {
 
     @Bean
     public Module javaTimeModule() {
-        var module = new JavaTimeModule();
-        module.addSerializer(OffsetDateTimeSerializer.INSTANCE);
-        return module;
+        return new JavaTimeModule();
     }
 }
