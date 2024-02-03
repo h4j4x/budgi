@@ -27,6 +27,7 @@ services:
       - DATASOURCE_USERNAME=budgi
       - DATASOURCE_PASSWORD=budgi
       - DATASOURCE_DRIVER=org.postgresql.Driver
+      - DATABASE_CLEAN_ON_START=true
     ports:
       - '8080:8080'
     depends_on:

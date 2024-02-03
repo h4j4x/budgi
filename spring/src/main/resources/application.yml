@@ -34,6 +34,7 @@ spring:
     changeLog: classpath:data/changelog-master.yml
     databaseChangeLogLockTable: changelog_lock
     databaseChangeLogTable: changelogs
+    dropFirst: ${DATABASE_CLEAN_ON_START:false}
 springdoc:
   apiDocs:
     path: /api/v1/docs
