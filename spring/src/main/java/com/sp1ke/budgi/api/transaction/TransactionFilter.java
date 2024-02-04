@@ -54,6 +54,10 @@ public class TransactionFilter extends ApiFilter<ApiTransaction> {
         to = DateTimeUtil.parseLocalDate(map.get("to"));
     }
 
+    public boolean hasInvalidDates() {
+        return from == null || to == null || from.isAfter(to);
+    }
+
     @Override
     public boolean isEmpty() {
         return super.isEmpty() &&

@@ -23,4 +23,12 @@ public class DateTimeUtil {
         }
         return null;
     }
+
+    @Nullable
+    public static OffsetDateTime localDateToOffsetDateTime(@Nullable LocalDate date) {
+        if (date != null) {
+            return date.atStartOfDay(ZoneId.systemDefault()).toOffsetDateTime();
+        }
+        return null;
+    }
 }

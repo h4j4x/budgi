@@ -1,11 +1,9 @@
 package com.sp1ke.budgi.api.transaction.service;
 
 import com.sp1ke.budgi.api.category.CategoryService;
+import com.sp1ke.budgi.api.common.DateTimeUtil;
 import com.sp1ke.budgi.api.common.ValidatorUtil;
-import com.sp1ke.budgi.api.transaction.ApiTransaction;
-import com.sp1ke.budgi.api.transaction.CreatedTransactionEvent;
-import com.sp1ke.budgi.api.transaction.TransactionFilter;
-import com.sp1ke.budgi.api.transaction.TransactionService;
+import com.sp1ke.budgi.api.transaction.*;
 import com.sp1ke.budgi.api.transaction.domain.JpaTransaction;
 import com.sp1ke.budgi.api.transaction.repo.TransactionRepo;
 import com.sp1ke.budgi.api.wallet.WalletService;
@@ -222,5 +220,24 @@ public class JpaTransactionService implements TransactionService {
         }
         return walletService.findCodeById(transaction.getUserId(), transaction.getWalletId())
             .orElse(null);
+    }
+
+    @Override
+    @NotNull
+    public TransactionsStats stats(@NotNull Long userId, @NotNull TransactionFilter filter) {
+        if (filter.hasInvalidDates()) {
+            throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Invalid dates");
+        }
+        var from = DateTimeUtil.localDateToOffsetDateTime(filter.getFrom());
+        var to = DateTimeUtil.localDateToOffsetDateTime(filter.getTo().plusDays(1));
+        var income = transactionRepo.sumAmountByUserIdAndFromDateAndToDateAndTransactionType(
+            userId, from, to, TransactionType.INCOME);
+        // TODO: tests
+        return TransactionsStats.builder()
+            .from(filter.getFrom())
+            .to(filter.getTo())
+            .income(income)
+            // TODO: other fields
+            .build();
     }
 }

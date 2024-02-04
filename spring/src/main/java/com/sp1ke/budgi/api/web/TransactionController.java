@@ -3,6 +3,7 @@ package com.sp1ke.budgi.api.web;
 import com.sp1ke.budgi.api.transaction.ApiTransaction;
 import com.sp1ke.budgi.api.transaction.TransactionFilter;
 import com.sp1ke.budgi.api.transaction.TransactionService;
+import com.sp1ke.budgi.api.transaction.TransactionsStats;
 import com.sp1ke.budgi.api.user.AuthUser;
 import com.sp1ke.budgi.api.web.annot.ApiController;
 import java.util.Map;
@@ -21,6 +22,14 @@ import org.springframework.web.client.HttpClientErrorException;
 @RequiredArgsConstructor
 public class TransactionController {
     private final TransactionService transactionService;
+
+    @GetMapping("/stats")
+    ResponseEntity<TransactionsStats> stats(@AuthenticationPrincipal AuthUser principal,
+                                            @RequestParam Map<String, String> params) {
+        var filter = TransactionFilter.parseMap(params);
+        var stats = transactionService.stats(principal.userId(), filter);
+        return ResponseEntity.ok(stats);
+    }
 
     @GetMapping("/transaction")
     ResponseEntity<Page<ApiTransaction>> list(@AuthenticationPrincipal AuthUser principal,
