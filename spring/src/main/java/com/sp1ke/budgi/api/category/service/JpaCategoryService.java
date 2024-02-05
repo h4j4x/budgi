@@ -73,14 +73,6 @@ public class JpaCategoryService implements CategoryService {
         categoryRepo.deleteByUserIdAndCodeIn(userId, codes);
     }
 
-    @NotNull
-    private ApiCategory mapToApiCategory(@NotNull JpaCategory category) {
-        return ApiCategory.builder()
-            .code(category.getCode())
-            .name(category.getName())
-            .build();
-    }
-
     @Override
     public Optional<Long> findIdByCode(@NotNull Long userId, @Nullable String code) {
         if (StringUtil.isNotBlank(code)) {
@@ -91,6 +83,7 @@ public class JpaCategoryService implements CategoryService {
     }
 
     @Override
+    @NotNull
     public Map<Long, String> fetchCodesOf(@NotNull Long userId, @NotNull Set<Long> ids) {
         if (ids.isEmpty()) {
             return Collections.emptyMap();
@@ -107,5 +100,20 @@ public class JpaCategoryService implements CategoryService {
     public Optional<String> findCodeById(@NotNull Long userId, @NotNull Long id) {
         return categoryRepo.findByUserIdAndId(userId, id)
             .map(JpaBase::getCode);
+    }
+
+    @Override
+    @NotNull
+    public List<ApiCategory> findAllByUserIdAndCodesIn(@NotNull Long userId, @NotNull Set<String> codes) {
+        return categoryRepo.findAllByUserIdAndCodeIn(userId, codes).stream()
+            .map(this::mapToApiCategory).toList();
+    }
+
+    @NotNull
+    private ApiCategory mapToApiCategory(@NotNull JpaCategory category) {
+        return ApiCategory.builder()
+            .code(category.getCode())
+            .name(category.getName())
+            .build();
     }
 }

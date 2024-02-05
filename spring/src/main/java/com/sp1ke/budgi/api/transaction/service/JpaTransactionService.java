@@ -1,5 +1,8 @@
 package com.sp1ke.budgi.api.transaction.service;
 
+import com.sp1ke.budgi.api.category.ApiCategory;
+import com.sp1ke.budgi.api.category.ApiCategoryBudget;
+import com.sp1ke.budgi.api.category.CategoryBudgetService;
 import com.sp1ke.budgi.api.category.CategoryService;
 import com.sp1ke.budgi.api.common.DateTimeUtil;
 import com.sp1ke.budgi.api.common.ValidatorUtil;
@@ -17,6 +20,7 @@ import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -36,6 +40,8 @@ public class JpaTransactionService implements TransactionService {
     private final Validator validator;
 
     private final CategoryService categoryService;
+
+    private final CategoryBudgetService categoryBudgetService;
 
     private final WalletService walletService;
 
@@ -232,12 +238,20 @@ public class JpaTransactionService implements TransactionService {
         var to = DateTimeUtil.localDateToOffsetDateTime(filter.getTo().plusDays(1));
         var income = transactionRepo.sumAmountByUserIdAndFromDateAndToDateAndTransactionType(
             userId, from, to, TransactionType.INCOME);
+        var budgetList = categoryBudgetService.categoryBudgets(userId, from, to);
+        var categoryBudget = budgetList.stream()
+            .collect(Collectors.toMap(ApiCategoryBudget::getCategoryCode, ApiCategoryBudget::getAmount));
+        var categories = categoryService.findAllByUserIdAndCodesIn(userId, categoryBudget.keySet());
 
         return TransactionsStats.builder()
             .from(filter.getFrom())
             .to(filter.getTo())
             .income(income)
-            // TODO: other fields
+            .categoryBudget(categoryBudget)
+            // .categoryExpense()
+            // .walletBalance()
+            .categories(categories.stream().collect(Collectors.toMap(ApiCategory::getCode, Function.identity())))
+            // .wallets()
             .build();
     }
 }

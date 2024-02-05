@@ -10,6 +10,8 @@ import com.sp1ke.budgi.api.common.ValidatorUtil;
 import jakarta.annotation.Nullable;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
+import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -66,6 +68,28 @@ public class JpaCategoryBudgetService implements CategoryBudgetService {
         return category.map(budget -> mapToApiCategoryBudget(userId, budget));
     }
 
+    @Override
+    public void deleteByCode(Long userId, String code) {
+        categoryBudgetRepo.deleteByUserIdAndCode(userId, code);
+    }
+
+    @Override
+    public void deleteByCodes(Long userId, @NotNull String[] codes) {
+        categoryBudgetRepo.deleteByUserIdAndCodeIn(userId, codes);
+    }
+
+    @Override
+    @NotNull
+    public List<ApiCategoryBudget> categoryBudgets(@NotNull Long userId,
+                                                   @NotNull OffsetDateTime from,
+                                                   @NotNull OffsetDateTime to) {
+        var fromDate = from.toLocalDate();
+        var toDate = to.toLocalDate().plusDays(1);
+        return categoryBudgetRepo
+            .findAllByUserIdAndDatesBetween(userId, fromDate, toDate).stream()
+            .map((JpaCategoryBudget budget) -> mapToApiCategoryBudget(userId, budget)).toList();
+    }
+
     @NotNull
     private ApiCategoryBudget mapToApiCategoryBudget(@NotNull Long userId, @NotNull JpaCategoryBudget budget) {
         return ApiCategoryBudget.builder()
@@ -76,15 +100,5 @@ public class JpaCategoryBudgetService implements CategoryBudgetService {
             .fromDate(budget.getFromDate())
             .toDate(budget.getToDate())
             .build();
-    }
-
-    @Override
-    public void deleteByCode(Long userId, String code) {
-        categoryBudgetRepo.deleteByUserIdAndCode(userId, code);
-    }
-
-    @Override
-    public void deleteByCodes(Long userId, @NotNull String[] codes) {
-        categoryBudgetRepo.deleteByUserIdAndCodeIn(userId, codes);
     }
 }

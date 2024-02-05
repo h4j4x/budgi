@@ -1,6 +1,8 @@
 package com.sp1ke.budgi.api.web;
 
 import com.sp1ke.budgi.api.category.domain.JpaCategory;
+import com.sp1ke.budgi.api.category.domain.JpaCategoryBudget;
+import com.sp1ke.budgi.api.category.repo.CategoryBudgetRepo;
 import com.sp1ke.budgi.api.category.repo.CategoryRepo;
 import com.sp1ke.budgi.api.helper.AssertHelper;
 import com.sp1ke.budgi.api.helper.AuthHelper;
@@ -41,6 +43,8 @@ public class TransactionControllerTests {
 
     final CategoryRepo categoryRepo;
 
+    final CategoryBudgetRepo categoryBudgetRepo;
+
     final WalletRepo walletRepo;
 
     final TransactionRepo transactionRepo;
@@ -50,14 +54,13 @@ public class TransactionControllerTests {
     final RestClient restClient;
 
     @Autowired
-    public TransactionControllerTests(@LocalServerPort int port,
-                                      UserRepo userRepo,
-                                      CategoryRepo categoryRepo,
-                                      WalletRepo walletRepo,
-                                      TransactionRepo transactionRepo,
+    public TransactionControllerTests(@LocalServerPort int port, UserRepo userRepo,
+                                      CategoryRepo categoryRepo, CategoryBudgetRepo categoryBudgetRepo,
+                                      WalletRepo walletRepo, TransactionRepo transactionRepo,
                                       PasswordEncoder passwordEncoder) {
         this.userRepo = userRepo;
         this.categoryRepo = categoryRepo;
+        this.categoryBudgetRepo = categoryBudgetRepo;
         this.walletRepo = walletRepo;
         this.transactionRepo = transactionRepo;
         this.passwordEncoder = passwordEncoder;
@@ -70,6 +73,7 @@ public class TransactionControllerTests {
     @BeforeEach
     void beforeEach() {
         categoryRepo.deleteAll();
+        categoryBudgetRepo.deleteAll();
         walletRepo.deleteAll();
         userRepo.deleteAll();
         transactionRepo.deleteAll();
@@ -203,6 +207,16 @@ public class TransactionControllerTests {
 
         var from = LocalDate.now().plusDays(-2);
         var to = LocalDate.now().plusDays(1);
+        var category = categoryWalletWrapper.category();
+        var categoryBudget = categoryBudgetRepo.save(JpaCategoryBudget.builder()
+            .userId(categoryWalletWrapper.userId())
+            .categoryId(category.getId())
+            .fromDate(from)
+            .toDate(to)
+            .currency(currency)
+            .amount(BigDecimal.valueOf(30.0))
+            .build());
+
         var response = restClient.get()
             .uri(String.format("/transaction/stats?from=%s&to=%s", from, to))
             .header("Authorization", "Bearer " + categoryWalletWrapper.userToken())
@@ -216,6 +230,18 @@ public class TransactionControllerTests {
         assertEquals(to, stats.getTo());
         var expectedIncome = amount.multiply(BigDecimal.valueOf(transactionTypeTimes * 1.0)).stripTrailingZeros();
         assertEquals(expectedIncome, stats.getIncome().stripTrailingZeros());
+        // category budget
+        assertNotNull(stats.getCategoryBudget());
+        assertEquals(1, stats.getCategoryBudget().size());
+        assertTrue(stats.getCategoryBudget().containsKey(category.getCode()));
+        assertEquals(
+            categoryBudget.getAmount().stripTrailingZeros(),
+            stats.getCategoryBudget().get(category.getCode()).stripTrailingZeros());
+        // categories
+        assertNotNull(stats.getCategories());
+        assertEquals(1, stats.getCategories().size());
+        assertTrue(stats.getCategories().containsKey(category.getCode()));
+        assertEquals(category.getName(), stats.getCategories().get(category.getCode()).getName());
     }
 
     private CategoryWalletWrapper createTransactions(int transactionTypeTimes, BigDecimal amount,
@@ -257,6 +283,6 @@ public class TransactionControllerTests {
             transactionTypeIndex = (transactionTypeIndex + 1) % transactionTypes.length;
         }
 
-        return new CategoryWalletWrapper(category, wallet, authTokenPair.getSecond());
+        return new CategoryWalletWrapper(category, wallet, authTokenPair.getSecond(), authTokenPair.getFirst());
     }
 }
