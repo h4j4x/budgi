@@ -19,9 +19,13 @@ public class TransactionsStats {
 
     private BigDecimal income;
 
-    private Map<ApiCategory, BigDecimal> budget;
+    private Map<String, BigDecimal> categoryBudget;
 
-    private Map<ApiCategory, BigDecimal> expense;
+    private Map<String, BigDecimal> categoryExpense;
 
-    private Map<ApiWallet, BigDecimal> balance;
+    private Map<String, BigDecimal> walletBalance;
+
+    private Map<String, ApiCategory> categories;
+
+    private Map<String, ApiWallet> wallets;
 }

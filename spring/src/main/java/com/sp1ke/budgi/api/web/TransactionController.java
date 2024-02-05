@@ -23,7 +23,7 @@ import org.springframework.web.client.HttpClientErrorException;
 public class TransactionController {
     private final TransactionService transactionService;
 
-    @GetMapping("/stats")
+    @GetMapping("/transaction/stats")
     ResponseEntity<TransactionsStats> stats(@AuthenticationPrincipal AuthUser principal,
                                             @RequestParam Map<String, String> params) {
         var filter = TransactionFilter.parseMap(params);
@@ -67,17 +67,17 @@ public class TransactionController {
         return ResponseEntity.status(200).body(apiTransaction);
     }
 
-    @DeleteMapping("/transaction/{code}")
-    ResponseEntity<Void> deleteByCode(@AuthenticationPrincipal AuthUser principal,
-                                      @PathVariable String code) {
-        transactionService.deleteByCode(principal.userId(), code);
-        return ResponseEntity.ok(null);
-    }
-
     @DeleteMapping("/transaction/batch")
     ResponseEntity<Void> deleteByCodes(@AuthenticationPrincipal AuthUser principal,
                                        @RequestParam String codes) {
         transactionService.deleteByCodes(principal.userId(), codes.split(","));
+        return ResponseEntity.ok(null);
+    }
+
+    @DeleteMapping("/transaction/{code}")
+    ResponseEntity<Void> deleteByCode(@AuthenticationPrincipal AuthUser principal,
+                                      @PathVariable String code) {
+        transactionService.deleteByCode(principal.userId(), code);
         return ResponseEntity.ok(null);
     }
 }

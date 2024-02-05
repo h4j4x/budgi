@@ -232,7 +232,7 @@ public class JpaTransactionService implements TransactionService {
         var to = DateTimeUtil.localDateToOffsetDateTime(filter.getTo().plusDays(1));
         var income = transactionRepo.sumAmountByUserIdAndFromDateAndToDateAndTransactionType(
             userId, from, to, TransactionType.INCOME);
-        // TODO: tests
+
         return TransactionsStats.builder()
             .from(filter.getFrom())
             .to(filter.getTo())
