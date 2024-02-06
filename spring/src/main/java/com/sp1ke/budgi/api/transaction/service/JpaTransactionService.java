@@ -8,6 +8,7 @@ import com.sp1ke.budgi.api.common.DateTimeUtil;
 import com.sp1ke.budgi.api.common.ValidatorUtil;
 import com.sp1ke.budgi.api.transaction.*;
 import com.sp1ke.budgi.api.transaction.domain.JpaTransaction;
+import com.sp1ke.budgi.api.transaction.model.IdAmount;
 import com.sp1ke.budgi.api.transaction.repo.TransactionRepo;
 import com.sp1ke.budgi.api.wallet.WalletService;
 import jakarta.annotation.Nullable;
@@ -18,6 +19,9 @@ import jakarta.persistence.criteria.Root;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
+import java.math.BigDecimal;
+import java.time.OffsetDateTime;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -191,23 +195,6 @@ public class JpaTransactionService implements TransactionService {
         return mapToApiTransaction(transaction, null, null);
     }
 
-    @NotNull
-    private ApiTransaction mapToApiTransaction(@NotNull JpaTransaction transaction,
-                                               @Nullable Map<Long, String> categoriesIdToCode,
-                                               @Nullable Map<Long, String> walletsIdToCode) {
-        return ApiTransaction.builder()
-            .code(transaction.getCode())
-            .categoryCode(categoryCode(transaction, categoriesIdToCode))
-            .walletCode(walletCode(transaction, walletsIdToCode))
-            .transactionType(transaction.getTransactionType())
-            .transactionStatus(transaction.getTransactionStatus())
-            .currency(transaction.getCurrency())
-            .amount(transaction.getAmount())
-            .description(transaction.getDescription())
-            .dateTime(transaction.getDateTime())
-            .build();
-    }
-
     @Nullable
     private String categoryCode(@NotNull JpaTransaction transaction,
                                 @Nullable Map<Long, String> categoriesIdToCode) {
@@ -236,22 +223,57 @@ public class JpaTransactionService implements TransactionService {
         }
         var from = DateTimeUtil.localDateToOffsetDateTime(filter.getFrom());
         var to = DateTimeUtil.localDateToOffsetDateTime(filter.getTo().plusDays(1));
-        var income = transactionRepo.sumAmountByUserIdAndFromDateAndToDateAndTransactionType(
+
+        var income = transactionRepo.sumAmountByUserIdAndDatesAndTransactionType(
             userId, from, to, TransactionType.INCOME);
-        var budgetList = categoryBudgetService.categoryBudgets(userId, from, to);
-        var categoryBudget = budgetList.stream()
-            .collect(Collectors.toMap(ApiCategoryBudget::getCategoryCode, ApiCategoryBudget::getAmount));
-        var categories = categoryService.findAllByUserIdAndCodesIn(userId, categoryBudget.keySet());
+        var categoryBudget = categoryBudgetService
+            .categoryBudgets(userId, from, to)
+            .stream().collect(Collectors.toMap(ApiCategoryBudget::getCategoryCode, ApiCategoryBudget::getAmount));
+        var expense = fetchCategoriesExpenses(userId, from, to);
+
+        var categoriesCodes = new HashSet<>(categoryBudget.keySet());
+        categoriesCodes.addAll(expense.keySet());
+        var categories = categoryService
+            .findAllByUserIdAndCodesIn(userId, categoriesCodes)
+            .stream().collect(Collectors.toMap(ApiCategory::getCode, Function.identity()));
 
         return TransactionsStats.builder()
             .from(filter.getFrom())
             .to(filter.getTo())
             .income(income)
             .categoryBudget(categoryBudget)
-            // .categoryExpense()
+            .categoryExpense(expense)
             // .walletBalance()
-            .categories(categories.stream().collect(Collectors.toMap(ApiCategory::getCode, Function.identity())))
+            .categories(categories)
             // .wallets()
+            .build();
+    }
+
+    private Map<String, BigDecimal> fetchCategoriesExpenses(@NotNull Long userId,
+                                                            @NotNull OffsetDateTime from,
+                                                            @NotNull OffsetDateTime to) {
+        var categoriesExpenses = transactionRepo.sumByUserIdAndDatesAndTransactionTypeGroupByCategories(
+            userId, from, to, TransactionType.EXPENSE);
+        var categoriesIds = categoriesExpenses.stream().map(IdAmount::getId).collect(Collectors.toSet());
+        var codes = categoryService.fetchCodesOf(userId, categoriesIds);
+        return categoriesExpenses.stream().collect(Collectors
+            .toMap(idAmount -> codes.get(idAmount.getId()), IdAmount::getAmount));
+    }
+
+    @NotNull
+    private ApiTransaction mapToApiTransaction(@NotNull JpaTransaction transaction,
+                                               @Nullable Map<Long, String> categoriesIdToCode,
+                                               @Nullable Map<Long, String> walletsIdToCode) {
+        return ApiTransaction.builder()
+            .code(transaction.getCode())
+            .categoryCode(categoryCode(transaction, categoriesIdToCode))
+            .walletCode(walletCode(transaction, walletsIdToCode))
+            .transactionType(transaction.getTransactionType())
+            .transactionStatus(transaction.getTransactionStatus())
+            .currency(transaction.getCurrency())
+            .amount(transaction.getAmount())
+            .description(transaction.getDescription())
+            .dateTime(transaction.getDateTime())
             .build();
     }
 }

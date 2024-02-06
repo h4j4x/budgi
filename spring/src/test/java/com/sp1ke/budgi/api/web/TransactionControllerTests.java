@@ -228,6 +228,7 @@ public class TransactionControllerTests {
         assertNotNull(stats);
         assertEquals(from, stats.getFrom());
         assertEquals(to, stats.getTo());
+        // income
         var expectedIncome = amount.multiply(BigDecimal.valueOf(transactionTypeTimes * 1.0)).stripTrailingZeros();
         assertEquals(expectedIncome, stats.getIncome().stripTrailingZeros());
         // category budget
@@ -237,6 +238,13 @@ public class TransactionControllerTests {
         assertEquals(
             categoryBudget.getAmount().stripTrailingZeros(),
             stats.getCategoryBudget().get(category.getCode()).stripTrailingZeros());
+        // category expense
+        assertNotNull(stats.getCategoryExpense());
+        assertEquals(1, stats.getCategoryExpense().size());
+        assertTrue(stats.getCategoryExpense().containsKey(category.getCode()));
+        assertEquals(
+            amount.multiply(BigDecimal.valueOf(transactionTypeTimes)).stripTrailingZeros(),
+            stats.getCategoryExpense().get(category.getCode()).stripTrailingZeros());
         // categories
         assertNotNull(stats.getCategories());
         assertEquals(1, stats.getCategories().size());
