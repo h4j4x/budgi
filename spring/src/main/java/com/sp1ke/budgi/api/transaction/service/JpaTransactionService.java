@@ -29,6 +29,8 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -41,6 +43,8 @@ import org.springframework.web.client.HttpClientErrorException;
 @Service
 @RequiredArgsConstructor
 public class JpaTransactionService implements TransactionService {
+    private static final String CACHE_STATS_NAME = "transactions-stats";
+
     private final TransactionRepo transactionRepo;
 
     private final Validator validator;
@@ -142,6 +146,7 @@ public class JpaTransactionService implements TransactionService {
     @Override
     @NotNull
     @Transactional
+    @CacheEvict(cacheNames = CACHE_STATS_NAME, key = "#userId")
     public ApiTransaction save(@NotNull Long userId, @NotNull ApiTransaction data, boolean throwIfExists) {
         var transaction = transactionRepo
             .findByUserIdAndCode(userId, data.getCode())
@@ -182,12 +187,14 @@ public class JpaTransactionService implements TransactionService {
 
     @Override
     @Transactional
+    @CacheEvict(cacheNames = CACHE_STATS_NAME, key = "#userId")
     public void deleteByCode(@NotNull Long userId, @NotNull String code) {
         transactionRepo.deleteByUserIdAndCode(userId, code);
     }
 
     @Override
     @Transactional
+    @CacheEvict(cacheNames = CACHE_STATS_NAME, key = "#userId")
     public void deleteByCodes(@NotNull Long userId, @NotNull String[] codes) {
         transactionRepo.deleteByUserIdAndCodeIn(userId, codes);
     }
@@ -219,6 +226,7 @@ public class JpaTransactionService implements TransactionService {
 
     @Override
     @NotNull
+    @Cacheable(value = CACHE_STATS_NAME, key = "#userId")
     public TransactionsStats stats(@NotNull Long userId, @NotNull TransactionFilter filter) {
         if (filter.hasInvalidDates()) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Invalid dates");

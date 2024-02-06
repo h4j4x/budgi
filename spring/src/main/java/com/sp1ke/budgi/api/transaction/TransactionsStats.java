@@ -2,6 +2,7 @@ package com.sp1ke.budgi.api.transaction;
 
 import com.sp1ke.budgi.api.category.ApiCategory;
 import com.sp1ke.budgi.api.wallet.ApiWallet;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Map;
@@ -12,7 +13,7 @@ import lombok.Setter;
 @Builder
 @Getter
 @Setter
-public class TransactionsStats {
+public class TransactionsStats implements Serializable {
     private LocalDate from;
 
     private LocalDate to;

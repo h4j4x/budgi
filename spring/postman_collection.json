@@ -423,17 +423,17 @@
 							"pm.variables.set('toDate', moment().format(('YYYY-MM-DD')));",
 							"",
 							"pm.sendRequest({",
-							"    url: pm.variables.get('categoryUrl'),",
+							"    url: pm.collectionVariables.get('categoryUrl'),",
 							"    method: 'POST',",
 							"    header: {",
 							"        'Content-Type': 'application/json',",
-							"        'Authorization': 'Bearer ' + pm.environment.get('authToken'),",
+							"        'Authorization': 'Bearer ' + pm.collectionVariables.get('authToken'),",
 							"    },",
 							"    body: {",
 							"        mode: 'raw',",
 							"        raw: JSON.stringify({",
-							"            code: pm.variables.get('categoryCode'),",
-							"            name: pm.variables.get('categoryName'),",
+							"            code: pm.collectionVariables.get('categoryCode'),",
+							"            name: pm.collectionVariables.get('categoryName'),",
 							"        })",
 							"    }",
 							"});",
@@ -549,6 +549,67 @@
 					"raw": "{{transactionUrl}}",
 					"host": [
 						"{{transactionUrl}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "013-transaction-stats",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200', () => {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"pm.test('Body contains data', () => {",
+							"  var json = pm.response.json();",
+							"  pm.expect(json).to.have.ownProperty('from');",
+							"  pm.expect(json).to.have.ownProperty('to');",
+							"  pm.expect(json).to.have.ownProperty('categoryBudget');",
+							"  pm.expect(json).to.have.ownProperty('categoryExpense');",
+							"  pm.expect(json).to.have.ownProperty('walletBalance');",
+							"  pm.expect(json).to.have.ownProperty('categories');",
+							"  pm.expect(json).to.have.ownProperty('wallets');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var moment = require('moment');",
+							"pm.variables.set('fromDate', moment().format(('YYYY-MM-01')));",
+							"pm.variables.set('toDate', moment().format(('YYYY-MM-DD')));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{transactionUrl}}/stats?from={{fromDate}}&to={{toDate}}",
+					"host": [
+						"{{transactionUrl}}"
+					],
+					"path": [
+						"stats"
+					],
+					"query": [
+						{
+							"key": "from",
+							"value": "{{fromDate}}"
+						},
+						{
+							"key": "to",
+							"value": "{{toDate}}"
+						}
 					]
 				}
 			},

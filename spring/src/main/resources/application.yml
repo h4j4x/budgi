@@ -11,8 +11,18 @@ management:
       exposure:
         include: health
 spring:
+  cache:
+    type: redis
   config:
     import: optional:file:.env[.properties]
+  data:
+    redis:
+      database: 0
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+      repositories:
+        enabled: false
   datasource:
     driverClassName: ${DATASOURCE_DRIVER}
     url: ${DATASOURCE_URL}
