@@ -40,4 +40,6 @@ public interface TransactionRepo extends CrudRepository<JpaTransaction, Long> {
                                                                           OffsetDateTime from,
                                                                           OffsetDateTime to,
                                                                           TransactionType transactionType);
+
+    List<JpaTransaction> findAllByUserIdAndDateTimeBetween(Long userId, OffsetDateTime from, OffsetDateTime to);
 }

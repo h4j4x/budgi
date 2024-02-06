@@ -22,4 +22,6 @@ public interface WalletRepo extends CrudRepository<JpaWallet, Long> {
     Optional<JpaWallet> findByUserIdAndId(Long userId, Long id);
 
     List<JpaWallet> findAllByUserIdAndIdIn(Long userId, Set<Long> ids);
+
+    List<JpaWallet> findAllByUserIdAndCodeIn(Long userId, Set<String> codes);
 }

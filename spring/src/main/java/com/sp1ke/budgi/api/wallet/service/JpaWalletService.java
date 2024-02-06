@@ -73,15 +73,6 @@ public class JpaWalletService implements WalletService {
         walletRepo.deleteByUserIdAndCodeIn(userId, codes);
     }
 
-    @NotNull
-    private ApiWallet mapToApiWallet(@NotNull JpaWallet wallet) {
-        return ApiWallet.builder()
-            .code(wallet.getCode())
-            .name(wallet.getName())
-            .walletType(wallet.getWalletType())
-            .build();
-    }
-
     @Override
     public Optional<Long> findIdByCode(@NotNull Long userId, @Nullable String code) {
         if (StringUtil.isNotBlank(code)) {
@@ -108,5 +99,20 @@ public class JpaWalletService implements WalletService {
     public Optional<String> findCodeById(@NotNull Long userId, @NotNull Long id) {
         return walletRepo.findByUserIdAndId(userId, id)
             .map(JpaBase::getCode);
+    }
+
+    @Override
+    public List<ApiWallet> findAllByUserIdAndCodesIn(Long userId, Set<String> codes) {
+        return walletRepo.findAllByUserIdAndCodeIn(userId, codes).stream()
+            .map(this::mapToApiWallet).toList();
+    }
+
+    @NotNull
+    private ApiWallet mapToApiWallet(@NotNull JpaWallet wallet) {
+        return ApiWallet.builder()
+            .code(wallet.getCode())
+            .name(wallet.getName())
+            .walletType(wallet.getWalletType())
+            .build();
     }
 }

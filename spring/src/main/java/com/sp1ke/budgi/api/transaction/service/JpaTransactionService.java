@@ -10,6 +10,7 @@ import com.sp1ke.budgi.api.transaction.*;
 import com.sp1ke.budgi.api.transaction.domain.JpaTransaction;
 import com.sp1ke.budgi.api.transaction.model.IdAmount;
 import com.sp1ke.budgi.api.transaction.repo.TransactionRepo;
+import com.sp1ke.budgi.api.wallet.ApiWallet;
 import com.sp1ke.budgi.api.wallet.WalletService;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityManager;
@@ -21,6 +22,7 @@ import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
@@ -230,12 +232,16 @@ public class JpaTransactionService implements TransactionService {
             .categoryBudgets(userId, from, to)
             .stream().collect(Collectors.toMap(ApiCategoryBudget::getCategoryCode, ApiCategoryBudget::getAmount));
         var expense = fetchCategoriesExpenses(userId, from, to);
+        var balance = fetchWalletsBalances(userId, from, to);
 
         var categoriesCodes = new HashSet<>(categoryBudget.keySet());
         categoriesCodes.addAll(expense.keySet());
         var categories = categoryService
             .findAllByUserIdAndCodesIn(userId, categoriesCodes)
             .stream().collect(Collectors.toMap(ApiCategory::getCode, Function.identity()));
+        var wallets = walletService
+            .findAllByUserIdAndCodesIn(userId, balance.keySet())
+            .stream().collect(Collectors.toMap(ApiWallet::getCode, Function.identity()));
 
         return TransactionsStats.builder()
             .from(filter.getFrom())
@@ -243,9 +249,9 @@ public class JpaTransactionService implements TransactionService {
             .income(income)
             .categoryBudget(categoryBudget)
             .categoryExpense(expense)
-            // .walletBalance()
+            .walletBalance(balance)
             .categories(categories)
-            // .wallets()
+            .wallets(wallets)
             .build();
     }
 
@@ -258,6 +264,22 @@ public class JpaTransactionService implements TransactionService {
         var codes = categoryService.fetchCodesOf(userId, categoriesIds);
         return categoriesExpenses.stream().collect(Collectors
             .toMap(idAmount -> codes.get(idAmount.getId()), IdAmount::getAmount));
+    }
+
+    private Map<String, BigDecimal> fetchWalletsBalances(@NotNull Long userId,
+                                                         @NotNull OffsetDateTime from,
+                                                         @NotNull OffsetDateTime to) {
+        var transactions = transactionRepo.findAllByUserIdAndDateTimeBetween(userId, from, to);
+        var walletsIds = transactions.stream().map(JpaTransaction::getWalletId).collect(Collectors.toSet());
+        var codes = walletService.fetchCodesOf(userId, walletsIds);
+        var map = new HashMap<String, BigDecimal>();
+        transactions.forEach(transaction -> {
+            var code = codes.get(transaction.getWalletId());
+            var balance = map.getOrDefault(code, BigDecimal.ZERO);
+            balance = balance.add(transaction.getSignedAmount());
+            map.put(code, balance);
+        });
+        return map;
     }
 
     @NotNull

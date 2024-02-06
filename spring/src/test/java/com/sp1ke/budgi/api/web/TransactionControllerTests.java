@@ -250,6 +250,21 @@ public class TransactionControllerTests {
         assertEquals(1, stats.getCategories().size());
         assertTrue(stats.getCategories().containsKey(category.getCode()));
         assertEquals(category.getName(), stats.getCategories().get(category.getCode()).getName());
+        // wallets balance
+        var wallet = categoryWalletWrapper.wallet();
+        assertNotNull(stats.getWalletBalance());
+        assertEquals(1, stats.getWalletBalance().size());
+        assertTrue(stats.getWalletBalance().containsKey(wallet.getCode()));
+        assertEquals(
+            BigDecimal.ZERO.stripTrailingZeros(),
+            stats.getWalletBalance().get(wallet.getCode()).stripTrailingZeros());
+        // wallets
+        assertNotNull(stats.getWallets());
+        assertEquals(1, stats.getWallets().size());
+        assertTrue(stats.getWallets().containsKey(wallet.getCode()));
+        var apiWallet = stats.getWallets().get(wallet.getCode());
+        assertEquals(wallet.getName(), apiWallet.getName());
+        assertEquals(wallet.getWalletType(), apiWallet.getWalletType());
     }
 
     private CategoryWalletWrapper createTransactions(int transactionTypeTimes, BigDecimal amount,

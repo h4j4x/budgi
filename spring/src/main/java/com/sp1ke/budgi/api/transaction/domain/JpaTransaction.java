@@ -6,6 +6,7 @@ import com.sp1ke.budgi.api.transaction.TransactionType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -59,5 +60,14 @@ public class JpaTransaction extends JpaUserAmountBase {
         if (dateTime == null) {
             dateTime = OffsetDateTime.now();
         }
+    }
+
+    @NotNull
+    public BigDecimal getSignedAmount() {
+        var amount = getAmount();
+        if (transactionType.isExpense()) {
+            return amount.negate();
+        }
+        return amount;
     }
 }

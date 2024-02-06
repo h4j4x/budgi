@@ -3,6 +3,7 @@ package com.sp1ke.budgi.api.wallet;
 import com.sp1ke.budgi.api.common.CrudService;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -13,4 +14,7 @@ public interface WalletService extends CrudService<ApiWallet, WalletFilter> {
     Map<Long, String> fetchCodesOf(@NotNull Long userId, @NotNull Set<Long> ids);
 
     Optional<String> findCodeById(@NotNull Long userId, @NotNull Long id);
+
+    @NotNull
+    List<ApiWallet> findAllByUserIdAndCodesIn(@NotNull Long userId, @NotNull Set<String> codes);
 }
