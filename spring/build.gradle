@@ -41,6 +41,7 @@ dependencies {
   implementation 'org.springframework.modulith:spring-modulith-starter-core'
   implementation 'org.springframework.modulith:spring-modulith-starter-jpa'
 
+  runtimeOnly "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
   runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
   runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
   runtimeOnly 'org.postgresql:postgresql'

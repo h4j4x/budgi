@@ -2,12 +2,10 @@ package com.sp1ke.budgi.api.transaction;
 
 import com.sp1ke.budgi.api.common.ApiFilter;
 import com.sp1ke.budgi.api.common.DateTimeUtil;
+import com.sp1ke.budgi.api.common.StringUtil;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -64,5 +62,32 @@ public class TransactionFilter extends ApiFilter<ApiTransaction> {
             (transactionTypes == null || transactionTypes.isEmpty()) &&
             (transactionStatuses == null || transactionStatuses.isEmpty()) &&
             categoryCode == null && walletCode == null && from == null && to == null;
+    }
+
+    @Override
+    public String toString() {
+        var map = new HashMap<String, String>();
+        if (transactionTypes != null && !transactionTypes.isEmpty()) {
+            var joined = String.join(",", transactionTypes.stream().map(Enum::name).toList());
+            map.put("transactionTypes", "[" + joined + "]");
+        }
+        if (transactionStatuses != null && !transactionStatuses.isEmpty()) {
+            var joined = String.join(",", transactionStatuses.stream().map(Enum::name).toList());
+            map.put("transactionStatuses", "[" + joined + "]");
+        }
+        if (StringUtil.isNotBlank(categoryCode)) {
+            map.put("categoryCode", categoryCode);
+        }
+        if (StringUtil.isNotBlank(walletCode)) {
+            map.put("walletCode", walletCode);
+        }
+        if (from != null) {
+            map.put("from", from.toString());
+        }
+        if (to != null) {
+            map.put("to", to.toString());
+        }
+        var joined = String.join(",", map.keySet().stream().map(key -> key + "=" + map.get(key)).toList());
+        return "{" + joined + "}";
     }
 }

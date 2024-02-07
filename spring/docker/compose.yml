@@ -18,7 +18,7 @@ services:
     environment:
       - REDIS_PASSWORD=budgi
       - REDIS_PORT=6379
-    command: redis-server --loglevel warning --requirepass budgi
+    command: redis-server --requirepass budgi
     ports:
       - '6379:6379'
     volumes:

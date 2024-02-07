@@ -43,7 +43,7 @@ import org.springframework.web.client.HttpClientErrorException;
 @Service
 @RequiredArgsConstructor
 public class JpaTransactionService implements TransactionService {
-    private static final String CACHE_STATS_NAME = "transactions-stats";
+    private static final String CACHE_TRANSACTION_STATS_NAME = "transactions-stats";
 
     private final TransactionRepo transactionRepo;
 
@@ -146,7 +146,7 @@ public class JpaTransactionService implements TransactionService {
     @Override
     @NotNull
     @Transactional
-    @CacheEvict(cacheNames = CACHE_STATS_NAME, key = "#userId")
+    @CacheEvict(value = CACHE_TRANSACTION_STATS_NAME, key = "#userId")
     public ApiTransaction save(@NotNull Long userId, @NotNull ApiTransaction data, boolean throwIfExists) {
         var transaction = transactionRepo
             .findByUserIdAndCode(userId, data.getCode())
@@ -187,14 +187,14 @@ public class JpaTransactionService implements TransactionService {
 
     @Override
     @Transactional
-    @CacheEvict(cacheNames = CACHE_STATS_NAME, key = "#userId")
+    @CacheEvict(value = CACHE_TRANSACTION_STATS_NAME, key = "#userId")
     public void deleteByCode(@NotNull Long userId, @NotNull String code) {
         transactionRepo.deleteByUserIdAndCode(userId, code);
     }
 
     @Override
     @Transactional
-    @CacheEvict(cacheNames = CACHE_STATS_NAME, key = "#userId")
+    @CacheEvict(value = CACHE_TRANSACTION_STATS_NAME, key = "#userId")
     public void deleteByCodes(@NotNull Long userId, @NotNull String[] codes) {
         transactionRepo.deleteByUserIdAndCodeIn(userId, codes);
     }
@@ -226,7 +226,7 @@ public class JpaTransactionService implements TransactionService {
 
     @Override
     @NotNull
-    @Cacheable(value = CACHE_STATS_NAME, key = "#userId")
+    @Cacheable(value = CACHE_TRANSACTION_STATS_NAME, key = "{" + "#userId" + ",#filter}")
     public TransactionsStats stats(@NotNull Long userId, @NotNull TransactionFilter filter) {
         if (filter.hasInvalidDates()) {
             throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Invalid dates");
