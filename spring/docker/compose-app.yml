@@ -18,6 +18,23 @@ services:
       retries: 3
       start_period: 5s
 
+  redis:
+    image: redis:alpine
+    environment:
+      - REDIS_PASSWORD=budgi
+      - REDIS_PORT=6379
+    command: redis-server --requirepass budgi
+    ports:
+      - '6379:6379'
+    volumes:
+      - ./data/redis-app:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 20s
+      retries: 3
+      start_period: 5s
+
   budgi:
     image: ghcr.io/h4j4x/budgi:latest
     restart: unless-stopped
@@ -28,13 +45,18 @@ services:
       - DATASOURCE_PASSWORD=budgi
       - DATASOURCE_DRIVER=org.postgresql.Driver
       - DATABASE_CLEAN_ON_START=true
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=budgi
     ports:
       - '8080:8080'
     depends_on:
       postgres:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     healthcheck:
-      test: "wget -q localhost:8080/manage/health -O- | grep -o UP | wc -l | grep 4 || exit 1"
+      test: "wget -q localhost:8080/manage/health -O- | grep -o UP | wc -l | grep 5 || exit 1"
       interval: 5s
       timeout: 20s
       retries: 3
