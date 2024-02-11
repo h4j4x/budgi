@@ -16,6 +16,7 @@ import 'service/memory/wallet_memory.dart';
 import 'service/spring/auth_spring.dart';
 import 'service/spring/category_spring.dart';
 import 'service/spring/config.dart';
+import 'service/spring/transaction_spring.dart';
 import 'service/spring/wallet_spring.dart';
 import 'service/storage.dart';
 import 'service/transaction.dart';
@@ -55,8 +56,7 @@ class DI {
     return _getIt.isRegistered<T>();
   }
 
-  Future<void> _configSpring(
-      AppConfig config, StorageService storageService) async {
+  Future<void> _configSpring(AppConfig config, StorageService storageService) async {
     final springConfig = SpringConfig(url: config.apiUrl!);
     final authService = AuthSpringService(
       storageService: storageService,
@@ -65,11 +65,12 @@ class DI {
     await authService.initialize();
     _getIt.registerSingleton<AuthService>(authService);
 
-    _getIt.registerSingleton<CategoryService>(CategorySpringService(
+    final categoryService = CategorySpringService(
       authService: authService,
       categoryValidator: CategoryValidator(),
       config: springConfig,
-    ));
+    );
+    _getIt.registerSingleton<CategoryService>(categoryService);
 
     // TODO: implement service
     _getIt.registerSingleton<CategoryAmountService>(CategoryMemoryService(
@@ -84,9 +85,11 @@ class DI {
     );
     _getIt.registerSingleton<WalletService>(walletService);
 
-    // TODO: implement service
-    _getIt.registerSingleton<TransactionService>(TransactionMemoryService(
+    _getIt.registerSingleton<TransactionService>(TransactionSpringService(
+      authService: authService,
+      categoryService: categoryService,
       walletService: walletService,
+      config: springConfig,
       transactionValidator: TransactionValidator(),
     ));
   }
@@ -99,13 +102,11 @@ class DI {
     _getIt.registerSingleton<CategoryService>(categoryService);
     _getIt.registerSingleton<CategoryAmountService>(categoryService);
 
-    final walletService = WalletMemoryService(
+    _getIt.registerSingleton<WalletService>(WalletMemoryService(
       walletValidator: WalletValidator(),
-    );
-    _getIt.registerSingleton<WalletService>(walletService);
+    ));
 
     _getIt.registerSingleton<TransactionService>(TransactionMemoryService(
-      walletService: walletService,
       transactionValidator: TransactionValidator(),
     ));
   }

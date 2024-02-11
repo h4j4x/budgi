@@ -1,51 +1,14 @@
-import 'package:meta/meta.dart';
-
+import '../model/data_page.dart';
 import '../model/domain/category.dart';
 import '../model/domain/transaction.dart';
 import '../model/domain/wallet.dart';
 import '../model/period.dart';
 import '../model/sort.dart';
 import '../util/string.dart';
-import 'wallet.dart';
 
 abstract class TransactionService {
-  final WalletService walletService;
-
-  TransactionService({required this.walletService});
-
   /// @throws ValidationError
   Future<Transaction> saveTransaction({
-    String? code,
-    required TransactionType transactionType,
-    required TransactionStatus transactionStatus,
-    required Category category,
-    required Wallet wallet,
-    required double amount,
-    DateTime? dateTime,
-    String? description,
-    int? deferredMonths,
-  }) async {
-    final transaction = await doSaveTransaction(
-      code: code,
-      transactionType: transactionType,
-      transactionStatus: transactionStatus,
-      category: category,
-      wallet: wallet,
-      amount: amount,
-      dateTime: dateTime,
-      description: description,
-      deferredMonths: deferredMonths,
-    );
-    final period = Period.monthFromDateTime(transaction.dateTime);
-    await walletService.updateWalletBalance(
-      code: transaction.wallet.code,
-      period: period,
-    );
-    return transaction;
-  }
-
-  @protected
-  Future<Transaction> doSaveTransaction({
     String? code,
     required TransactionType transactionType,
     required TransactionStatus transactionStatus,
@@ -102,10 +65,9 @@ abstract class TransactionService {
     }
   }
 
-  Future<void> _completePendingTransactions(Wallet wallet,
-      {required double maxAmount}) async {
+  Future<void> _completePendingTransactions(Wallet wallet, {required double maxAmount}) async {
     final transactions = await listTransactions(
-      transactionStatuses: [TransactionStatus.pending],
+      transactionStatuses: {TransactionStatus.pending},
       dateTimeSort: Sort.asc,
     );
     double restAmount = maxAmount;
@@ -127,13 +89,15 @@ abstract class TransactionService {
     }
   }
 
-  Future<List<Transaction>> listTransactions({
-    List<TransactionType>? transactionTypes,
-    List<TransactionStatus>? transactionStatuses,
+  Future<DataPage<Transaction>> listTransactions({
+    Set<TransactionType>? transactionTypes,
+    Set<TransactionStatus>? transactionStatuses,
     Category? category,
     Wallet? wallet,
     Period? period,
     Sort? dateTimeSort,
+    int? page,
+    int? pageSize,
   });
 
   Future<void> deleteTransaction({

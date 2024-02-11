@@ -25,7 +25,8 @@ class CategorySpringService implements CategoryService {
 
   @override
   Future<DataPage<Category>> listCategories({
-    List<String>? excludingCodes,
+    Set<String>? includingCodes, // TODO
+    Set<String>? excludingCodes, // TODO
     int? page,
     int? pageSize,
   }) {
@@ -96,8 +97,7 @@ class CategorySpringService implements CategoryService {
       return Future.value();
     }
     try {
-      await _httpClient.delete(
-          authService: authService, path: '/batch?codes=${codes.join(',')}');
+      await _httpClient.delete(authService: authService, path: '/batch?codes=${codes.join(',')}');
     } on SocketException catch (_) {
       throw NoServerError();
     } catch (e) {

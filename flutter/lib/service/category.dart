@@ -9,7 +9,8 @@ abstract class CategoryService {
   });
 
   Future<DataPage<Category>> listCategories({
-    List<String>? excludingCodes,
+    Set<String>? includingCodes,
+    Set<String>? excludingCodes,
     int? page,
     int? pageSize,
   });

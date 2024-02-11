@@ -38,11 +38,17 @@ class WalletMemoryService implements WalletService {
 
   @override
   Future<DataPage<Wallet>> listWallets({
-    List<String>? excludingCodes,
+    Set<String>? includingCodes,
+    Set<String>? excludingCodes,
     int? page,
     int? pageSize,
   }) {
     var list = _wallets.values.toList();
+    if (includingCodes?.isNotEmpty ?? false) {
+      list.removeWhere((wallet) {
+        return !includingCodes!.contains(wallet.code);
+      });
+    }
     if (excludingCodes?.isNotEmpty ?? false) {
       list.removeWhere((wallet) {
         return excludingCodes!.contains(wallet.code);

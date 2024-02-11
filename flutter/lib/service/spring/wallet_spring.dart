@@ -28,7 +28,8 @@ class WalletSpringService implements WalletService {
 
   @override
   Future<DataPage<Wallet>> listWallets({
-    List<String>? excludingCodes,
+    Set<String>? includingCodes, // TODO
+    Set<String>? excludingCodes, // TODO
     int? page,
     int? pageSize,
   }) async {
@@ -103,8 +104,7 @@ class WalletSpringService implements WalletService {
       return Future.value();
     }
     try {
-      await _httpClient.delete(
-          authService: authService, path: '/batch?codes=${codes.join(',')}');
+      await _httpClient.delete(authService: authService, path: '/batch?codes=${codes.join(',')}');
     } on SocketException catch (_) {
       throw NoServerError();
     } catch (e) {
@@ -116,15 +116,13 @@ class WalletSpringService implements WalletService {
   }
 
   @override
-  Future<void> updateWalletBalance(
-      {required String code, required Period period}) {
+  Future<void> updateWalletBalance({required String code, required Period period}) {
     // TODO: implement updateWalletBalance
     return Future.value();
   }
 
   @override
-  Future<Map<Wallet, double>> walletsBalance(
-      {required Period period, bool showZeroBalance = false}) {
+  Future<Map<Wallet, double>> walletsBalance({required Period period, bool showZeroBalance = false}) {
     // TODO: implement walletsBalance
     return Future.value({});
   }

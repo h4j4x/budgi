@@ -2,7 +2,8 @@ import 'dart:math';
 
 import 'fetch_mode.dart';
 
-class DataPage<T> {
+class DataPage<T> with Iterable<T> implements Iterator<T> {
+  int _index = 0;
   List<T> content;
   int pageNumber;
   int pageSize;
@@ -21,10 +22,12 @@ class DataPage<T> {
         totalElements = totalElements ?? content.length,
         totalPages = totalPages ?? pageNumber + 1;
 
+  @override
   bool get isEmpty {
     return content.isEmpty;
   }
 
+  @override
   int get length {
     return content.length;
   }
@@ -125,5 +128,20 @@ class DataPage<T> {
 
   int pageNumberOfIndex(int index) {
     return index ~/ pageSize;
+  }
+
+  @override
+  Iterator<T> get iterator {
+    return this;
+  }
+
+  @override
+  T get current {
+    return content[_index];
+  }
+
+  @override
+  bool moveNext() {
+    return ++_index < content.length;
   }
 }

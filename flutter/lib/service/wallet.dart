@@ -11,7 +11,8 @@ abstract class WalletService {
   });
 
   Future<DataPage<Wallet>> listWallets({
-    List<String>? excludingCodes,
+    Set<String>? includingCodes,
+    Set<String>? excludingCodes,
     int? page,
     int? pageSize,
   });
