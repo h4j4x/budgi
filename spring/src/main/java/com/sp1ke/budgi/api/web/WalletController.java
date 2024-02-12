@@ -2,8 +2,10 @@ package com.sp1ke.budgi.api.web;
 
 import com.sp1ke.budgi.api.user.AuthUser;
 import com.sp1ke.budgi.api.wallet.ApiWallet;
+import com.sp1ke.budgi.api.wallet.WalletFilter;
 import com.sp1ke.budgi.api.wallet.WalletService;
 import com.sp1ke.budgi.api.web.annot.ApiController;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,8 +24,10 @@ public class WalletController {
 
     @GetMapping("/wallet")
     ResponseEntity<Page<ApiWallet>> list(@AuthenticationPrincipal AuthUser principal,
-                                         @SortDefault(sort = "updatedAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        var itemsPage = walletService.fetch(principal.userId(), pageable);
+                                         @SortDefault(sort = "updatedAt", direction = Sort.Direction.DESC) Pageable pageable,
+                                         @RequestParam Map<String, String> params) {
+        var filter = WalletFilter.parseMap(params);
+        var itemsPage = walletService.fetch(principal.userId(), pageable, filter);
         return ResponseEntity.ok(itemsPage);
     }
 

@@ -25,16 +25,24 @@ class CategorySpringService implements CategoryService {
 
   @override
   Future<DataPage<Category>> listCategories({
-    Set<String>? includingCodes, // TODO
-    Set<String>? excludingCodes, // TODO
+    Set<String>? includingCodes,
+    Set<String>? excludingCodes,
     int? page,
     int? pageSize,
   }) {
+    final data = <String, String>{};
+    if (includingCodes?.isNotEmpty ?? false) {
+      data[includingCodesField] = includingCodes!.join(';');
+    }
+    if (excludingCodes?.isNotEmpty ?? false) {
+      data[excludingCodesField] = excludingCodes!.join(';');
+    }
     try {
       return _httpClient.jsonGetPage<Category>(
         authService: authService,
         page: page,
         pageSize: pageSize,
+        data: data.isNotEmpty ? data : null,
         mapper: _SpringCategory.from,
       );
     } on SocketException catch (_) {

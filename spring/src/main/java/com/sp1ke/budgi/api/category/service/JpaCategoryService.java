@@ -9,13 +9,19 @@ import com.sp1ke.budgi.api.common.StringUtil;
 import com.sp1ke.budgi.api.common.ValidatorUtil;
 import com.sp1ke.budgi.api.data.JpaBase;
 import jakarta.annotation.Nullable;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.query.QueryUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -25,14 +31,71 @@ import org.springframework.web.client.HttpClientErrorException;
 public class JpaCategoryService implements CategoryService {
     private final CategoryRepo categoryRepo;
 
+    private final EntityManager entityManager;
+
     private final Validator validator;
 
     @Override
     @NotNull
     public Page<ApiCategory> fetch(@NotNull Long userId, @NotNull Pageable pageable,
                                    @Nullable CategoryFilter filter) {
-        var page = categoryRepo.findAllByUserId(userId, pageable);
+        var page = fetchPage(userId, pageable, filter);
         return page.map(this::mapToApiCategory);
+    }
+
+    private Page<JpaCategory> fetchPage(@NotNull Long userId, @NotNull Pageable pageable,
+                                        @Nullable CategoryFilter filter) {
+        if (filter == null || filter.isEmpty()) {
+            return categoryRepo.findAllByUserId(userId, pageable);
+        }
+
+        var criteriaBuilder = entityManager.getCriteriaBuilder();
+        var listQuery = criteriaBuilder.createQuery(JpaCategory.class);
+        var countQuery = criteriaBuilder.createQuery(Long.class);
+        var root = listQuery.from(JpaCategory.class);
+        var listRoot = countQuery.from(JpaCategory.class);
+
+        listQuery
+            .distinct(true)
+            .where(where(criteriaBuilder, root, userId, filter))
+            .orderBy(QueryUtils.toOrders(pageable.getSort(), root, criteriaBuilder));
+        countQuery
+            .select(criteriaBuilder.countDistinct(listRoot))
+            .where(where(criteriaBuilder, listRoot, userId, filter));
+        var list = entityManager.createQuery(listQuery)
+            .setFirstResult(pageable.getPageNumber())
+            .setMaxResults(pageable.getPageSize())
+            .getResultList();
+        var count = entityManager.createQuery(countQuery).getSingleResult();
+        return new PageImpl<>(list, pageable, count);
+    }
+
+    private Predicate where(@NotNull CriteriaBuilder criteriaBuilder,
+                            @NotNull Root<JpaCategory> root,
+                            @NotNull Long userId,
+                            @NotNull CategoryFilter filter) {
+        var where = criteriaBuilder.equal(root.get("userId"), userId);
+        var searchLike = filter.getSearchLike();
+        if (searchLike != null) {
+            var searchWhere = criteriaBuilder.like(root.get("code"), searchLike);
+            searchWhere = criteriaBuilder.or(searchWhere, criteriaBuilder.like(root.get("name"), searchLike));
+            where = criteriaBuilder.and(where, searchWhere);
+        }
+        if (filter.getIncludingCodes() != null && !filter.getIncludingCodes().isEmpty()) {
+            var inClause = criteriaBuilder.in(root.get("code"));
+            for (var includedCode : filter.getIncludingCodes()) {
+                inClause.value(includedCode);
+            }
+            where = criteriaBuilder.and(where, inClause);
+        }
+        if (filter.getExcludingCodes() != null && !filter.getExcludingCodes().isEmpty()) {
+            var inClause = criteriaBuilder.in(root.get("code"));
+            for (var excludedCode : filter.getExcludingCodes()) {
+                inClause.value(excludedCode);
+            }
+            where = criteriaBuilder.and(where, criteriaBuilder.not(inClause));
+        }
+        return where;
     }
 
     @Override

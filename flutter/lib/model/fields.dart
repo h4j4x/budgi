@@ -4,6 +4,8 @@ const nameField = 'name';
 const categoryCodeField = 'categoryCode';
 const walletCodeField = 'walletCode';
 const amountField = 'amount';
+const includingCodesField = 'includingCodes';
+const excludingCodesField = 'excludingCodes';
 
 /// wallet
 const walletTypeField = 'walletType';

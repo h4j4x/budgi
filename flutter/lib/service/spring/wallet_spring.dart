@@ -28,16 +28,24 @@ class WalletSpringService implements WalletService {
 
   @override
   Future<DataPage<Wallet>> listWallets({
-    Set<String>? includingCodes, // TODO
-    Set<String>? excludingCodes, // TODO
+    Set<String>? includingCodes,
+    Set<String>? excludingCodes,
     int? page,
     int? pageSize,
-  }) async {
+  }) {
+    final data = <String, String>{};
+    if (includingCodes?.isNotEmpty ?? false) {
+      data[includingCodesField] = includingCodes!.join(';');
+    }
+    if (excludingCodes?.isNotEmpty ?? false) {
+      data[excludingCodesField] = excludingCodes!.join(';');
+    }
     try {
       return _httpClient.jsonGetPage<Wallet>(
         authService: authService,
         page: page,
         pageSize: pageSize,
+        data: data.isNotEmpty ? data : null,
         mapper: _SpringWallet.from,
       );
     } on SocketException catch (_) {

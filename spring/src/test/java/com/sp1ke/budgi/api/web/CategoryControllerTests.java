@@ -13,6 +13,7 @@ import com.sp1ke.budgi.api.user.repo.UserRepo;
 import java.math.BigDecimal;
 import java.time.YearMonth;
 import java.util.Optional;
+import java.util.StringJoiner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,7 +116,8 @@ public class CategoryControllerTests {
     @Test
     void fetchPageReturnsUserItems() {
         var authTokenPair = AuthHelper.fetchAuthToken(userRepo, passwordEncoder, restClient);
-        for (int i = 1; i < 9; i++) {
+        var len = 9;
+        for (int i = 1; i < len; i++) {
             var category = JpaCategory.builder()
                 .userId(authTokenPair.getFirst() + i % 2)
                 .code("test" + i)
@@ -134,7 +136,7 @@ public class CategoryControllerTests {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         var page = response.getBody();
         assertNotNull(page);
-        assertEquals(4L, page.getTotalElements());
+        assertEquals(len / 2, page.getTotalElements());
     }
 
     @Test
@@ -187,7 +189,8 @@ public class CategoryControllerTests {
         var authTokenPair = AuthHelper.fetchAuthToken(userRepo, passwordEncoder, restClient);
         var fromDate = YearMonth.now().atDay(1);
         var toDate = YearMonth.now().atEndOfMonth();
-        for (var i = 1; i < 9; i++) {
+        var len = 9;
+        for (var i = 1; i < len; i++) {
             var category = JpaCategory.builder()
                 .userId(authTokenPair.getFirst() + i % 2)
                 .code("test" + i)
@@ -216,7 +219,7 @@ public class CategoryControllerTests {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         var page = response.getBody();
         assertNotNull(page);
-        assertEquals(4L, page.getTotalElements());
+        assertEquals(len / 2, page.getTotalElements());
         for (var budget : page) {
             assertNotNull(budget.getCode());
             assertNotNull(budget.getCategoryCode());
@@ -227,6 +230,74 @@ public class CategoryControllerTests {
             assertEquals(budgetAmount.stripTrailingZeros(), budget.getAmount().stripTrailingZeros());
             assertEquals(fromDate, budget.getFromDate());
             assertEquals(toDate, budget.getToDate());
+        }
+    }
+
+    @Test
+    void fetchPageIncludingCodes() {
+        var authTokenPair = AuthHelper.fetchAuthToken(userRepo, passwordEncoder, restClient);
+        var codes = new StringJoiner(";");
+        var len = 9;
+        for (int i = 1; i < len; i++) {
+            var code = "test" + i;
+            if (i % 2 == 0) {
+                codes.add(code);
+            }
+            var category = JpaCategory.builder()
+                .userId(authTokenPair.getFirst())
+                .code(code)
+                .name("Test " + i)
+                .build();
+            categoryRepo.save(category);
+        }
+
+        var response = restClient.get()
+            .uri("/category?includingCodes=" + codes)
+            .header("Authorization", "Bearer " + authTokenPair.getSecond())
+            .retrieve()
+            .toEntity(new ParameterizedTypeReference<RestResponsePage<ApiCategory>>() {
+            });
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        var page = response.getBody();
+        assertNotNull(page);
+        assertEquals(len / 2, page.getTotalElements());
+        for (var item : page) {
+            assertTrue(codes.toString().contains(item.getCode()));
+        }
+    }
+
+    @Test
+    void fetchPageExcludingCodes() {
+        var authTokenPair = AuthHelper.fetchAuthToken(userRepo, passwordEncoder, restClient);
+        var codes = new StringJoiner(";");
+        var len = 9;
+        for (int i = 1; i < len; i++) {
+            var code = "test" + i;
+            if (i % 2 == 0) {
+                codes.add(code);
+            }
+            var category = JpaCategory.builder()
+                .userId(authTokenPair.getFirst())
+                .code(code)
+                .name("Test " + i)
+                .build();
+            categoryRepo.save(category);
+        }
+
+        var response = restClient.get()
+            .uri("/category?excludingCodes=" + codes)
+            .header("Authorization", "Bearer " + authTokenPair.getSecond())
+            .retrieve()
+            .toEntity(new ParameterizedTypeReference<RestResponsePage<ApiCategory>>() {
+            });
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        var page = response.getBody();
+        assertNotNull(page);
+        assertEquals(len / 2, page.getTotalElements());
+        for (var item : page) {
+            assertFalse(codes.toString().contains(item.getCode()));
         }
     }
 }

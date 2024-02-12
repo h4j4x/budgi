@@ -24,8 +24,10 @@ public class CategoryController {
 
     @GetMapping("/category")
     ResponseEntity<Page<ApiCategory>> list(@AuthenticationPrincipal AuthUser principal,
-                                           @SortDefault(sort = "updatedAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        var itemsPage = categoryService.fetch(principal.userId(), pageable);
+                                           @SortDefault(sort = "updatedAt", direction = Sort.Direction.DESC) Pageable pageable,
+                                           @RequestParam Map<String, String> params) {
+        var filter = CategoryFilter.parseMap(params);
+        var itemsPage = categoryService.fetch(principal.userId(), pageable, filter);
         return ResponseEntity.ok(itemsPage);
     }
 

@@ -1,5 +1,6 @@
 package com.sp1ke.budgi.api.web;
 
+import com.sp1ke.budgi.api.category.ApiCategory;
 import com.sp1ke.budgi.api.helper.AuthHelper;
 import com.sp1ke.budgi.api.helper.RestResponsePage;
 import com.sp1ke.budgi.api.user.repo.UserRepo;
@@ -8,6 +9,7 @@ import com.sp1ke.budgi.api.wallet.WalletType;
 import com.sp1ke.budgi.api.wallet.domain.JpaWallet;
 import com.sp1ke.budgi.api.wallet.repo.WalletRepo;
 import java.util.Optional;
+import java.util.StringJoiner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -128,5 +130,75 @@ public class WalletControllerTests {
         var page = response.getBody();
         assertNotNull(page);
         assertEquals(4L, page.getTotalElements());
+    }
+
+    @Test
+    void fetchPageIncludingCodes() {
+        var authTokenPair = AuthHelper.fetchAuthToken(userRepo, passwordEncoder, restClient);
+        var codes = new StringJoiner(";");
+        var len = 9;
+        for (int i = 1; i < len; i++) {
+            var code = "test" + i;
+            if (i % 2 == 0) {
+                codes.add(code);
+            }
+            var wallet = JpaWallet.builder()
+                .userId(authTokenPair.getFirst())
+                .code(code)
+                .name("Test " + i)
+                .walletType(WalletType.CASH)
+                .build();
+            walletRepo.save(wallet);
+        }
+
+        var response = restClient.get()
+            .uri("/wallet?includingCodes=" + codes)
+            .header("Authorization", "Bearer " + authTokenPair.getSecond())
+            .retrieve()
+            .toEntity(new ParameterizedTypeReference<RestResponsePage<ApiCategory>>() {
+            });
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        var page = response.getBody();
+        assertNotNull(page);
+        assertEquals(len / 2, page.getTotalElements());
+        for (var item : page) {
+            assertTrue(codes.toString().contains(item.getCode()));
+        }
+    }
+
+    @Test
+    void fetchPageExcludingCodes() {
+        var authTokenPair = AuthHelper.fetchAuthToken(userRepo, passwordEncoder, restClient);
+        var codes = new StringJoiner(";");
+        var len = 9;
+        for (int i = 1; i < len; i++) {
+            var code = "test" + i;
+            if (i % 2 == 0) {
+                codes.add(code);
+            }
+            var wallet = JpaWallet.builder()
+                .userId(authTokenPair.getFirst())
+                .code(code)
+                .name("Test " + i)
+                .walletType(WalletType.CASH)
+                .build();
+            walletRepo.save(wallet);
+        }
+
+        var response = restClient.get()
+            .uri("/wallet?excludingCodes=" + codes)
+            .header("Authorization", "Bearer " + authTokenPair.getSecond())
+            .retrieve()
+            .toEntity(new ParameterizedTypeReference<RestResponsePage<ApiCategory>>() {
+            });
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        var page = response.getBody();
+        assertNotNull(page);
+        assertEquals(len / 2, page.getTotalElements());
+        for (var item : page) {
+            assertFalse(codes.toString().contains(item.getCode()));
+        }
     }
 }

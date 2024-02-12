@@ -9,13 +9,19 @@ import com.sp1ke.budgi.api.wallet.WalletService;
 import com.sp1ke.budgi.api.wallet.domain.JpaWallet;
 import com.sp1ke.budgi.api.wallet.repo.WalletRepo;
 import jakarta.annotation.Nullable;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.query.QueryUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -25,13 +31,71 @@ import org.springframework.web.client.HttpClientErrorException;
 public class JpaWalletService implements WalletService {
     private final WalletRepo walletRepo;
 
+    private final EntityManager entityManager;
+
     private final Validator validator;
 
     @Override
+    @NotNull
     public Page<ApiWallet> fetch(@NotNull Long userId, @NotNull Pageable pageable,
                                  @Nullable WalletFilter filter) {
-        var page = walletRepo.findAllByUserId(userId, pageable);
+        var page = fetchPage(userId, pageable, filter);
         return page.map(this::mapToApiWallet);
+    }
+
+    private Page<JpaWallet> fetchPage(@NotNull Long userId, @NotNull Pageable pageable,
+                                      @Nullable WalletFilter filter) {
+        if (filter == null || filter.isEmpty()) {
+            return walletRepo.findAllByUserId(userId, pageable);
+        }
+
+        var criteriaBuilder = entityManager.getCriteriaBuilder();
+        var listQuery = criteriaBuilder.createQuery(JpaWallet.class);
+        var countQuery = criteriaBuilder.createQuery(Long.class);
+        var root = listQuery.from(JpaWallet.class);
+        var listRoot = countQuery.from(JpaWallet.class);
+
+        listQuery
+            .distinct(true)
+            .where(where(criteriaBuilder, root, userId, filter))
+            .orderBy(QueryUtils.toOrders(pageable.getSort(), root, criteriaBuilder));
+        countQuery
+            .select(criteriaBuilder.countDistinct(listRoot))
+            .where(where(criteriaBuilder, listRoot, userId, filter));
+        var list = entityManager.createQuery(listQuery)
+            .setFirstResult(pageable.getPageNumber())
+            .setMaxResults(pageable.getPageSize())
+            .getResultList();
+        var count = entityManager.createQuery(countQuery).getSingleResult();
+        return new PageImpl<>(list, pageable, count);
+    }
+
+    private Predicate where(@NotNull CriteriaBuilder criteriaBuilder,
+                            @NotNull Root<JpaWallet> root,
+                            @NotNull Long userId,
+                            @NotNull WalletFilter filter) {
+        var where = criteriaBuilder.equal(root.get("userId"), userId);
+        var searchLike = filter.getSearchLike();
+        if (searchLike != null) {
+            var searchWhere = criteriaBuilder.like(root.get("code"), searchLike);
+            searchWhere = criteriaBuilder.or(searchWhere, criteriaBuilder.like(root.get("name"), searchLike));
+            where = criteriaBuilder.and(where, searchWhere);
+        }
+        if (filter.getIncludingCodes() != null && !filter.getIncludingCodes().isEmpty()) {
+            var inClause = criteriaBuilder.in(root.get("code"));
+            for (var includedCode : filter.getIncludingCodes()) {
+                inClause.value(includedCode);
+            }
+            where = criteriaBuilder.and(where, inClause);
+        }
+        if (filter.getExcludingCodes() != null && !filter.getExcludingCodes().isEmpty()) {
+            var inClause = criteriaBuilder.in(root.get("code"));
+            for (var excludedCode : filter.getExcludingCodes()) {
+                inClause.value(excludedCode);
+            }
+            where = criteriaBuilder.and(where, criteriaBuilder.not(inClause));
+        }
+        return where;
     }
 
     @Override
