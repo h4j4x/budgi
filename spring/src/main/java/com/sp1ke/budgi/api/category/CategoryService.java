@@ -12,9 +12,9 @@ public interface CategoryService extends CrudService<ApiCategory, CategoryFilter
     Optional<Long> findIdByCode(@NotNull Long userId, @Nullable String code);
 
     @NotNull
-    Map<Long, String> fetchCodesOf(@NotNull Long userId, @NotNull Set<Long> ids);
+    Map<Long, ApiCategory> findAllByIds(@NotNull Long userId, @NotNull Set<Long> ids);
 
-    Optional<String> findCodeById(@NotNull Long userId, @NotNull Long id);
+    Optional<ApiCategory> findById(@NotNull Long userId, @NotNull Long id);
 
     @NotNull
     List<ApiCategory> findAllByUserIdAndCodesIn(@NotNull Long userId, @NotNull Set<String> codes);

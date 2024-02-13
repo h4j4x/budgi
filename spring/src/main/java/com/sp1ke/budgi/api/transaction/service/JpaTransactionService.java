@@ -5,6 +5,7 @@ import com.sp1ke.budgi.api.category.ApiCategoryBudget;
 import com.sp1ke.budgi.api.category.CategoryBudgetService;
 import com.sp1ke.budgi.api.category.CategoryService;
 import com.sp1ke.budgi.api.common.DateTimeUtil;
+import com.sp1ke.budgi.api.common.SavedTransactionEvent;
 import com.sp1ke.budgi.api.common.ValidatorUtil;
 import com.sp1ke.budgi.api.transaction.*;
 import com.sp1ke.budgi.api.transaction.domain.JpaTransaction;
@@ -64,11 +65,11 @@ public class JpaTransactionService implements TransactionService {
     public Page<ApiTransaction> fetch(@NotNull Long userId, @NotNull Pageable pageable,
                                       @Nullable TransactionFilter filter) {
         var page = fetchPage(userId, pageable, filter);
-        var categoriesIdToCode = categoryService
-            .fetchCodesOf(userId, page.get().map(JpaTransaction::getCategoryId).collect(Collectors.toSet()));
-        var walletsIdToCode = walletService
-            .fetchCodesOf(userId, page.get().map(JpaTransaction::getWalletId).collect(Collectors.toSet()));
-        return page.map(transaction -> mapToApiTransaction(transaction, categoriesIdToCode, walletsIdToCode));
+        var categoriesIdMap = categoryService
+            .findAllByIds(userId, page.get().map(JpaTransaction::getCategoryId).collect(Collectors.toSet()));
+        var walletsIdMap = walletService
+            .findAllByIds(userId, page.get().map(JpaTransaction::getWalletId).collect(Collectors.toSet()));
+        return page.map(transaction -> mapToApiTransaction(transaction, categoriesIdMap, walletsIdMap));
     }
 
     private Page<JpaTransaction> fetchPage(@NotNull Long userId, @NotNull Pageable pageable,
@@ -160,11 +161,13 @@ public class JpaTransactionService implements TransactionService {
         var walletId = walletService.findIdByCode(userId, data.getWalletCode())
             .orElseThrow(() -> new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Invalid wallet"));
 
+        var previousAmount = transaction.getSignedAmount().negate();
         transaction = transaction.toBuilder()
             .userId(userId)
             .code(data.getCode())
             .categoryId(categoryId)
             .walletId(walletId)
+            .currency(data.getCurrency())
             .transactionType(data.getTransactionType())
             .transactionStatus(data.getTransactionStatus())
             .amount(data.getAmount())
@@ -175,7 +178,10 @@ public class JpaTransactionService implements TransactionService {
 
         transaction = transactionRepo.save(transaction);
         var apiTransaction = mapToApiTransaction(transaction);
-        eventPublisher.publishEvent(new CreatedTransactionEvent(apiTransaction));
+        var newAmount = transaction.getSignedAmount();
+        var event = new SavedTransactionEvent(userId, data.getWalletCode(),
+            transaction.getCurrency(), transaction.getDateTime(), previousAmount, newAmount);
+        eventPublisher.publishEvent(event);
         return apiTransaction;
     }
 
@@ -202,26 +208,6 @@ public class JpaTransactionService implements TransactionService {
     @NotNull
     private ApiTransaction mapToApiTransaction(@NotNull JpaTransaction transaction) {
         return mapToApiTransaction(transaction, null, null);
-    }
-
-    @Nullable
-    private String categoryCode(@NotNull JpaTransaction transaction,
-                                @Nullable Map<Long, String> categoriesIdToCode) {
-        if (categoriesIdToCode != null && categoriesIdToCode.containsKey(transaction.getCategoryId())) {
-            return categoriesIdToCode.get(transaction.getCategoryId());
-        }
-        return categoryService.findCodeById(transaction.getUserId(), transaction.getCategoryId())
-            .orElse(null);
-    }
-
-    @Nullable
-    private String walletCode(@NotNull JpaTransaction transaction,
-                              @Nullable Map<Long, String> walletsIdToCode) {
-        if (walletsIdToCode != null && walletsIdToCode.containsKey(transaction.getWalletId())) {
-            return walletsIdToCode.get(transaction.getWalletId());
-        }
-        return walletService.findCodeById(transaction.getUserId(), transaction.getWalletId())
-            .orElse(null);
     }
 
     @Override
@@ -269,9 +255,9 @@ public class JpaTransactionService implements TransactionService {
         var categoriesExpenses = transactionRepo.sumByUserIdAndDatesAndTransactionTypeGroupByCategories(
             userId, from, to, TransactionType.EXPENSE);
         var categoriesIds = categoriesExpenses.stream().map(IdAmount::getId).collect(Collectors.toSet());
-        var codes = categoryService.fetchCodesOf(userId, categoriesIds);
+        var categories = categoryService.findAllByIds(userId, categoriesIds);
         return categoriesExpenses.stream().collect(Collectors
-            .toMap(idAmount -> codes.get(idAmount.getId()), IdAmount::getAmount));
+            .toMap(idAmount -> categories.get(idAmount.getId()).getCode(), IdAmount::getAmount));
     }
 
     private Map<String, BigDecimal> fetchWalletsBalances(@NotNull Long userId,
@@ -279,10 +265,10 @@ public class JpaTransactionService implements TransactionService {
                                                          @NotNull OffsetDateTime to) {
         var transactions = transactionRepo.findAllByUserIdAndDateTimeBetween(userId, from, to);
         var walletsIds = transactions.stream().map(JpaTransaction::getWalletId).collect(Collectors.toSet());
-        var codes = walletService.fetchCodesOf(userId, walletsIds);
+        var wallets = walletService.findAllByIds(userId, walletsIds);
         var map = new HashMap<String, BigDecimal>();
         transactions.forEach(transaction -> {
-            var code = codes.get(transaction.getWalletId());
+            var code = wallets.get(transaction.getWalletId()).getCode();
             var balance = map.getOrDefault(code, BigDecimal.ZERO);
             balance = balance.add(transaction.getSignedAmount());
             map.put(code, balance);
@@ -292,12 +278,16 @@ public class JpaTransactionService implements TransactionService {
 
     @NotNull
     private ApiTransaction mapToApiTransaction(@NotNull JpaTransaction transaction,
-                                               @Nullable Map<Long, String> categoriesIdToCode,
-                                               @Nullable Map<Long, String> walletsIdToCode) {
+                                               @Nullable Map<Long, ApiCategory> categoriesIdMap,
+                                               @Nullable Map<Long, ApiWallet> walletsIdMap) {
+        var category = categoryOf(transaction, categoriesIdMap);
+        var wallet = walletOf(transaction, walletsIdMap);
         return ApiTransaction.builder()
             .code(transaction.getCode())
-            .categoryCode(categoryCode(transaction, categoriesIdToCode))
-            .walletCode(walletCode(transaction, walletsIdToCode))
+            .categoryCode(category != null ? category.getCode() : null)
+            .category(category)
+            .walletCode(wallet != null ? wallet.getCode() : null)
+            .wallet(wallet)
             .transactionType(transaction.getTransactionType())
             .transactionStatus(transaction.getTransactionStatus())
             .currency(transaction.getCurrency())
@@ -305,5 +295,25 @@ public class JpaTransactionService implements TransactionService {
             .description(transaction.getDescription())
             .dateTime(transaction.getDateTime())
             .build();
+    }
+
+    @Nullable
+    private ApiCategory categoryOf(@NotNull JpaTransaction transaction,
+                                   @Nullable Map<Long, ApiCategory> categoriesIdsMap) {
+        if (categoriesIdsMap != null && categoriesIdsMap.containsKey(transaction.getCategoryId())) {
+            return categoriesIdsMap.get(transaction.getCategoryId());
+        }
+        return categoryService.findById(transaction.getUserId(), transaction.getCategoryId())
+            .orElse(null);
+    }
+
+    @Nullable
+    private ApiWallet walletOf(@NotNull JpaTransaction transaction,
+                               @Nullable Map<Long, ApiWallet> walletsIdMap) {
+        if (walletsIdMap != null && walletsIdMap.containsKey(transaction.getWalletId())) {
+            return walletsIdMap.get(transaction.getWalletId());
+        }
+        return walletService.findById(transaction.getUserId(), transaction.getWalletId())
+            .orElse(null);
     }
 }

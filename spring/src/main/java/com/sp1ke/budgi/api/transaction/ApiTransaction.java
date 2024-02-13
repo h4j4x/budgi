@@ -1,5 +1,7 @@
 package com.sp1ke.budgi.api.transaction;
 
+import com.sp1ke.budgi.api.category.ApiCategory;
+import com.sp1ke.budgi.api.wallet.ApiWallet;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.Currency;
@@ -15,7 +17,11 @@ public class ApiTransaction {
 
     private String categoryCode;
 
+    private ApiCategory category;
+
     private String walletCode;
+
+    private ApiWallet wallet;
 
     private TransactionType transactionType;
 

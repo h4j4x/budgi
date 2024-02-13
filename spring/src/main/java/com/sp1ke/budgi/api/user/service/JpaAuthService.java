@@ -57,6 +57,13 @@ public class JpaAuthService implements AuthService {
             .map(this::mapToApiUser);
     }
 
+    @Override
+    public Optional<ApiUser> findUser(@NotNull Long id) {
+        return userRepo
+            .findById(id)
+            .map(this::mapToApiUser);
+    }
+
     @NotNull
     private ApiUser mapToApiUser(@NotNull JpaUser user) {
         return ApiUser.builder()

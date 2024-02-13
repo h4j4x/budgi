@@ -32,10 +32,4 @@ abstract class WalletService {
     required Period period,
     bool showZeroBalance = false,
   });
-
-  /// Updates balance for given wallet and period
-  Future<void> updateWalletBalance({
-    required String code,
-    required Period period,
-  });
 }

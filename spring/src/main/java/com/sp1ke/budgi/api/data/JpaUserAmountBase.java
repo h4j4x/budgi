@@ -1,6 +1,7 @@
 package com.sp1ke.budgi.api.data;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PrePersist;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -19,6 +20,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class JpaUserAmountBase extends JpaUserBase {
     @Column(length = 3, nullable = false)
+    @Convert(converter = CurrencyConverter.class)
     private Currency currency;
 
     @PositiveOrZero(message = "Positive or zero amount is required")

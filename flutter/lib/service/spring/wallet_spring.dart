@@ -124,12 +124,6 @@ class WalletSpringService implements WalletService {
   }
 
   @override
-  Future<void> updateWalletBalance({required String code, required Period period}) {
-    // TODO: implement updateWalletBalance
-    return Future.value();
-  }
-
-  @override
   Future<Map<Wallet, double>> walletsBalance({required Period period, bool showZeroBalance = false}) {
     // TODO: implement walletsBalance
     return Future.value({});

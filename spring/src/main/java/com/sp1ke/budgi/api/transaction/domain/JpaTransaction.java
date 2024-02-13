@@ -64,8 +64,8 @@ public class JpaTransaction extends JpaUserAmountBase {
 
     @NotNull
     public BigDecimal getSignedAmount() {
-        var amount = getAmount();
-        if (transactionType.isExpense()) {
+        var amount = getAmount() != null ? getAmount() : BigDecimal.ZERO;
+        if (transactionType != null && transactionType.isExpense()) {
             return amount.negate();
         }
         return amount;

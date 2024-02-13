@@ -92,9 +92,11 @@ public class JpaCategoryBudgetService implements CategoryBudgetService {
 
     @NotNull
     private ApiCategoryBudget mapToApiCategoryBudget(@NotNull Long userId, @NotNull JpaCategoryBudget budget) {
+        var category = categoryService.findById(userId, budget.getCategoryId()).orElse(null);
         return ApiCategoryBudget.builder()
             .code(budget.getCode())
-            .categoryCode(categoryService.findCodeById(userId, budget.getCategoryId()).orElse(null))
+            .categoryCode(category != null ? category.getCode() : null)
+            .category(category)
             .currency(budget.getCurrency())
             .amount(budget.getAmount())
             .fromDate(budget.getFromDate())

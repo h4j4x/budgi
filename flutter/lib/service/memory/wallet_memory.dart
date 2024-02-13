@@ -1,11 +1,9 @@
-import '../../di.dart';
 import '../../model/data_page.dart';
 import '../../model/domain/wallet.dart';
 import '../../model/error/validation.dart';
 import '../../model/error/wallet.dart';
 import '../../model/period.dart';
 import '../../util/string.dart';
-import '../transaction.dart';
 import '../validator.dart';
 import '../wallet.dart';
 
@@ -95,39 +93,6 @@ class WalletMemoryService implements WalletService {
       }
     }
     return Future.value(map);
-  }
-
-  @override
-  Future<void> updateWalletBalance({
-    required String code,
-    required Period period,
-  }) async {
-    if (_wallets.containsKey(code)) {
-      final wallet = _wallets[code]!;
-      final transactions = await DI().get<TransactionService>().listTransactions(
-            period: period,
-            wallet: wallet,
-          );
-      final previousPeriod = period.previous;
-      double balance = 0;
-      if (_balances.containsKey(previousPeriod.toString())) {
-        final previousBalance = _balances[period.toString()]!.where((element) => element.wallet == wallet).firstOrNull;
-        balance = previousBalance?.balance ?? 0;
-      }
-      for (var transaction in transactions) {
-        balance += transaction.signedAmount;
-      }
-      if (!_balances.containsKey(period.toString())) {
-        _balances[period.toString()] = {};
-      }
-      final walletBalance = _WalletBalance(
-        wallet: wallet,
-        period: period,
-        balance: balance,
-        updatedAt: DateTime.now(),
-      );
-      _balances[period.toString()]!.add(walletBalance);
-    }
   }
 }
 

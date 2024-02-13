@@ -1,4 +1,4 @@
-package com.sp1ke.budgi.api.category;
+package com.sp1ke.budgi.api.wallet;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -10,12 +10,12 @@ import lombok.Setter;
 @Builder
 @Getter
 @Setter
-public class ApiCategoryBudget {
+public class ApiWalletBalance {
     private String code;
 
-    private String categoryCode;
+    private String walletCode;
 
-    private ApiCategory category;
+    private ApiWallet wallet;
 
     private Currency currency;
 

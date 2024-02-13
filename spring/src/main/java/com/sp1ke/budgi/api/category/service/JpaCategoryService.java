@@ -147,22 +147,22 @@ public class JpaCategoryService implements CategoryService {
 
     @Override
     @NotNull
-    public Map<Long, String> fetchCodesOf(@NotNull Long userId, @NotNull Set<Long> ids) {
+    public Map<Long, ApiCategory> findAllByIds(@NotNull Long userId, @NotNull Set<Long> ids) {
         if (ids.isEmpty()) {
             return Collections.emptyMap();
         }
         var list = categoryRepo.findAllByUserIdAndIdIn(userId, ids);
-        var map = new HashMap<Long, String>();
+        var map = new HashMap<Long, ApiCategory>();
         for (var category : list) {
-            map.put(category.getId(), category.getCode());
+            map.put(category.getId(), mapToApiCategory(category));
         }
         return map;
     }
 
     @Override
-    public Optional<String> findCodeById(@NotNull Long userId, @NotNull Long id) {
+    public Optional<ApiCategory> findById(@NotNull Long userId, @NotNull Long id) {
         return categoryRepo.findByUserIdAndId(userId, id)
-            .map(JpaBase::getCode);
+            .map(this::mapToApiCategory);
     }
 
     @Override

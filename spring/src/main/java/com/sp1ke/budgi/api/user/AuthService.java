@@ -11,4 +11,6 @@ public interface AuthService {
     ApiUser findUser(@NotNull ApiUser apiUser);
 
     Optional<ApiUser> findUser(@NotNull String email);
+
+    Optional<ApiUser> findUser(@NotNull Long id);
 }

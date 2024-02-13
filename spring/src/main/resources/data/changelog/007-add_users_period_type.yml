@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      id: 007-users_period-type_column
+      author: budgi
+      changes:
+        - addColumn:
+            tableName: users
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                  name: period_type
+                  type: VARCHAR(50)
+                  defaultValue: MONTHLY
+                  value: MONTHLY
