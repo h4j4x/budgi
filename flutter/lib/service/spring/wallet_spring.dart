@@ -69,7 +69,7 @@ class WalletSpringService implements WalletService {
     }
     try {
       Map<String, dynamic> response;
-      if (code != null) {
+      if (code?.isNotEmpty ?? false) {
         response = await _httpClient.jsonPut<Map<String, dynamic>>(
           authService: authService,
           path: '/$code',
@@ -84,11 +84,6 @@ class WalletSpringService implements WalletService {
       return _SpringWallet.from(response)!;
     } on SocketException catch (_) {
       throw NoServerError();
-    } catch (e) {
-      debugPrint('Unexpected error $e');
-      throw ValidationError({
-        'wallet': WalletError.invalidWallet,
-      });
     }
   }
 
@@ -112,7 +107,8 @@ class WalletSpringService implements WalletService {
       return Future.value();
     }
     try {
-      await _httpClient.delete(authService: authService, path: '/batch?codes=${codes.join(',')}');
+      await _httpClient.delete(
+          authService: authService, path: '/batch?codes=${codes.join(',')}');
     } on SocketException catch (_) {
       throw NoServerError();
     } catch (e) {
@@ -124,7 +120,8 @@ class WalletSpringService implements WalletService {
   }
 
   @override
-  Future<Map<Wallet, double>> walletsBalance({required Period period, bool showZeroBalance = false}) {
+  Future<Map<Wallet, double>> walletsBalance(
+      {required Period period, bool showZeroBalance = false}) {
     // TODO: implement walletsBalance
     return Future.value({});
   }

@@ -31,7 +31,9 @@ List<double> calculateTableWidths(List<TableColumn> columns, double width) {
       leftWidth -= column.fixedWidth!;
       unassigned -= 1;
     } else if (column.widthPercent != null) {
-      final widthPercent = column.widthPercent! > 1 ? column.widthPercent! / 100 : column.widthPercent!;
+      final widthPercent = column.widthPercent! > 1
+          ? column.widthPercent! / 100
+          : column.widthPercent!;
       widths[index] = width * widthPercent;
       leftWidth -= widths[index];
       unassigned -= 1;

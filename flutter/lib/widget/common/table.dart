@@ -38,10 +38,17 @@ class AppTable<T, K> extends StatelessWidget {
     this.onKeySelect,
     this.keyOf,
   })  : columns = List<TableColumn>.of(columns),
-        _hasSelect = selectedKeys != null && onKeySelect != null && keyOf != null,
+        _hasSelect =
+            selectedKeys != null && onKeySelect != null && keyOf != null,
         _selectCellKey = randomString(10) {
     if (_hasSelect) {
-      this.columns.insert(0, TableColumn(key: _selectCellKey, label: '', fixedWidth: 50, alignment: Alignment.center));
+      this.columns.insert(
+          0,
+          TableColumn(
+              key: _selectCellKey,
+              label: '',
+              fixedWidth: 50,
+              alignment: Alignment.center));
     }
   }
 
@@ -158,7 +165,8 @@ class AppTable<T, K> extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(right: 6.0),
           child: Text(
-            l10n.paginationInfo(dataPage.pageIndexStart + 1, dataPage.pageIndexEnd, dataPage.totalElements),
+            l10n.paginationInfo(dataPage.pageIndexStart + 1,
+                dataPage.pageIndexEnd, dataPage.totalElements),
             style: TextStyle(
               color: Theme.of(context).disabledColor,
             ),
@@ -184,7 +192,9 @@ class AppTable<T, K> extends StatelessWidget {
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 6.0),
-          child: loading ? AppIcon.loading : Text((dataPage.pageNumber + 1).toString()),
+          child: loading
+              ? AppIcon.loading
+              : Text((dataPage.pageNumber + 1).toString()),
         ),
         IconButton(
           onPressed: !loading && dataPage.pageNumber < dataPage.totalPages - 1

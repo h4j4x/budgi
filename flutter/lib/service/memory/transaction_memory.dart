@@ -31,12 +31,15 @@ class TransactionMemoryService extends TransactionService {
     int? deferredMonths,
   }) {
     final transactionCode = code ?? randomString(6);
-    final trnDateTime = dateTime ?? _transactions[transactionCode]?.dateTime ?? DateTime.now();
-    final months = deferredMonths != null && deferredMonths > 1 ? deferredMonths : 1;
+    final trnDateTime =
+        dateTime ?? _transactions[transactionCode]?.dateTime ?? DateTime.now();
+    final months =
+        deferredMonths != null && deferredMonths > 1 ? deferredMonths : 1;
     Transaction? firstTransaction;
     final theAmount = amount / months;
     for (int i = 0; i < months; i++) {
-      final theTransactionCode = i > 0 ? '$transactionCode-${i + 1}' : transactionCode;
+      final theTransactionCode =
+          i > 0 ? '$transactionCode-${i + 1}' : transactionCode;
       final transaction = _Transaction(
         theTransactionCode,
         category,
@@ -69,10 +72,12 @@ class TransactionMemoryService extends TransactionService {
     int? pageSize,
   }) {
     final list = _transactions.values.toList().where((transaction) {
-      if (transactionTypes != null && !transactionTypes.contains(transaction.transactionType)) {
+      if (transactionTypes != null &&
+          !transactionTypes.contains(transaction.transactionType)) {
         return false;
       }
-      if (transactionStatuses != null && !transactionStatuses.contains(transaction.transactionStatus)) {
+      if (transactionStatuses != null &&
+          !transactionStatuses.contains(transaction.transactionStatus)) {
         return false;
       }
       if (category != null && transaction.category != category) {
@@ -97,7 +102,8 @@ class TransactionMemoryService extends TransactionService {
           return 0;
         },
       );
-    final dataPage = DataPage<Transaction>(content: list, pageNumber: page ?? 0, pageSize: pageSize);
+    final dataPage = DataPage<Transaction>(
+        content: list, pageNumber: page ?? 0, pageSize: pageSize);
     return Future.value(dataPage);
   }
 
@@ -151,7 +157,9 @@ class _Transaction extends Transaction {
     if (identical(this, other)) {
       return true;
     }
-    return other is _Transaction && runtimeType == other.runtimeType && code == other.code;
+    return other is _Transaction &&
+        runtimeType == other.runtimeType &&
+        code == other.code;
   }
 
   @override

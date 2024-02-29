@@ -60,8 +60,11 @@ class _TransactionsPageState extends State<TransactionsPage> {
           period: period,
           wallet: filter.wallet,
           category: filter.category,
-          transactionTypes: filter.transactionType != null ? {filter.transactionType!} : {},
-          transactionStatuses: filter.transactionStatus != null ? {filter.transactionStatus!} : {},
+          transactionTypes:
+              filter.transactionType != null ? {filter.transactionType!} : {},
+          transactionStatuses: filter.transactionStatus != null
+              ? {filter.transactionStatus!}
+              : {},
           dateTimeSort: filter.dateTimeSort,
         );
     list.clear();

@@ -51,7 +51,9 @@ abstract class Wallet {
     if (identical(this, other)) {
       return true;
     }
-    return other is Wallet && runtimeType == other.runtimeType && code == other.code;
+    return other is Wallet &&
+        runtimeType == other.runtimeType &&
+        code == other.code;
   }
 
   @override

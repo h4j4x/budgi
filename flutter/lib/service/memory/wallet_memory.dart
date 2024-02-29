@@ -113,7 +113,9 @@ class _Wallet implements Wallet {
     if (identical(this, other)) {
       return true;
     }
-    return other is _Wallet && runtimeType == other.runtimeType && code == other.code;
+    return other is _Wallet &&
+        runtimeType == other.runtimeType &&
+        code == other.code;
   }
 
   @override

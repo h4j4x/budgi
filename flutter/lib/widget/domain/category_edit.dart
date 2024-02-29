@@ -9,6 +9,8 @@ import '../../model/domain/category.dart';
 import '../../model/error/category.dart';
 import '../../service/category.dart';
 import '../../service/impl/category_validator.dart';
+import '../../service/spring/http_client.dart';
+import '../../util/ui.dart';
 import '../common/form_toolbar.dart';
 
 class CategoryEdit extends StatefulWidget {
@@ -104,6 +106,10 @@ class _CategoryEditState extends State<CategoryEdit> {
       }
     } on ValidationError<CategoryError> catch (e) {
       errors.addAll(e.errors);
+    } on HttpError catch (e) {
+      if (mounted) {
+        context.showError(e.l10n(context));
+      }
     } finally {
       setState(() {
         saving = false;

@@ -65,7 +65,8 @@ abstract class TransactionService {
     }
   }
 
-  Future<void> _completePendingTransactions(Wallet wallet, {required double maxAmount}) async {
+  Future<void> _completePendingTransactions(Wallet wallet,
+      {required double maxAmount}) async {
     final transactions = await listTransactions(
       transactionStatuses: {TransactionStatus.pending},
       dateTimeSort: Sort.asc,

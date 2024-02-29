@@ -56,7 +56,8 @@ class DI {
     return _getIt.isRegistered<T>();
   }
 
-  Future<void> _configSpring(AppConfig config, StorageService storageService) async {
+  Future<void> _configSpring(
+      AppConfig config, StorageService storageService) async {
     final springConfig = SpringConfig(url: config.apiUrl!);
     final authService = AuthSpringService(
       storageService: storageService,

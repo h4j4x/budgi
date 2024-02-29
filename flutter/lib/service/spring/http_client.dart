@@ -1,9 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
+import '../../l10n/l10n.dart';
 import '../../model/data_page.dart';
+import '../../model/fields.dart';
 import '../../model/token.dart';
 import '../auth.dart';
 
@@ -21,7 +24,8 @@ class ApiHttpClient {
     String path = '',
   }) async {
     final uri = Uri.parse('$baseUrl$path');
-    final response = await httpClient.get(uri, headers: _headers(authService.token(), isJson: true));
+    final response = await httpClient.get(uri,
+        headers: _headers(authService.token(), isJson: true));
     if (_is2xxStatus(response.statusCode)) {
       return jsonDecode(response.body) as T;
     }
@@ -41,7 +45,8 @@ class ApiHttpClient {
     Map<String, String>? data,
   }) async {
     final uri = _queryUri('$baseUrl$path', data, page, pageSize);
-    final response = await httpClient.get(uri, headers: _headers(authService.token(), isJson: true));
+    final response = await httpClient.get(uri,
+        headers: _headers(authService.token(), isJson: true));
     if (_is2xxStatus(response.statusCode)) {
       final map = jsonDecode(response.body) as Map<String, dynamic>;
       return _from<T>(map, mapper: mapper)!;
@@ -60,7 +65,7 @@ class ApiHttpClient {
   }) async {
     final response = await httpClient.post(
       Uri.parse('$baseUrl$path'),
-      body: data != null ? jsonEncode(data) : null,
+      body: data != null ? _jsonEncode(data) : null,
       headers: _headers(authService.token(), isJson: true),
     );
     if (_is2xxStatus(response.statusCode)) {
@@ -80,7 +85,7 @@ class ApiHttpClient {
   }) async {
     final response = await httpClient.put(
       Uri.parse('$baseUrl$path'),
-      body: data != null ? jsonEncode(data) : null,
+      body: data != null ? _jsonEncode(data) : null,
       headers: _headers(authService.token(), isJson: true),
     );
     if (_is2xxStatus(response.statusCode)) {
@@ -126,14 +131,19 @@ class ApiHttpClient {
     return code >= 200 && code < 300;
   }
 
-  static DataPage<T>? _from<T>(Map<String, dynamic> map, {required DataMapper mapper}) {
+  static DataPage<T>? _from<T>(Map<String, dynamic> map,
+      {required DataMapper mapper}) {
     final content = map['content'] as List<dynamic>?;
     final pageable = (map['pageable'] as Map<String, dynamic>?) ?? {};
     final pageNumber = pageable['pageNumber'] as int?;
     final pageSize = pageable['pageSize'] as int?;
     final totalElements = map['totalElements'] as int?;
     final totalPages = map['totalPages'] as int?;
-    if (content != null && pageNumber != null && pageSize != null && totalElements != null && totalPages != null) {
+    if (content != null &&
+        pageNumber != null &&
+        pageSize != null &&
+        totalElements != null &&
+        totalPages != null) {
       final list = content.map(mapper).whereType<T>().toList();
       return DataPage<T>(
         content: list,
@@ -146,7 +156,8 @@ class ApiHttpClient {
     return null;
   }
 
-  Uri _queryUri(String url, Map<String, String>? data, [int? page, int? pageSize]) {
+  Uri _queryUri(String url, Map<String, String>? data,
+      [int? page, int? pageSize]) {
     final params = <String, String>{};
     if (data?.isNotEmpty ?? false) {
       params.addAll(data!);
@@ -159,7 +170,12 @@ class ApiHttpClient {
     }
     final uri = Uri.parse(url);
     if (params.isNotEmpty) {
-      return Uri(scheme: uri.scheme, host: uri.host, port: uri.port, path: uri.path, queryParameters: params);
+      return Uri(
+          scheme: uri.scheme,
+          host: uri.host,
+          port: uri.port,
+          path: uri.path,
+          queryParameters: params);
     }
     return uri;
   }
@@ -168,6 +184,18 @@ class ApiHttpClient {
     if (statusCode == 401) {
       await authService.signOut();
     }
+  }
+
+  String _jsonEncode(Map<String, Object> data) {
+    final map = <String, Object>{};
+    data.forEach((key, value) {
+      if (codeField != key || value is! String || value.isNotEmpty) {
+        map[key] = value;
+      } else {
+        debugPrint('Http discarding key $key value $value');
+      }
+    });
+    return jsonEncode(map);
   }
 }
 
@@ -183,6 +211,16 @@ class HttpError extends Error {
   @override
   String toString() {
     return 'HttpError{statusCode: $statusCode, reasonPhrase: $reasonPhrase}';
+  }
+
+  String l10n(BuildContext context) {
+    if (reasonPhrase?.isNotEmpty ?? false) {
+      return reasonPhrase!;
+    }
+    return switch (statusCode) {
+      400 => L10n.of(context).httpStatus400,
+      _ => L10n.of(context).unknownError,
+    };
   }
 }
 

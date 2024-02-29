@@ -104,7 +104,8 @@ class CategoryMemoryService implements CategoryService, CategoryAmountService {
 
     final periodKey = period.toString();
     _values[periodKey] ??= <CategoryAmount>{};
-    _values[periodKey]!.removeWhere((amount) => amount.category.code == category.code);
+    _values[periodKey]!
+        .removeWhere((amount) => amount.category.code == category.code);
     _values[periodKey]!.add(categoryAmount);
     return Future.value(categoryAmount);
   }
@@ -206,9 +207,12 @@ class CategoryMemoryService implements CategoryService, CategoryAmountService {
     final map = <CategoryAmount, double>{};
     final amounts = _values[period.toString()] ?? {};
     for (var transaction in transactions) {
-      final categoryAmount = amounts.where((amount) => amount.category == transaction.category).toList();
+      final categoryAmount = amounts
+          .where((amount) => amount.category == transaction.category)
+          .toList();
       if (categoryAmount.length == 1) {
-        map[categoryAmount.first] = (map[categoryAmount.first] ?? 0) + transaction.signedAmount;
+        map[categoryAmount.first] =
+            (map[categoryAmount.first] ?? 0) + transaction.signedAmount;
       }
     }
     if (showZeroTotal) {
@@ -234,7 +238,9 @@ class _Category implements Category {
     if (identical(this, other)) {
       return true;
     }
-    return other is _Category && runtimeType == other.runtimeType && code == other.code;
+    return other is _Category &&
+        runtimeType == other.runtimeType &&
+        code == other.code;
   }
 
   @override
@@ -260,7 +266,9 @@ class _CategoryAmount implements CategoryAmount {
     if (identical(this, other)) {
       return true;
     }
-    return other is _CategoryAmount && runtimeType == other.runtimeType && category == other.category;
+    return other is _CategoryAmount &&
+        runtimeType == other.runtimeType &&
+        category == other.category;
   }
 
   @override

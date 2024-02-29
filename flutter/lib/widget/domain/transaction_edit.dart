@@ -12,9 +12,11 @@ import '../../model/error/validation.dart';
 import '../../model/period.dart';
 import '../../service/category.dart';
 import '../../service/impl/transaction_validator.dart';
+import '../../service/spring/http_client.dart';
 import '../../service/storage.dart';
 import '../../service/transaction.dart';
 import '../../service/wallet.dart';
+import '../../util/ui.dart';
 import '../common/form_toolbar.dart';
 import 'category_select.dart';
 import 'transaction_status_select.dart';
@@ -398,6 +400,10 @@ class _TransactionEditState extends State<TransactionEdit> {
       }
     } on ValidationError<TransactionError> catch (e) {
       errors.addAll(e.errors);
+    } on HttpError catch (e) {
+      if (mounted) {
+        context.showError(e.l10n(context));
+      }
     } finally {
       setState(() {
         saving = false;

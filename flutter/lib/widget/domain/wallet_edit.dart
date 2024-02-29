@@ -9,6 +9,7 @@ import '../../l10n/l10n.dart';
 import '../../model/domain/wallet.dart';
 import '../../model/error/wallet.dart';
 import '../../service/impl/wallet_validator.dart';
+import '../../service/spring/http_client.dart';
 import '../../service/wallet.dart';
 import '../../util/ui.dart';
 import '../common/form_toolbar.dart';
@@ -145,6 +146,10 @@ class _WalletEditState extends State<WalletEdit> {
       errors.addAll(e.errors);
       if (errors.containsKey('wallet') && mounted) {
         context.showError(errors['wallet']!.l10n(context));
+      }
+    } on HttpError catch (e) {
+      if (mounted) {
+        context.showError(e.l10n(context));
       }
     } finally {
       setState(() {

@@ -11,6 +11,8 @@ import '../../model/period.dart';
 import '../../service/category.dart';
 import '../../service/category_amount.dart';
 import '../../service/impl/category_amount_validator.dart';
+import '../../service/spring/http_client.dart';
+import '../../util/ui.dart';
 import '../common/form_toolbar.dart';
 import 'category_select.dart';
 
@@ -155,6 +157,10 @@ class _CategoryAmountEditState extends State<CategoryAmountEdit> {
       }
     } on ValidationError<CategoryError> catch (e) {
       errors.addAll(e.errors);
+    } on HttpError catch (e) {
+      if (mounted) {
+        context.showError(e.l10n(context));
+      }
     } finally {
       setState(() {
         saving = false;

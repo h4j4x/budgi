@@ -10,6 +10,7 @@ Budg1 Spring project.
 - [SpringBoot 3.2.1](https://spring.io/projects/spring-boot/).
 - [JWT](https://jwt.io/) using [jwtk-jjwt](https://github.com/jwtk/jjwt).
 - [Postgres](https://www.postgresql.org/).
+- [Redis](https://redis.io/docs/get-started/).
 - [Liquibase](https://docs.liquibase.com/home.html).
 
 ## Development
@@ -45,10 +46,16 @@ All configurations should be done in [.env file](./.env), create it if not exist
   ```
 - Setup your database properties:
   ```properties
+  DATASOURCE_DRIVER=org.postgresql.Driver
   DATASOURCE_URL=jdbc:postgresql://localhost:5432/budgi
   DATASOURCE_USERNAME=budgi
   DATASOURCE_PASSWORD=budgi
-  DATASOURCE_DRIVER=org.postgresql.Driver
+  ```
+- Setup your redis properties:
+  ```properties
+  REDIS_HOST=localhost
+  REDIS_PORT=6379
+  REDIS_PASSWORD=budgi
   ```
 
 ### Generate docker image

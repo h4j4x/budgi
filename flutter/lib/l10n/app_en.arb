@@ -64,6 +64,7 @@
   "goNextPage": "Go next page",
   "goPreviousPage": "Go previous page",
   "home": "Home",
+  "httpStatus400": "Invalid request.",
   "invalidBudgetAmount": "Invalid budget amount. Enter a non negative number for amount.",
   "invalidCategory": "Invalid category.",
   "invalidCategoryName": "Invalid category name. Enter a non empty name with no more than {maxLength} characters.",
@@ -216,6 +217,7 @@
       }
     }
   },
+  "unknownError": "Unknown error",
   "userEmail": "Email",
   "userEmailHint": "Enter email...",
   "userPassword": "Password",

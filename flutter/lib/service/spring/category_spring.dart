@@ -64,7 +64,7 @@ class CategorySpringService implements CategoryService {
     }
     try {
       Map<String, dynamic> response;
-      if (code != null) {
+      if (code?.isNotEmpty ?? false) {
         response = await _httpClient.jsonPut<Map<String, dynamic>>(
           authService: authService,
           path: '/$code',
@@ -79,10 +79,6 @@ class CategorySpringService implements CategoryService {
       return _SpringCategory.from(response)!;
     } on SocketException catch (_) {
       throw NoServerError();
-    } catch (e) {
-      throw ValidationError({
-        'category': CategoryError.invalidCategory,
-      });
     }
   }
 
@@ -105,7 +101,8 @@ class CategorySpringService implements CategoryService {
       return Future.value();
     }
     try {
-      await _httpClient.delete(authService: authService, path: '/batch?codes=${codes.join(',')}');
+      await _httpClient.delete(
+          authService: authService, path: '/batch?codes=${codes.join(',')}');
     } on SocketException catch (_) {
       throw NoServerError();
     } catch (e) {

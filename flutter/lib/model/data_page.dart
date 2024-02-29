@@ -66,7 +66,8 @@ class DataPage<T> with Iterable<T> implements Iterator<T> {
       pageNumber = dataPage.pageNumber;
     } else {
       final pageIndexStart = dataPage.pageNumber * dataPage.pageSize;
-      final pageIndexEnd = min(pageIndexStart + dataPage.pageSize, content.length);
+      final pageIndexEnd =
+          min(pageIndexStart + dataPage.pageSize, content.length);
       content.replaceRange(pageIndexStart, pageIndexEnd, dataPage.content);
     }
     pageSize = dataPage.pageSize;
@@ -83,7 +84,8 @@ class DataPage<T> with Iterable<T> implements Iterator<T> {
   }
 
   void apply(FetchMode fetchMode, [int? forPageNumber]) {
-    if (forPageNumber != null && (forPageNumber < 0 || forPageNumber >= totalPages)) {
+    if (forPageNumber != null &&
+        (forPageNumber < 0 || forPageNumber >= totalPages)) {
       forPageNumber = null;
     }
     switch (fetchMode) {
