@@ -6,6 +6,7 @@ import '../../model/domain/transaction.dart';
 import '../../model/domain/wallet.dart';
 import '../../model/error/http.dart';
 import '../../model/error/transaction.dart';
+import '../../model/error/validation.dart';
 import '../../model/fields.dart';
 import '../../model/period.dart';
 import '../../model/sort.dart';
@@ -17,11 +18,11 @@ import '../wallet.dart';
 import 'config.dart';
 import 'http_client.dart';
 
-class TransactionSpringService implements TransactionService {
+class TransactionSpringService extends TransactionService {
   final AuthService authService;
   final CategoryService categoryService;
   final WalletService walletService;
-  final Validator<Transaction, TransactionError>? transactionValidator;
+  final Validator<Transaction, TransactionError> transactionValidator;
   final ApiHttpClient _httpClient;
 
   TransactionSpringService({
@@ -86,37 +87,62 @@ class TransactionSpringService implements TransactionService {
   }
 
   @override
-  Future<Transaction> saveTransaction(
-      {String? code,
-      required TransactionType transactionType,
-      required TransactionStatus transactionStatus,
-      required Category category,
-      required Wallet wallet,
-      required double amount,
-      DateTime? dateTime,
-      String? description,
-      int? deferredMonths}) {
-    // TODO: implement saveTransaction
-    throw UnimplementedError();
+  Future<Transaction> saveTransaction({
+    String? code,
+    required TransactionType transactionType,
+    required TransactionStatus transactionStatus,
+    required Category category,
+    required Wallet wallet,
+    required double amount,
+    DateTime? dateTime,
+    String? description,
+    int? deferredMonths,
+  }) async {
+    final transaction = _SpringTransaction(
+      code: code ?? '',
+      category: category,
+      wallet: wallet,
+      transactionType: transactionType,
+      transactionStatus: transactionStatus,
+      amount: amount,
+      dateTime: dateTime,
+      description: description ?? '',
+    );
+    final errors = transactionValidator.validate(transaction);
+    if (errors.isNotEmpty) {
+      throw ValidationError(errors);
+    }
+    try {
+      Map<String, dynamic> response;
+      if (code?.isNotEmpty ?? false) {
+        response = await _httpClient.jsonPut<Map<String, dynamic>>(
+          authService: authService,
+          path: '/$code',
+          data: transaction.toMap(),
+        );
+      } else {
+        response = await _httpClient.jsonPost<Map<String, dynamic>>(
+          authService: authService,
+          data: transaction.toMap(),
+        );
+      }
+      return _SpringTransaction.from(response, [category], [wallet])!;
+    } on SocketException catch (_) {
+      throw NoServerError();
+    }
   }
 
   @override
-  Future<void> deleteTransaction({required String code}) {
-    // TODO: implement deleteTransaction
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> saveWalletTransfer(
-      {required Category category,
-      required Wallet sourceWallet,
-      required Wallet targetWallet,
-      required double amount,
-      DateTime? dateTime,
-      String? sourceDescription,
-      String? targetDescription}) {
-    // TODO: implement saveWalletTransfer
-    throw UnimplementedError();
+  Future<void> deleteTransaction({required String code}) async {
+    try {
+      await _httpClient.delete(authService: authService, path: '/$code');
+    } on SocketException catch (_) {
+      throw NoServerError();
+    } catch (e) {
+      throw ValidationError({
+        'transaction': TransactionError.invalidTransaction,
+      });
+    }
   }
 }
 

@@ -67,8 +67,7 @@ class L10nEn extends L10n {
   }
 
   @override
-  String get categoryDeleteSelectedConfirm =>
-      'Confirm to delete selected categories.';
+  String get categoryDeleteSelectedConfirm => 'Confirm to delete selected categories.';
 
   @override
   String get categoryName => 'Category name';
@@ -80,8 +79,7 @@ class L10nEn extends L10n {
   String get code => 'Code';
 
   @override
-  String get copyingPreviousPeriod =>
-      'Copying previous period amounts. Please wait...';
+  String get copyingPreviousPeriod => 'Copying previous period amounts. Please wait...';
 
   @override
   String get createAction => 'Create';
@@ -119,8 +117,7 @@ class L10nEn extends L10n {
   String get httpStatus400 => 'Invalid request.';
 
   @override
-  String get invalidBudgetAmount =>
-      'Invalid budget amount. Enter a non negative number for amount.';
+  String get invalidBudgetAmount => 'Invalid budget amount. Enter a non negative number for amount.';
 
   @override
   String get invalidCategory => 'Invalid category.';
@@ -131,12 +128,13 @@ class L10nEn extends L10n {
   }
 
   @override
-  String get invalidTransactionAmount =>
-      'Invalid transaction amount. Enter a non negative number for amount.';
+  String get invalidTransaction => 'Invalid transaction.';
 
   @override
-  String get invalidTransactionDeferredMonths =>
-      'Invalid transaction deferred months.';
+  String get invalidTransactionAmount => 'Invalid transaction amount. Enter a non negative number for amount.';
+
+  @override
+  String get invalidTransactionDeferredMonths => 'Invalid transaction deferred months.';
 
   @override
   String invalidTransactionDescription(int maxLength) {
@@ -362,8 +360,7 @@ class L10nEn extends L10n {
   }
 
   @override
-  String get walletDeleteSelectedConfirm =>
-      'Confirm to delete selected wallets.';
+  String get walletDeleteSelectedConfirm => 'Confirm to delete selected wallets.';
 
   @override
   String get walletName => 'Wallet name';

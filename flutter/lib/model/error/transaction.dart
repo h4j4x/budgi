@@ -11,7 +11,8 @@ enum TransactionError {
   invalidWalletTarget,
   invalidCategory,
   invalidAmount,
-  invalidDescription;
+  invalidDescription,
+  invalidTransaction;
 
   String l10n(BuildContext context) {
     final l10n = L10n.of(context);
@@ -25,6 +26,7 @@ enum TransactionError {
       invalidAmount => l10n.invalidTransactionAmount,
       invalidDescription =>
         l10n.invalidTransactionDescription(AppConfig.textFieldMaxLength),
+      invalidTransaction => l10n.invalidTransaction
     };
   }
 }
