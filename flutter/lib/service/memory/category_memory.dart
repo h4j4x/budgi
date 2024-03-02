@@ -60,7 +60,11 @@ class CategoryMemoryService implements CategoryService, CategoryAmountService {
         return excludingCodes!.contains(wallet.code);
       });
     }
-    if (page != null && page >= 0 && pageSize != null && pageSize > 0) {
+    if (list.isNotEmpty &&
+        page != null &&
+        page >= 0 &&
+        pageSize != null &&
+        pageSize > 0) {
       final offset = page * pageSize;
       list = list.sublist(offset, offset + pageSize);
     }
