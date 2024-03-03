@@ -1,17 +1,16 @@
 import '../../model/domain/category_amount.dart';
-import '../../model/error/category.dart';
+import '../../model/error/budget.dart';
 import '../validator.dart';
 
-class CategoryAmountValidator
-    implements Validator<CategoryAmount, CategoryError> {
+class BudgetValidator implements Validator<Budget, BudgetError> {
   static const String category = 'category';
   static const String amount = 'amount';
 
   @override
-  Map<String, CategoryError> validate(CategoryAmount item) {
-    final errors = <String, CategoryError>{};
+  Map<String, BudgetError> validate(Budget item) {
+    final errors = <String, BudgetError>{};
     if (item.amount < 0) {
-      errors[amount] = CategoryError.invalidAmount;
+      errors[amount] = BudgetError.invalidAmount;
     }
     return errors;
   }

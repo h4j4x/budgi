@@ -3,27 +3,28 @@ import '../../model/data_page.dart';
 import '../../model/domain/category.dart';
 import '../../model/domain/category_amount.dart';
 import '../../model/domain/transaction.dart';
+import '../../model/error/budget.dart';
 import '../../model/error/category.dart';
 import '../../model/error/validation.dart';
 import '../../model/period.dart';
 import '../../model/sort.dart';
 import '../../util/string.dart';
 import '../category.dart';
-import '../category_amount.dart';
+import '../budget.dart';
 import '../transaction.dart';
 import '../validator.dart';
 
-class CategoryMemoryService implements CategoryService, CategoryAmountService {
+class CategoryMemoryService implements CategoryService, BudgetService {
   final Validator<Category, CategoryError>? categoryValidator;
-  final Validator<CategoryAmount, CategoryError>? amountValidator;
+  final Validator<Budget, BudgetError>? budgetValidator;
 
   final _categories = <String, Category>{};
-  final _values = <String, Set<CategoryAmount>>{};
+  final _values = <String, Set<Budget>>{};
   final _periods = <String>[];
 
   CategoryMemoryService({
     this.categoryValidator,
-    this.amountValidator,
+    this.budgetValidator,
   });
 
   @override
@@ -88,7 +89,7 @@ class CategoryMemoryService implements CategoryService, CategoryAmountService {
   }
 
   @override
-  Future<CategoryAmount> saveAmount({
+  Future<Budget> saveBudget({
     required Category category,
     required Period period,
     required double amount,
@@ -100,24 +101,24 @@ class CategoryMemoryService implements CategoryService, CategoryAmountService {
         'category': CategoryError.invalidCategory,
       });
     }
-    final categoryAmount = _CategoryAmount(category, period, amount);
-    final errors = amountValidator?.validate(categoryAmount);
+    final budget = _Budget(category, period, amount);
+    final errors = budgetValidator?.validate(budget);
     if (errors?.isNotEmpty ?? false) {
       throw ValidationError(errors!);
     }
 
     final periodKey = period.toString();
-    _values[periodKey] ??= <CategoryAmount>{};
+    _values[periodKey] ??= <Budget>{};
     _values[periodKey]!
         .removeWhere((amount) => amount.category.code == category.code);
-    _values[periodKey]!.add(categoryAmount);
-    return Future.value(categoryAmount);
+    _values[periodKey]!.add(budget);
+    return Future.value(budget);
   }
 
   @override
-  Future<List<CategoryAmount>> listAmounts({
+  Future<List<Budget>> listBudgets({
     required Period period,
-    Sort? amountSort,
+    Sort? budgetSort,
     bool showZeroAmount = false,
   }) {
     _saveLastUsed(period);
@@ -125,24 +126,24 @@ class CategoryMemoryService implements CategoryService, CategoryAmountService {
     final set = _values[period.toString()] ?? {};
 
     if (showZeroAmount) {
-      final includedCategories = set.map((categoryAmount) {
-        return categoryAmount.category;
+      final includedCategories = set.map((budget) {
+        return budget.category;
       });
       final zeroCategories = _categories.values.where((category) {
         return !includedCategories.contains(category);
       });
       set.addAll(zeroCategories.map((category) {
-        return _CategoryAmount(category, period, 0);
+        return _Budget(category, period, 0);
       }));
     }
 
     return Future.value(set.toList()
       ..sort(
         (value1, value2) {
-          if (amountSort == Sort.asc) {
+          if (budgetSort == Sort.asc) {
             return value1.amount.compareTo(value2.amount);
           }
-          if (amountSort == Sort.desc) {
+          if (budgetSort == Sort.desc) {
             return value2.amount.compareTo(value1.amount);
           }
           return 0;
@@ -151,14 +152,14 @@ class CategoryMemoryService implements CategoryService, CategoryAmountService {
   }
 
   @override
-  Future<void> deleteAmount({
+  Future<void> deleteBudget({
     required Category category,
     required Period period,
   }) {
     _saveLastUsed(period);
 
     final set = _values[period.toString()] ?? {};
-    set.removeWhere((amount) => amount.category == category);
+    set.removeWhere((budget) => budget.category == category);
     return Future.value();
   }
 
@@ -179,20 +180,20 @@ class CategoryMemoryService implements CategoryService, CategoryAmountService {
   }
 
   @override
-  Future copyPreviousPeriodAmountsInto(Period period) {
+  Future copyPreviousPeriodBudgetsInto(Period period) {
     if (_periods.isNotEmpty) {
       final previousPeriodKey = _periods.last;
       final periodKey = period.toString();
-      _values[periodKey] = <CategoryAmount>{};
-      for (var categoryAmount in _values[previousPeriodKey]!) {
-        _values[periodKey]!.add(categoryAmount.copyWith(period: period));
+      _values[periodKey] = <Budget>{};
+      for (var budget in _values[previousPeriodKey]!) {
+        _values[periodKey]!.add(budget.copyWith(period: period));
       }
     }
     return Future.value();
   }
 
   @override
-  Future<Map<CategoryAmount, double>> categoriesTransactionsTotal({
+  Future<Map<Budget, double>> categoriesTransactionsTotal({
     required Period period,
     bool expensesTransactions = true,
     bool showZeroTotal = false,
@@ -208,20 +209,19 @@ class CategoryMemoryService implements CategoryService, CategoryAmountService {
           period: period,
           dateTimeSort: Sort.asc,
         );
-    final map = <CategoryAmount, double>{};
-    final amounts = _values[period.toString()] ?? {};
+    final map = <Budget, double>{};
+    final budgets = _values[period.toString()] ?? {};
     for (var transaction in transactions) {
-      final categoryAmount = amounts
+      final budget = budgets
           .where((amount) => amount.category == transaction.category)
           .toList();
-      if (categoryAmount.length == 1) {
-        map[categoryAmount.first] =
-            (map[categoryAmount.first] ?? 0) + transaction.signedAmount;
+      if (budget.length == 1) {
+        map[budget.first] = (map[budget.first] ?? 0) + transaction.signedAmount;
       }
     }
     if (showZeroTotal) {
-      for (var categoryAmount in amounts) {
-        map[categoryAmount] ??= 0;
+      for (var budget in budgets) {
+        map[budget] ??= 0;
       }
     }
     return map;
@@ -253,8 +253,8 @@ class _Category implements Category {
   }
 }
 
-class _CategoryAmount implements CategoryAmount {
-  _CategoryAmount(this.category, this.period, this.amount);
+class _Budget implements Budget {
+  _Budget(this.category, this.period, this.amount);
 
   @override
   Category category;
@@ -270,7 +270,7 @@ class _CategoryAmount implements CategoryAmount {
     if (identical(this, other)) {
       return true;
     }
-    return other is _CategoryAmount &&
+    return other is _Budget &&
         runtimeType == other.runtimeType &&
         category == other.category;
   }
@@ -281,7 +281,7 @@ class _CategoryAmount implements CategoryAmount {
   }
 
   @override
-  CategoryAmount copyWith({required Period period}) {
-    return _CategoryAmount(category, period, amount);
+  Budget copyWith({required Period period}) {
+    return _Budget(category, period, amount);
   }
 }

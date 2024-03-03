@@ -7,24 +7,24 @@ import '../l10n/l10n.dart';
 import '../model/domain/category_amount.dart';
 import '../model/item_action.dart';
 import '../model/period.dart';
-import '../service/category_amount.dart';
+import '../service/budget.dart';
 import '../widget/common/month_field.dart';
-import '../widget/domain/category_amount_list.dart';
-import 'category_amount.dart';
+import '../widget/domain/budget_list.dart';
+import 'budget.dart';
 
-class CategoriesAmountsPage extends StatefulWidget {
-  static const route = '/categories-amounts';
+class BudgetsPage extends StatefulWidget {
+  static const route = '/budgets';
 
-  const CategoriesAmountsPage({super.key});
+  const BudgetsPage({super.key});
 
   @override
   State<StatefulWidget> createState() {
-    return _CategoriesAmountsPageState();
+    return _BudgetsPageState();
   }
 }
 
-class _CategoriesAmountsPageState extends State<CategoriesAmountsPage> {
-  final list = <CategoryAmount>[];
+class _BudgetsPageState extends State<BudgetsPage> {
+  final list = <Budget>[];
 
   bool loading = false;
   String? loadingMessage;
@@ -40,13 +40,13 @@ class _CategoriesAmountsPageState extends State<CategoriesAmountsPage> {
     setState(() {
       loading = true;
     });
-    final categoryService = DI().get<CategoryAmountService>();
+    final categoryService = DI().get<BudgetService>();
     final periodChanged = await categoryService.periodHasChanged(period);
     if (periodChanged) {
       setState(() {
         loadingMessage = L10n.of(context).copyingPreviousPeriod;
       });
-      await categoryService.copyPreviousPeriodAmountsInto(period);
+      await categoryService.copyPreviousPeriodBudgetsInto(period);
       loadingMessage = null;
     }
     loading = false;
@@ -60,8 +60,7 @@ class _CategoriesAmountsPageState extends State<CategoriesAmountsPage> {
     setState(() {
       loading = true;
     });
-    final newList =
-        await DI().get<CategoryAmountService>().listAmounts(period: period);
+    final newList = await DI().get<BudgetService>().listBudgets(period: period);
     list.clear();
     list.addAll(newList);
     setState(() {
@@ -84,7 +83,7 @@ class _CategoriesAmountsPageState extends State<CategoriesAmountsPage> {
     return CustomScrollView(
       slivers: [
         toolbar(),
-        CategoryAmountList(
+        BudgetList(
           list: list,
           enabled: !loading,
           onItemAction: onItemAction,
@@ -127,16 +126,16 @@ class _CategoriesAmountsPageState extends State<CategoriesAmountsPage> {
 
   void onItemAction(
     BuildContext context,
-    CategoryAmount item,
+    Budget item,
     ItemAction action,
   ) async {
     switch (action) {
       case ItemAction.select:
         {
           await context.push(
-            CategoryAmountPage.route,
-            extra: CategoryAmountData.fromPeriod(
-              amount: item,
+            BudgetPage.route,
+            extra: BudgetData.fromPeriod(
+              budget: item,
               period: period,
             ),
           );
@@ -144,7 +143,7 @@ class _CategoriesAmountsPageState extends State<CategoriesAmountsPage> {
         }
       case ItemAction.delete:
         {
-          await DI().get<CategoryAmountService>().deleteAmount(
+          await DI().get<BudgetService>().deleteBudget(
                 category: item.category,
                 period: period,
               );
@@ -158,8 +157,8 @@ class _CategoriesAmountsPageState extends State<CategoriesAmountsPage> {
     return FloatingActionButton(
       onPressed: () async {
         await context.push(
-          CategoryAmountPage.route,
-          extra: CategoryAmountData.fromPeriod(
+          BudgetPage.route,
+          extra: BudgetData.fromPeriod(
             period: period,
           ),
         );

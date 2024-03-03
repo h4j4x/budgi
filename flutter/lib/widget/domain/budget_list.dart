@@ -8,12 +8,12 @@ import '../../util/function.dart';
 import '../../util/ui.dart';
 import '../common/sliver_center.dart';
 
-class CategoryAmountList extends StatelessWidget {
-  final List<CategoryAmount> list;
+class BudgetList extends StatelessWidget {
+  final List<Budget> list;
   final bool enabled;
-  final TypedContextItemAction<CategoryAmount> onItemAction;
+  final TypedContextItemAction<Budget> onItemAction;
 
-  const CategoryAmountList({
+  const BudgetList({
     super.key,
     required this.list,
     required this.enabled,
@@ -47,7 +47,7 @@ class CategoryAmountList extends StatelessWidget {
     );
   }
 
-  Widget listItem(BuildContext context, CategoryAmount item) {
+  Widget listItem(BuildContext context, Budget item) {
     return ListTile(
       title: Text(item.category.name),
       subtitle: Text('\$${item.amount.toStringAsFixed(2)}'),

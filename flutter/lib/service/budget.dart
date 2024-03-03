@@ -3,12 +3,12 @@ import '../model/domain/category_amount.dart';
 import '../model/period.dart';
 import '../model/sort.dart';
 
-abstract class CategoryAmountService {
+abstract class BudgetService {
   /// period dates are inclusive.
   ///
   /// Should save given period as last used.
   /// @throws ValidationError
-  Future<CategoryAmount> saveAmount({
+  Future<Budget> saveBudget({
     required Category category,
     required Period period,
     required double amount,
@@ -17,16 +17,16 @@ abstract class CategoryAmountService {
   /// period dates are inclusive.
   ///
   /// Should save given period as last used.
-  Future<List<CategoryAmount>> listAmounts({
+  Future<List<Budget>> listBudgets({
     required Period period,
-    Sort? amountSort,
+    Sort? budgetSort,
     bool showZeroAmount = false,
   });
 
   /// period dates are inclusive.
   ///
   /// Should save given period as last used.
-  Future<void> deleteAmount({
+  Future<void> deleteBudget({
     required Category category,
     required Period period,
   });
@@ -39,12 +39,12 @@ abstract class CategoryAmountService {
   /// Duplicates previous used period amounts into given one.
   ///
   /// Should save given period as last used.
-  Future copyPreviousPeriodAmountsInto(Period period);
+  Future copyPreviousPeriodBudgetsInto(Period period);
 
   /// Obtains categories transactions total for given period.
   ///
   /// period dates are inclusive.
-  Future<Map<CategoryAmount, double>> categoriesTransactionsTotal({
+  Future<Map<Budget, double>> categoriesTransactionsTotal({
     required Period period,
     bool expensesTransactions = true,
     bool showZeroTotal = false,

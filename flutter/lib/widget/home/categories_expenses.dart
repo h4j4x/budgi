@@ -6,7 +6,7 @@ import '../../l10n/l10n.dart';
 import '../../model/domain/category_amount.dart';
 import '../../model/period.dart';
 import '../../model/sort.dart';
-import '../../service/category_amount.dart';
+import '../../service/budget.dart';
 import '../common/month_field.dart';
 import '../common/responsive.dart';
 import '../common/sort_field.dart';
@@ -21,8 +21,8 @@ class CategoriesExpenses extends StatefulWidget {
 }
 
 class _CategoriesExpensesState extends State<CategoriesExpenses> {
-  final amounts = <CategoryAmount>[];
-  final amountsMap = <CategoryAmount, double>{};
+  final amounts = <Budget>[];
+  final amountsMap = <Budget, double>{};
 
   bool loading = false;
 
@@ -43,7 +43,7 @@ class _CategoriesExpensesState extends State<CategoriesExpenses> {
       loading = true;
     });
     final values = await DI()
-        .get<CategoryAmountService>()
+        .get<BudgetService>()
         .categoriesTransactionsTotal(period: period);
     amounts.clear();
     amounts.addAll(values.keys);
@@ -136,7 +136,7 @@ class _CategoriesExpensesState extends State<CategoriesExpenses> {
     );
   }
 
-  Widget listItem(CategoryAmount item) {
+  Widget listItem(Budget item) {
     final budget = item.amount;
     final amount = (amountsMap[item] ?? 0).abs();
     final diff = budget - amount;

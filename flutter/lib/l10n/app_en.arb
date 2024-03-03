@@ -75,6 +75,7 @@
       }
     }
   },
+  "invalidBudgetPeriod": "Invalid budget period",
   "invalidTransaction": "Invalid transaction.",
   "invalidTransactionAmount": "Invalid transaction amount. Enter a non negative number for amount.",
   "invalidTransactionDeferredMonths": "Invalid transaction deferred months.",

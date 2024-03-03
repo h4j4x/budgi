@@ -8,9 +8,9 @@ import '../model/domain/category_amount.dart';
 import '../model/domain/transaction.dart';
 import '../model/domain/wallet.dart';
 import '../page/categories.dart';
-import '../page/categories_amounts.dart';
+import '../page/budgets.dart';
 import '../page/category.dart';
-import '../page/category_amount.dart';
+import '../page/budget.dart';
 import '../page/home.dart';
 import '../page/sign_in.dart';
 import '../page/splash.dart';
@@ -70,22 +70,22 @@ final _routes = <AppRoute>[
   ),
   // budget categories amounts
   AppRoute(
-    path: CategoriesAmountsPage.route,
-    icon: AppIcon.categoryAmount,
+    path: BudgetsPage.route,
+    icon: AppIcon.budget,
     menuTextBuilder: (context) {
       return L10n.of(context).budgetsAmounts;
     },
     pageBuilder: (_, __) {
-      return const CategoriesAmountsPage();
+      return const BudgetsPage();
     },
   ),
   // budget category amount
   AppRoute(
-    path: CategoryAmountPage.route,
+    path: BudgetPage.route,
     pageBuilder: (_, state) {
-      if (state.extra is CategoryAmountData) {
-        return CategoryAmountPage.data(
-          state.extra as CategoryAmountData,
+      if (state.extra is BudgetData) {
+        return BudgetPage.data(
+          state.extra as BudgetData,
         );
       }
       return const HomePage();

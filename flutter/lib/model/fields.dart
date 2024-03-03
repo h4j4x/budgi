@@ -7,6 +7,10 @@ const amountField = 'amount';
 const includingCodesField = 'includingCodes';
 const excludingCodesField = 'excludingCodes';
 
+/// budget
+const fromDateField = 'fromDate';
+const toDateField = 'toDate';
+
 /// wallet
 const walletTypeField = 'walletType';
 

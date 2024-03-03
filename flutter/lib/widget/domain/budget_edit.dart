@@ -9,18 +9,18 @@ import '../../model/error/category.dart';
 import '../../model/error/validation.dart';
 import '../../model/period.dart';
 import '../../service/category.dart';
-import '../../service/category_amount.dart';
+import '../../service/budget.dart';
 import '../../service/impl/category_amount_validator.dart';
 import '../../service/spring/http_client.dart';
 import '../../util/ui.dart';
 import '../common/form_toolbar.dart';
 import 'category_select.dart';
 
-class CategoryAmountEdit extends StatefulWidget {
-  final CategoryAmount? value;
+class BudgetEdit extends StatefulWidget {
+  final Budget? value;
   final Period period;
 
-  const CategoryAmountEdit({
+  const BudgetEdit({
     super.key,
     this.value,
     required this.period,
@@ -28,11 +28,11 @@ class CategoryAmountEdit extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return _CategoryAmountEditState();
+    return _BudgetEditState();
   }
 }
 
-class _CategoryAmountEditState extends State<CategoryAmountEdit> {
+class _BudgetEditState extends State<BudgetEdit> {
   final amountController = TextEditingController();
   final amountFocus = FocusNode();
   final errors = <String, CategoryError>{};
@@ -94,12 +94,12 @@ class _CategoryAmountEditState extends State<CategoryAmountEdit> {
       enabled: widget.value == null,
       onChanged: (value) {
         setState(() {
-          errors.remove(CategoryAmountValidator.category);
+          errors.remove(BudgetValidator.category);
           category = value;
         });
       },
       hintText: L10n.of(context).budgetAmountCategoryHint,
-      errorText: errors[CategoryAmountValidator.category]?.l10n(context),
+      errorText: errors[BudgetValidator.category]?.l10n(context),
     );
   }
 
@@ -115,11 +115,11 @@ class _CategoryAmountEditState extends State<CategoryAmountEdit> {
       decoration: InputDecoration(
         labelText: l10n.budgetAmount,
         hintText: l10n.budgetAmountHint,
-        errorText: errors[CategoryAmountValidator.amount]?.l10n(context),
+        errorText: errors[BudgetValidator.amount]?.l10n(context),
       ),
       onChanged: (_) {
         setState(() {
-          errors.remove(CategoryAmountValidator.amount);
+          errors.remove(BudgetValidator.amount);
         });
       },
       onSubmitted: (_) {
@@ -135,8 +135,7 @@ class _CategoryAmountEditState extends State<CategoryAmountEdit> {
 
     if (category == null) {
       setState(() {
-        errors[CategoryAmountValidator.category] =
-            CategoryError.invalidCategory;
+        errors[BudgetValidator.category] = CategoryError.invalidCategory;
       });
       return;
     }
@@ -147,7 +146,7 @@ class _CategoryAmountEditState extends State<CategoryAmountEdit> {
     });
     try {
       final amount = double.tryParse(amountController.text) ?? -1;
-      await DI().get<CategoryAmountService>().saveAmount(
+      await DI().get<BudgetService>().saveBudget(
             category: category!,
             period: widget.period,
             amount: amount,

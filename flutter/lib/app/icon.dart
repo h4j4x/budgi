@@ -15,12 +15,12 @@ class AppIcon {
     return const _Icon(FontAwesomeIcons.plus);
   }
 
-  static Widget get category {
-    return const _Icon(FontAwesomeIcons.tags);
+  static Widget get budget {
+    return const _Icon(FontAwesomeIcons.userTag);
   }
 
-  static Widget get categoryAmount {
-    return const _Icon(FontAwesomeIcons.userTag);
+  static Widget get category {
+    return const _Icon(FontAwesomeIcons.tags);
   }
 
   static Widget get calendar {

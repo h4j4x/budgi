@@ -33,7 +33,7 @@ void main() {
     expect(list.length, equals(total - 1));
   });
 
-  test('.saveAmount(), .listAmounts(), .removeAmount()', () async {
+  test('.saveBudget(), .listBudgets(), .removeBudget()', () async {
     final service = CategoryMemoryService();
 
     final startDate = DateTime.now();
@@ -50,33 +50,33 @@ void main() {
       final period = Period(from: fromDate, to: toDate);
 
       final amount = i.toDouble();
-      final categoryAmount = await service.saveAmount(
+      final budget = await service.saveBudget(
         category: category,
         period: period,
         amount: amount,
       );
-      expect(categoryAmount.category, equals(category));
-      expect(categoryAmount.period.from, equals(fromDate));
-      expect(categoryAmount.period.to, equals(toDate));
-      expect(categoryAmount.amount, equals(amount));
+      expect(budget.category, equals(category));
+      expect(budget.period.from, equals(fromDate));
+      expect(budget.period.to, equals(toDate));
+      expect(budget.amount, equals(amount));
 
-      var list = await service.listAmounts(
+      var list = await service.listBudgets(
         period: period,
       );
       expect(list.length, equals(1));
 
-      await service.deleteAmount(
+      await service.deleteBudget(
         category: category,
         period: period,
       );
-      list = await service.listAmounts(
+      list = await service.listBudgets(
         period: period,
       );
       expect(list.length, equals(0));
     }
   });
 
-  test('.listAmounts() with sort', () async {
+  test('.listBudgets() with sort', () async {
     final service = CategoryMemoryService();
 
     final fromDate = DateTime.now();
@@ -90,18 +90,18 @@ void main() {
         name: name,
       );
 
-      final categoryAmount = await service.saveAmount(
+      final budget = await service.saveBudget(
         category: category,
         period: period,
         amount: random.nextDouble(),
       );
-      expect(categoryAmount.category, equals(category));
+      expect(budget.category, equals(category));
     }
 
     // ASC
-    var list = await service.listAmounts(
+    var list = await service.listBudgets(
       period: period,
-      amountSort: Sort.asc,
+      budgetSort: Sort.asc,
     );
     var lastAmount = -1.0;
     for (var value in list) {
@@ -110,9 +110,9 @@ void main() {
     }
 
     // DESC
-    list = await service.listAmounts(
+    list = await service.listBudgets(
       period: period,
-      amountSort: Sort.desc,
+      budgetSort: Sort.desc,
     );
     lastAmount = double.infinity;
     for (var value in list) {
@@ -121,7 +121,7 @@ void main() {
     }
   });
 
-  test('.saveAmount() with update', () async {
+  test('.saveBudget() with update', () async {
     final service = CategoryMemoryService();
 
     final category = await service.saveCategory(
@@ -132,20 +132,20 @@ void main() {
     final toDate = fromDate.add(const Duration(days: 2));
     final period = Period(from: fromDate, to: toDate);
 
-    final categoryAmount = await service.saveAmount(
+    final budget = await service.saveBudget(
       category: category,
       period: period,
       amount: 10.0,
     );
-    expect(categoryAmount.category, equals(category));
+    expect(budget.category, equals(category));
 
-    var list = await service.listAmounts(
+    var list = await service.listBudgets(
       period: period,
     );
     expect(list.length, equals(1));
 
     const updatedAmount = 20.0;
-    final updated = await service.saveAmount(
+    final updated = await service.saveBudget(
       category: category,
       period: period,
       amount: updatedAmount,
@@ -153,14 +153,14 @@ void main() {
     expect(updated.category, equals(category));
     expect(updated.amount, equals(updatedAmount));
 
-    list = await service.listAmounts(
+    list = await service.listBudgets(
       period: period,
     );
     expect(list.length, equals(1));
     expect(list[0].amount, equals(updatedAmount));
   });
 
-  test('Copies previous period amounts and save current', () async {
+  test('Copies previous period budgets and save current', () async {
     final service = CategoryMemoryService();
 
     final category = await service.saveCategory(
@@ -174,7 +174,7 @@ void main() {
     var periodHasChanged = await service.periodHasChanged(period);
     expect(periodHasChanged, isFalse);
 
-    final categoryAmount = await service.saveAmount(
+    final budget = await service.saveBudget(
       category: category,
       period: period,
       amount: 10.0,
@@ -188,13 +188,13 @@ void main() {
     periodHasChanged = await service.periodHasChanged(newPeriod);
     expect(periodHasChanged, isTrue);
 
-    await service.copyPreviousPeriodAmountsInto(newPeriod);
-    final list = await service.listAmounts(
+    await service.copyPreviousPeriodBudgetsInto(newPeriod);
+    final list = await service.listBudgets(
       period: newPeriod,
     );
     expect(list.length, equals(1));
-    expect(list[0].category, equals(categoryAmount.category));
+    expect(list[0].category, equals(budget.category));
     expect(list[0].period, equals(newPeriod));
-    expect(list[0].amount, equals(categoryAmount.amount));
+    expect(list[0].amount, equals(budget.amount));
   });
 }

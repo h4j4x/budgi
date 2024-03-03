@@ -1,31 +1,31 @@
 import '../period.dart';
 import 'category.dart';
 
-abstract class CategoryAmount {
+abstract class Budget {
   Category get category;
 
   Period get period;
 
   double get amount;
 
-  CategoryAmount copyWith({required Period period});
+  Budget copyWith({required Period period});
 }
 
-class CategoryAmountData extends Period {
-  final CategoryAmount? amount;
+class BudgetData extends Period {
+  final Budget? budget;
 
-  CategoryAmountData({
-    this.amount,
+  BudgetData({
+    this.budget,
     required super.from,
     required super.to,
   });
 
-  factory CategoryAmountData.fromPeriod({
-    CategoryAmount? amount,
+  factory BudgetData.fromPeriod({
+    Budget? budget,
     required Period period,
   }) {
-    return CategoryAmountData(
-      amount: amount,
+    return BudgetData(
+      budget: budget,
       from: period.from,
       to: period.to,
     );

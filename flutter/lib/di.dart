@@ -4,7 +4,7 @@ import 'app/config.dart';
 import 'app/info.dart';
 import 'service/auth.dart';
 import 'service/category.dart';
-import 'service/category_amount.dart';
+import 'service/budget.dart';
 import 'service/impl/category_amount_validator.dart';
 import 'service/impl/category_validator.dart';
 import 'service/impl/storage.dart';
@@ -14,6 +14,7 @@ import 'service/memory/category_memory.dart';
 import 'service/memory/transaction_memory.dart';
 import 'service/memory/wallet_memory.dart';
 import 'service/spring/auth_spring.dart';
+import 'service/spring/budget_spring.dart';
 import 'service/spring/category_spring.dart';
 import 'service/spring/config.dart';
 import 'service/spring/transaction_spring.dart';
@@ -73,10 +74,10 @@ class DI {
     );
     _getIt.registerSingleton<CategoryService>(categoryService);
 
-    // TODO: implement service
-    _getIt.registerSingleton<CategoryAmountService>(CategoryMemoryService(
-      categoryValidator: CategoryValidator(),
-      amountValidator: CategoryAmountValidator(),
+    _getIt.registerSingleton<BudgetService>(BudgetSpringService(
+      authService: authService,
+      budgetValidator: BudgetValidator(),
+      config: springConfig,
     ));
 
     final walletService = WalletSpringService(
@@ -98,10 +99,10 @@ class DI {
   Future<void> _configMemory(AppConfig config) async {
     final categoryService = CategoryMemoryService(
       categoryValidator: CategoryValidator(),
-      amountValidator: CategoryAmountValidator(),
+      budgetValidator: BudgetValidator(),
     );
     _getIt.registerSingleton<CategoryService>(categoryService);
-    _getIt.registerSingleton<CategoryAmountService>(categoryService);
+    _getIt.registerSingleton<BudgetService>(categoryService);
 
     _getIt.registerSingleton<WalletService>(WalletMemoryService(
       walletValidator: WalletValidator(),

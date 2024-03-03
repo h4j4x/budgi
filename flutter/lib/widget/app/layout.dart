@@ -188,7 +188,9 @@ class _AppScaffoldState extends State<AppScaffold> {
       return IconButton(
         onPressed: onTap,
         icon: route.icon ?? Container(),
-        tooltip: route.menuTextBuilder != null ? route.menuTextBuilder!(context) : null,
+        tooltip: route.menuTextBuilder != null
+            ? route.menuTextBuilder!(context)
+            : null,
       );
     }
     return ListTile(
