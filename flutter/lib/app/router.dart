@@ -190,12 +190,13 @@ final router = GoRouter(
 );
 
 typedef PageWidgetBuilder = Widget Function(BuildContext, GoRouterState state);
+typedef WidgetBoldBuilder = Widget Function(BuildContext context, bool bold);
 typedef StringBuilder = String Function(BuildContext context);
 
 class AppRoute {
   final bool anon;
   final String path;
-  final WidgetBuilder? menuWidgetBuilder;
+  final WidgetBoldBuilder? menuWidgetBuilder;
   final StringBuilder? menuTextBuilder;
   final Widget? icon;
   final PageWidgetBuilder pageBuilder;
@@ -213,12 +214,17 @@ class AppRoute {
     return menuWidgetBuilder != null || menuTextBuilder != null;
   }
 
-  Widget menuBuilder(BuildContext context) {
+  Widget menuBuilder(BuildContext context, bool selected) {
     if (menuWidgetBuilder != null) {
-      return menuWidgetBuilder!(context);
+      return menuWidgetBuilder!(context, selected);
     }
     if (menuTextBuilder != null) {
-      return Text(menuTextBuilder!(context));
+      return Text(
+        menuTextBuilder!(context),
+        style: TextStyle(
+          fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+        ),
+      );
     }
     return Container();
   }

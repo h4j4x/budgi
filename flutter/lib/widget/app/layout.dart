@@ -116,7 +116,7 @@ class _AppScaffoldState extends State<AppScaffold> {
         children: [
           if (route.icon != null) route.icon!,
           if (route.icon != null) const SizedBox(width: 4),
-          Expanded(child: route.menuBuilder(context)),
+          Expanded(child: route.menuBuilder(context, false)),
         ],
       );
     }
@@ -188,13 +188,11 @@ class _AppScaffoldState extends State<AppScaffold> {
       return IconButton(
         onPressed: onTap,
         icon: route.icon ?? Container(),
-        tooltip: route.menuTextBuilder != null
-            ? route.menuTextBuilder!(context)
-            : null,
+        tooltip: route.menuTextBuilder != null ? route.menuTextBuilder!(context) : null,
       );
     }
     return ListTile(
-      title: route.menuBuilder(context),
+      title: route.menuBuilder(context, selected),
       leading: route.icon,
       selected: selected,
       onTap: onTap,
