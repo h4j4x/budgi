@@ -9,7 +9,7 @@ enum DataProvider {
         }
       }
     }
-    return DataProvider.values[0];
+    return DataProvider.values.first;
   }
 }
 

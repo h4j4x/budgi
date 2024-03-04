@@ -1,0 +1,10 @@
+flutter_launcher_icons:
+  android: false
+  ios: false
+  image_path: "icon/logo-400.png"
+  web:
+    generate: true
+  windows:
+    generate: true
+  macos:
+    generate: true

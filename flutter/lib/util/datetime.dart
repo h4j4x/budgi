@@ -20,6 +20,10 @@ extension DateTimeExtension on DateTime {
     }
     return add(Duration.zero);
   }
+
+  String toApiString() {
+    return '$year$month$day';
+  }
 }
 
 String formatDateTimePeriod(
@@ -27,8 +31,7 @@ String formatDateTimePeriod(
   required Period period,
 }) {
   final l10n = L10n.of(context);
-  if (period.from.month == period.to.month &&
-      period.from.year == period.to.year) {
+  if (period.from.month == period.to.month && period.from.year == period.to.year) {
     return l10n.dateMonthYear(period.from);
   }
   return 'TODO';

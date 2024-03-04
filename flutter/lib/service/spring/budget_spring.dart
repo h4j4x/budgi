@@ -9,6 +9,7 @@ import '../../model/error/validation.dart';
 import '../../model/fields.dart';
 import '../../model/period.dart';
 import '../../model/sort.dart';
+import '../../util/datetime.dart';
 import '../auth.dart';
 import '../budget.dart';
 import '../validator.dart';
@@ -50,8 +51,7 @@ class BudgetSpringService implements BudgetService {
     required Period period,
   }) async {
     try {
-      await _httpClient.delete(
-          authService: authService, path: '/${category.code}');
+      await _httpClient.delete(authService: authService, path: '/${category.code}');
     } on SocketException catch (_) {
       throw NoServerError();
     } catch (e) {
@@ -78,9 +78,16 @@ class BudgetSpringService implements BudgetService {
   }
 
   @override
-  Future<bool> periodHasChanged(Period period) {
-    // TODO: implement periodHasChanged
-    throw UnimplementedError();
+  Future<bool> periodHasChanged(Period period) async {
+    try {
+      final count = await _httpClient.jsonGet<int>(authService: authService, path: '/count', data: {
+        fromDateField: period.from.toApiString(),
+        toDateField: period.to.toApiString(),
+      });
+      return count < 1;
+    } catch (e) {
+      return false;
+    }
   }
 }
 
