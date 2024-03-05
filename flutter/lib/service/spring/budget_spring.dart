@@ -12,17 +12,20 @@ import '../../model/sort.dart';
 import '../../util/datetime.dart';
 import '../auth.dart';
 import '../budget.dart';
+import '../category.dart';
 import '../validator.dart';
 import 'config.dart';
 import 'http_client.dart';
 
 class BudgetSpringService implements BudgetService {
   final AuthService authService;
+  final CategoryService categoryService;
   final Validator<Budget, BudgetError> budgetValidator;
   final ApiHttpClient _httpClient;
 
   BudgetSpringService({
     required this.authService,
+    required this.categoryService,
     required this.budgetValidator,
     required SpringConfig config,
   }) : _httpClient = ApiHttpClient(baseUrl: '${config.url}/category-budget');
@@ -33,7 +36,25 @@ class BudgetSpringService implements BudgetService {
     Sort? budgetSort,
     bool showZeroAmount = false,
   }) async {
-    return [];
+    try {
+      final list = await _httpClient.jsonGet<List<Map<String, Object>>>(
+        authService: authService,
+        data: {
+          fromDateField: period.from.toApiString(),
+          toDateField: period.to.toApiString(),
+        },
+      );
+      final categoryCodes = list
+          .map((item) {
+            return item[categoryCodeField] as String?;
+          })
+          .whereType<String>()
+          .toSet();
+      final categories = (await categoryService.listCategories(includingCodes: categoryCodes)).content;
+      return list.map((map) => _SpringBudget.from(map, categories)).whereType<Budget>().toList();
+    } on SocketException catch (_) {
+      throw NoServerError();
+    }
   }
 
   @override
@@ -116,21 +137,21 @@ class _SpringBudget implements Budget {
     };
   }
 
-  // static _SpringBudget? from(dynamic raw, List<Category> categories) {
-  //   if (raw is Map<String, dynamic>) {
-  //     final categoryCode = raw[categoryCodeField] as String?;
-  //     final category = categories.where((c) => c.code == categoryCode).firstOrNull;
-  //     final fromDateStr = raw[fromDateField] as String?;
-  //     final fromDate = DateTime.tryParse(fromDateStr ?? '');
-  //     final toDateStr = raw[toDateField] as String?;
-  //     final toDate = DateTime.tryParse(toDateStr ?? '');
-  //     final amount = raw[amountField] as double?;
-  //     if (category != null && fromDate != null && toDate != null && amount != null) {
-  //       return _SpringBudget(category: category, period: Period(from: fromDate, to: toDate), amount: amount);
-  //     }
-  //   }
-  //   return null;
-  // }
+  static _SpringBudget? from(dynamic raw, List<Category> categories) {
+    if (raw is Map<String, dynamic>) {
+      final categoryCode = raw[categoryCodeField] as String?;
+      final category = categories.where((c) => c.code == categoryCode).firstOrNull;
+      final fromDateStr = raw[fromDateField] as String?;
+      final fromDate = DateTime.tryParse(fromDateStr ?? '');
+      final toDateStr = raw[toDateField] as String?;
+      final toDate = DateTime.tryParse(toDateStr ?? '');
+      final amount = raw[amountField] as double?;
+      if (category != null && fromDate != null && toDate != null && amount != null) {
+        return _SpringBudget(category: category, period: Period(from: fromDate, to: toDate), amount: amount);
+      }
+    }
+    return null;
+  }
 
   @override
   Budget copyWith({required Period period}) {

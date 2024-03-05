@@ -9,7 +9,7 @@ import java.time.ZoneId;
 import java.util.Calendar;
 import org.springframework.data.util.Pair;
 
-public class DateTimeUtil {
+public interface DateTimeUtil {
     @NotNull
     public static OffsetDateTime calendarToOffsetDateTime(@NotNull Calendar calendar) {
         return OffsetDateTime.ofInstant(calendar.toInstant(), ZoneId.systemDefault());

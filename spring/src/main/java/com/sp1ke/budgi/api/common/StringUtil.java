@@ -4,7 +4,7 @@ import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import java.util.Random;
 
-public class StringUtil {
+public interface StringUtil {
     @NotNull
     public static String randomString(int length) {
         var random = new Random();

@@ -3,8 +3,8 @@ import 'package:get_it/get_it.dart';
 import 'app/config.dart';
 import 'app/info.dart';
 import 'service/auth.dart';
-import 'service/category.dart';
 import 'service/budget.dart';
+import 'service/category.dart';
 import 'service/impl/category_amount_validator.dart';
 import 'service/impl/category_validator.dart';
 import 'service/impl/storage.dart';
@@ -57,8 +57,7 @@ class DI {
     return _getIt.isRegistered<T>();
   }
 
-  Future<void> _configSpring(
-      AppConfig config, StorageService storageService) async {
+  Future<void> _configSpring(AppConfig config, StorageService storageService) async {
     final springConfig = SpringConfig(url: config.apiUrl!);
     final authService = AuthSpringService(
       storageService: storageService,
@@ -76,6 +75,7 @@ class DI {
 
     _getIt.registerSingleton<BudgetService>(BudgetSpringService(
       authService: authService,
+      categoryService: categoryService,
       budgetValidator: BudgetValidator(),
       config: springConfig,
     ));

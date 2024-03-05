@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 
-public class ValidatorUtil {
+public interface ValidatorUtil {
     public static void validate(@NotNull Validator validator, @NotNull Object object) {
         var violations = validator.validate(object);
         if (!violations.isEmpty()) {

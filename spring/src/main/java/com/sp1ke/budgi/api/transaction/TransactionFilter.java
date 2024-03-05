@@ -2,6 +2,7 @@ package com.sp1ke.budgi.api.transaction;
 
 import com.sp1ke.budgi.api.common.ApiFilter;
 import com.sp1ke.budgi.api.common.DateTimeUtil;
+import com.sp1ke.budgi.api.common.ObjectUtil;
 import com.sp1ke.budgi.api.common.StringUtil;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
@@ -48,7 +49,7 @@ public class TransactionFilter extends ApiFilter<ApiTransaction> {
         }
         categoryCode = map.get("categoryCode");
         walletCode = map.get("walletCode");
-        from = DateTimeUtil.parseLocalDate(map.get("from"));
+        from = DateTimeUtil.parseLocalDate(ObjectUtil.<String>firstNonNull(map.get("from"), map.get("fromDate")));
         to = DateTimeUtil.parseLocalDate(map.get("to"));
     }
 
