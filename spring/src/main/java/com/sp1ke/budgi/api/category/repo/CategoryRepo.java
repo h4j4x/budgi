@@ -13,6 +13,8 @@ import org.springframework.stereotype.Repository;
 public interface CategoryRepo extends CrudRepository<JpaCategory, Long> {
     Page<JpaCategory> findAllByUserId(Long userId, Pageable pageable);
 
+    Long countByUserId(Long userId);
+
     Optional<JpaCategory> findByUserIdAndCode(Long userId, String code);
 
     void deleteByUserIdAndCode(Long userId, String code);

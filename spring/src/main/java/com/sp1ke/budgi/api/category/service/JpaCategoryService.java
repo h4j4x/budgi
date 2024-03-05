@@ -43,6 +43,23 @@ public class JpaCategoryService implements CategoryService {
         return page.map(this::mapToApiCategory);
     }
 
+    @Override
+    @NotNull
+    public Long count(@NotNull Long userId, @Nullable CategoryFilter filter) {
+        if (filter == null || filter.isEmpty()) {
+            return categoryRepo.countByUserId(userId);
+        }
+
+        var criteriaBuilder = entityManager.getCriteriaBuilder();
+        var countQuery = criteriaBuilder.createQuery(Long.class);
+        var countRoot = countQuery.from(JpaCategory.class);
+        countQuery
+            .select(criteriaBuilder.countDistinct(countRoot))
+            .where(where(criteriaBuilder, countRoot, userId, filter));
+
+        return entityManager.createQuery(countQuery).getSingleResult();
+    }
+
     private Page<JpaCategory> fetchPage(@NotNull Long userId, @NotNull Pageable pageable,
                                         @Nullable CategoryFilter filter) {
         if (filter == null || filter.isEmpty()) {
@@ -51,22 +68,17 @@ public class JpaCategoryService implements CategoryService {
 
         var criteriaBuilder = entityManager.getCriteriaBuilder();
         var listQuery = criteriaBuilder.createQuery(JpaCategory.class);
-        var countQuery = criteriaBuilder.createQuery(Long.class);
         var root = listQuery.from(JpaCategory.class);
-        var listRoot = countQuery.from(JpaCategory.class);
 
         listQuery
             .distinct(true)
             .where(where(criteriaBuilder, root, userId, filter))
             .orderBy(QueryUtils.toOrders(pageable.getSort(), root, criteriaBuilder));
-        countQuery
-            .select(criteriaBuilder.countDistinct(listRoot))
-            .where(where(criteriaBuilder, listRoot, userId, filter));
         var list = entityManager.createQuery(listQuery)
             .setFirstResult(pageable.getPageNumber())
             .setMaxResults(pageable.getPageSize())
             .getResultList();
-        var count = entityManager.createQuery(countQuery).getSingleResult();
+        var count = count(userId, filter);
         return new PageImpl<>(list, pageable, count);
     }
 

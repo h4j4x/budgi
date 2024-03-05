@@ -16,6 +16,9 @@ public interface CrudService<T, F extends ApiFilter<T>> {
     Page<T> fetch(@NotNull Long userId, @NotNull Pageable pageable, @Nullable F filter);
 
     @NotNull
+    Long count(@NotNull Long userId, @Nullable F filter);
+
+    @NotNull
     T save(@NotNull Long userId, @NotNull T data, boolean throwIfExists);
 
     Optional<T> findByCode(@NotNull Long userId, @NotNull String code);

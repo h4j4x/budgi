@@ -39,6 +39,13 @@ public class JpaCategoryBudgetService implements CategoryBudgetService {
     }
 
     @Override
+    @NotNull
+    public Long count(@NotNull Long userId, @Nullable CategoryBudgetFilter filter) {
+        var filterValue = filter != null ? filter : new CategoryBudgetFilter();
+        return categoryBudgetRepo.countByUserIdAndFromDateAndToDate(userId, filterValue.fromDate(), filterValue.toDate());
+    }
+
+    @Override
     public ApiCategoryBudget save(@NotNull Long userId, @NotNull ApiCategoryBudget data, boolean ignored) {
         var categoryId = categoryService.findIdByCode(userId, data.getCategoryCode());
         if (categoryId.isEmpty()) {

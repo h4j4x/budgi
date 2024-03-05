@@ -13,6 +13,8 @@ import org.springframework.stereotype.Repository;
 public interface WalletRepo extends CrudRepository<JpaWallet, Long> {
     Page<JpaWallet> findAllByUserId(Long userId, Pageable pageable);
 
+    Long countByUserId(Long userId);
+
     Optional<JpaWallet> findByUserIdAndCode(Long userId, String code);
 
     void deleteByUserIdAndCode(Long userId, String code);

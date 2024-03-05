@@ -17,6 +17,8 @@ import org.springframework.stereotype.Repository;
 public interface TransactionRepo extends CrudRepository<JpaTransaction, Long> {
     Page<JpaTransaction> findAllByUserId(Long userId, Pageable pageable);
 
+    Long countByUserId(Long userId);
+
     Optional<JpaTransaction> findByUserIdAndCode(Long userId, String code);
 
     void deleteByUserIdAndCode(Long userId, String code);

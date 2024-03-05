@@ -97,6 +97,14 @@ public class CategoryController {
         return ResponseEntity.ok(apiCategoryBudget);
     }
 
+    @GetMapping("/category-budget/count")
+    ResponseEntity<Long> countBudgets(@AuthenticationPrincipal AuthUser principal,
+                                         @RequestParam Map<String, String> params) {
+        var filter = CategoryBudgetFilter.parseMap(params);
+        var count = categoryBudgetService.count(principal.userId(), filter);
+        return ResponseEntity.ok(count);
+    }
+
     @PutMapping("/category-budget/{code}")
     ResponseEntity<ApiCategoryBudget> updateBudgetByCode(@AuthenticationPrincipal AuthUser principal,
                                                          @PathVariable String code,

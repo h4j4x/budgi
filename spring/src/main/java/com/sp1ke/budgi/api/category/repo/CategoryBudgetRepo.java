@@ -16,6 +16,8 @@ public interface CategoryBudgetRepo extends CrudRepository<JpaCategoryBudget, Lo
                                                                 LocalDate fromDate, LocalDate toDate,
                                                                 Pageable pageable);
 
+    Long countByUserIdAndFromDateAndToDate(Long userId, LocalDate fromDate, LocalDate toDate);
+
     Optional<JpaCategoryBudget> findByUserIdAndCode(Long userId, String code);
 
     void deleteByUserIdAndCode(Long userId, String code);
