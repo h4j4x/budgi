@@ -465,7 +465,63 @@
 			"response": []
 		},
 		{
-			"name": "011-transaction-add",
+			"name": "011-category-budget-count",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200', () => {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"pm.test('Body contains data', () => {",
+							"  var count = Number.parseInt(pm.response.json());",
+							"  pm.expect(count).to.equal(1);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var moment = require('moment');",
+							"pm.variables.set('fromDate', moment().format(('YYYY-MM-01')));",
+							"pm.variables.set('toDate', moment().format(('YYYY-MM-DD')));",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{categoryBudgetUrl}}/count?from={{fromDate}}&to={{toDate}}",
+					"host": [
+						"{{categoryBudgetUrl}}"
+					],
+					"path": [
+						"count"
+					],
+					"query": [
+						{
+							"key": "from",
+							"value": "{{fromDate}}"
+						},
+						{
+							"key": "to",
+							"value": "{{toDate}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "012-transaction-add",
 			"event": [
 				{
 					"listen": "test",
@@ -515,7 +571,7 @@
 			"response": []
 		},
 		{
-			"name": "012-transaction-list",
+			"name": "013-transaction-list",
 			"event": [
 				{
 					"listen": "test",
@@ -555,7 +611,7 @@
 			"response": []
 		},
 		{
-			"name": "013-transaction-stats",
+			"name": "014-transaction-stats",
 			"event": [
 				{
 					"listen": "test",
