@@ -6,28 +6,37 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.YearMonth;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import org.springframework.data.util.Pair;
 
 public interface DateTimeUtil {
     @NotNull
-    public static OffsetDateTime calendarToOffsetDateTime(@NotNull Calendar calendar) {
+    static OffsetDateTime calendarToOffsetDateTime(@NotNull Calendar calendar) {
         return OffsetDateTime.ofInstant(calendar.toInstant(), ZoneId.systemDefault());
     }
 
     @Nullable
-    public static LocalDate parseLocalDate(@Nullable String value) {
-        try {
-            if (value != null) {
-                return LocalDate.parse(value);
+    static LocalDate parseLocalDate(@Nullable String value) {
+        if (value != null) {
+            var formats = new String[] {
+                "yyyy-MM-dd", "dd-MM-yyyy",
+                "yyyy/MM/dd", "dd/MM/yyyy",
+                "yyyyMMdd", "ddMMyyyy"
+            };
+            for (var format : formats) {
+                try {
+                    var formatter = DateTimeFormatter.ofPattern(format);
+                    return LocalDate.parse(value, formatter);
+                } catch (Exception ignored) {
+                }
             }
-        } catch (Exception ignored) {
         }
         return null;
     }
 
     @Nullable
-    public static OffsetDateTime localDateToOffsetDateTime(@Nullable LocalDate date) {
+    static OffsetDateTime localDateToOffsetDateTime(@Nullable LocalDate date) {
         if (date != null) {
             return date.atStartOfDay(ZoneId.systemDefault()).toOffsetDateTime();
         }
@@ -35,8 +44,8 @@ public interface DateTimeUtil {
     }
 
     @NotNull
-    public static Pair<LocalDate, LocalDate> findDatesPeriod(@NotNull OffsetDateTime dateTime,
-                                                             @NotNull PeriodType periodType) {
+    static Pair<LocalDate, LocalDate> findDatesPeriod(@NotNull OffsetDateTime dateTime,
+                                                      @NotNull PeriodType periodType) {
         // defaults MONTHLY
         var yearMonth = YearMonth.of(dateTime.getYear(), dateTime.getMonth());
         var fromDate = yearMonth.atDay(1);

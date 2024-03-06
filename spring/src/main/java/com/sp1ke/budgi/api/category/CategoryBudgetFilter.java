@@ -3,7 +3,6 @@ package com.sp1ke.budgi.api.category;
 import com.sp1ke.budgi.api.common.ApiFilter;
 import com.sp1ke.budgi.api.common.DateTimeUtil;
 import com.sp1ke.budgi.api.common.ObjectUtil;
-
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -31,8 +30,8 @@ public class CategoryBudgetFilter extends ApiFilter<ApiCategoryBudget> {
     protected void parseFromMap(Map<String, String> map) {
         super.parseFromMap(map);
         categoryCode = map.get("categoryCode");
-        from = DateTimeUtil.parseLocalDate(ObjectUtil.<String>firstNonNull(map.get("from"), map.get("fromDate")));
-        to = DateTimeUtil.parseLocalDate(map.get("to"));
+        from = DateTimeUtil.parseLocalDate(ObjectUtil.firstNonNull(map.get("from"), map.get("fromDate")));
+        to = DateTimeUtil.parseLocalDate(ObjectUtil.firstNonNull(map.get("to"), map.get("toDate")));
     }
 
     @Override

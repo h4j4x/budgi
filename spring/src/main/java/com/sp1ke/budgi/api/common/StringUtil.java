@@ -6,7 +6,7 @@ import java.util.Random;
 
 public interface StringUtil {
     @NotNull
-    public static String randomString(int length) {
+    static String randomString(int length) {
         var random = new Random();
         return random.ints('0', 'z' + 1)
             .filter(i -> (i <= '9' || i >= 'A') && (i <= 'Z' || i >= 'a'))
@@ -16,22 +16,22 @@ public interface StringUtil {
     }
 
     @NotNull
-    public static String removePrefix(@NotNull String value, @NotNull String prefix) {
+    static String removePrefix(@NotNull String value, @NotNull String prefix) {
         if (value.startsWith(prefix)) {
             return value.substring(prefix.length());
         }
         return value;
     }
 
-    public static boolean isNotBlank(@Nullable String value) {
+    static boolean isNotBlank(@Nullable String value) {
         return value != null && !value.isBlank();
     }
 
-    public static boolean isBlank(@Nullable String value) {
+    static boolean isBlank(@Nullable String value) {
         return value == null || value.isBlank();
     }
 
-    public static String tail(@Nullable String value, int length) {
+    static String tail(@Nullable String value, int length) {
         if (value != null) {
             if (length >= value.length()) {
                 return value;

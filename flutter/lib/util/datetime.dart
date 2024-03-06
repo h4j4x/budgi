@@ -22,7 +22,7 @@ extension DateTimeExtension on DateTime {
   }
 
   String toApiString() {
-    return '$year$month$day';
+    return '${year.toString().padLeft(4, '0')}${month.toString().padLeft(2, '0')}${day.toString().padLeft(2, '0')}';
   }
 }
 
@@ -31,7 +31,8 @@ String formatDateTimePeriod(
   required Period period,
 }) {
   final l10n = L10n.of(context);
-  if (period.from.month == period.to.month && period.from.year == period.to.year) {
+  if (period.from.month == period.to.month &&
+      period.from.year == period.to.year) {
     return l10n.dateMonthYear(period.from);
   }
   return 'TODO';

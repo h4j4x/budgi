@@ -49,8 +49,8 @@ public class TransactionFilter extends ApiFilter<ApiTransaction> {
         }
         categoryCode = map.get("categoryCode");
         walletCode = map.get("walletCode");
-        from = DateTimeUtil.parseLocalDate(ObjectUtil.<String>firstNonNull(map.get("from"), map.get("fromDate")));
-        to = DateTimeUtil.parseLocalDate(map.get("to"));
+        from = DateTimeUtil.parseLocalDate(ObjectUtil.firstNonNull(map.get("from"), map.get("fromDate")));
+        to = DateTimeUtil.parseLocalDate(ObjectUtil.firstNonNull(map.get("to"), map.get("toDate")));
     }
 
     public boolean hasInvalidDates() {
