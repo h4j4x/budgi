@@ -3,6 +3,7 @@ plugins {
   id 'org.springframework.boot' version "${springVersion}"
   id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
   id 'com.google.cloud.tools.jib' version "${jibVersion}"
+  id 'com.github.ben-manes.versions' version "${benManesVersion}"
 }
 
 group = 'com.sp1ke.budgi'

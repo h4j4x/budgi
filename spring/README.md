@@ -28,6 +28,13 @@ You can use [Nix](https://nixos.org) for a portable dev environment. Launch the 
 nix-shell
 ```
 
+### Check dependencies
+
+Using [Gradle Versions Plugin](https://github.com/ben-manes/gradle-versions-plugin):
+```shell
+./gradlew dependencyUpdates
+```
+
 ### Configuration
 
 All configurations should be done in [.env file](./.env), create it if not exists.
