@@ -1,9 +1,6 @@
 package com.sp1ke.budgi.api.transaction.service;
 
-import com.sp1ke.budgi.api.category.ApiCategory;
-import com.sp1ke.budgi.api.category.ApiCategoryBudget;
-import com.sp1ke.budgi.api.category.CategoryBudgetService;
-import com.sp1ke.budgi.api.category.CategoryService;
+import com.sp1ke.budgi.api.category.*;
 import com.sp1ke.budgi.api.common.DateTimeUtil;
 import com.sp1ke.budgi.api.common.SavedTransactionEvent;
 import com.sp1ke.budgi.api.common.ValidatorUtil;
@@ -234,8 +231,9 @@ public class JpaTransactionService implements TransactionService {
 
         var income = transactionRepo.sumAmountByUserIdAndDatesAndTransactionType(
             userId, from, to, TransactionType.INCOME);
+        var budgetFilter = CategoryBudgetFilter.builder().from(filter.getFrom()).to(filter.getTo()).build();
         var categoryBudget = categoryBudgetService
-            .categoryBudgets(userId, from, to)
+            .categoryBudgets(userId, budgetFilter)
             .stream().collect(Collectors.toMap(ApiCategoryBudget::getCategoryCode, ApiCategoryBudget::getAmount));
         var expense = fetchCategoriesExpenses(userId, from, to);
         var balance = fetchWalletsBalances(userId, from, to);

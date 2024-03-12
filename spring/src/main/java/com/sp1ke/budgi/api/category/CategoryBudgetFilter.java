@@ -7,11 +7,13 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.Map;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
+@Builder
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class CategoryBudgetFilter extends ApiFilter<ApiCategoryBudget> {
     private String categoryCode;
 

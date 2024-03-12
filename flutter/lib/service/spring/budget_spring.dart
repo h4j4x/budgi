@@ -93,9 +93,15 @@ class BudgetSpringService implements BudgetService {
   }
 
   @override
-  Future copyPreviousPeriodBudgetsInto(Period period) {
-    // TODO: implement copyPreviousPeriodBudgetsInto
-    throw UnimplementedError();
+  Future copyPreviousPeriodBudgetsInto(Period period) async {
+    try {
+      await _httpClient.jsonPost(authService: authService, path: '/copy-previous-period', data: {
+        fromDateField: period.from.toApiString(),
+        toDateField: period.to.toApiString(),
+      });
+    } catch (e) {
+      debugPrint('Unexpected error $e');
+    }
   }
 
   @override

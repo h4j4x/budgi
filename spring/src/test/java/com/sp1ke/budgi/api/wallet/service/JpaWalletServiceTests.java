@@ -24,9 +24,9 @@ public class JpaWalletServiceTests {
 
     final WalletBalanceRepo walletBalanceRepo;
 
-    private final UserRepo userRepo;
+    final UserRepo userRepo;
 
-    private final PasswordEncoder passwordEncoder;
+    final PasswordEncoder passwordEncoder;
 
     @Autowired
     public JpaWalletServiceTests(UserRepo userRepo,

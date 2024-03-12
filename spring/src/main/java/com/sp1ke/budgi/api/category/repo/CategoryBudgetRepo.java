@@ -28,4 +28,9 @@ public interface CategoryBudgetRepo extends CrudRepository<JpaCategoryBudget, Lo
         " WHERE userId = :userId" +
         " AND fromDate >= :from AND toDate < :to")
     List<JpaCategoryBudget> findAllByUserIdAndDatesBetween(Long userId, LocalDate from, LocalDate to);
+
+    @Query("SELECT id, categoryId, max(updatedAt) FROM JpaCategoryBudget budget" +
+        " WHERE userId = :userId" +
+        " GROUP BY categoryId ORDER BY max(updatedAt) DESC")
+    List<JpaCategoryBudget> findLastsByUserId(Long userId);
 }

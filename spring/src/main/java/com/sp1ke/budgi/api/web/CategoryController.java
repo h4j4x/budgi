@@ -99,10 +99,18 @@ public class CategoryController {
 
     @GetMapping("/category-budget/count")
     ResponseEntity<Long> countBudgets(@AuthenticationPrincipal AuthUser principal,
-                                         @RequestParam Map<String, String> params) {
+                                      @RequestParam Map<String, String> params) {
         var filter = CategoryBudgetFilter.parseMap(params);
         var count = categoryBudgetService.count(principal.userId(), filter);
         return ResponseEntity.ok(count);
+    }
+
+    @PostMapping("/category-budget/copy-previous-period")
+    ResponseEntity<Void> copyPreviousBudgets(@AuthenticationPrincipal AuthUser principal,
+                                             @RequestParam Map<String, String> params) {
+        var filter = CategoryBudgetFilter.parseMap(params);
+        categoryBudgetService.copyPrevious(principal.userId(), filter);
+        return ResponseEntity.ok(null);
     }
 
     @PutMapping("/category-budget/{code}")

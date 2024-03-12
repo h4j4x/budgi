@@ -10,7 +10,6 @@ import com.sp1ke.budgi.api.common.ValidatorUtil;
 import jakarta.annotation.Nullable;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -87,14 +86,25 @@ public class JpaCategoryBudgetService implements CategoryBudgetService {
 
     @Override
     @NotNull
-    public List<ApiCategoryBudget> categoryBudgets(@NotNull Long userId,
-                                                   @NotNull OffsetDateTime from,
-                                                   @NotNull OffsetDateTime to) {
-        var fromDate = from.toLocalDate();
-        var toDate = to.toLocalDate().plusDays(1);
+    public List<ApiCategoryBudget> categoryBudgets(@NotNull Long userId, @NotNull CategoryBudgetFilter filter) {
+        var fromDate = filter.fromDate();
+        var toDate = filter.toDate().plusDays(1);
         return categoryBudgetRepo
             .findAllByUserIdAndDatesBetween(userId, fromDate, toDate).stream()
             .map((JpaCategoryBudget budget) -> mapToApiCategoryBudget(userId, budget)).toList();
+    }
+
+    @Override
+    public void copyPrevious(@NotNull Long userId, @NotNull CategoryBudgetFilter filter) {
+        var previousBudgets = categoryBudgetRepo.findLastsByUserId(userId);
+        for (var previousBudget : previousBudgets) {
+            var budget = previousBudget.toBuilder()
+                .fromDate(filter.fromDate())
+                .toDate(filter.toDate())
+                .build();
+            ValidatorUtil.validate(validator, budget);
+            categoryBudgetRepo.save(budget);
+        }
     }
 
     @NotNull
