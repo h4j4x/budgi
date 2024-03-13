@@ -95,10 +95,11 @@ public class JpaCategoryBudgetService implements CategoryBudgetService {
     }
 
     @Override
-    public void copyPrevious(@NotNull Long userId, @NotNull CategoryBudgetFilter filter) {
-        var previousBudgets = categoryBudgetRepo.findLastsByUserId(userId);
-        for (var previousBudget : previousBudgets) {
-            var budget = previousBudget.toBuilder()
+    public void copyLastPeriod(@NotNull Long userId, @NotNull CategoryBudgetFilter filter) {
+        var fromDate = categoryBudgetRepo.findLastFromDate(userId);
+        var lastBudgets = categoryBudgetRepo.findAllByUserIdAndFromDate(userId, fromDate);
+        for (var lastBudget : lastBudgets) {
+            var budget = lastBudget.toBuilder()
                 .fromDate(filter.fromDate())
                 .toDate(filter.toDate())
                 .build();

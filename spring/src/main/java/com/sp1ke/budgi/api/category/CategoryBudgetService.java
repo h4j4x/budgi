@@ -8,5 +8,5 @@ public interface CategoryBudgetService extends CrudService<ApiCategoryBudget, Ca
     @NotNull
     List<ApiCategoryBudget> categoryBudgets(@NotNull Long userId, @NotNull CategoryBudgetFilter filter);
 
-    void copyPrevious(@NotNull Long userId, @NotNull CategoryBudgetFilter filter);
+    void copyLastPeriod(@NotNull Long userId, @NotNull CategoryBudgetFilter filter);
 }
