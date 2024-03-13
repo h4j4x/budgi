@@ -180,7 +180,7 @@ class CategoryMemoryService implements CategoryService, BudgetService {
   }
 
   @override
-  Future copyPreviousPeriodBudgetsInto(Period period) {
+  Future<bool> copyPreviousPeriodBudgetsInto(Period period) {
     if (_periods.isNotEmpty) {
       final previousPeriodKey = _periods.last;
       final periodKey = period.toString();
@@ -189,7 +189,7 @@ class CategoryMemoryService implements CategoryService, BudgetService {
         _values[periodKey]!.add(budget.copyWith(period: period));
       }
     }
-    return Future.value();
+    return Future.value(true);
   }
 
   @override

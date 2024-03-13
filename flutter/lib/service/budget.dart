@@ -39,7 +39,7 @@ abstract class BudgetService {
   /// Duplicates previous used period amounts into given one.
   ///
   /// Should save given period as last used.
-  Future copyPreviousPeriodBudgetsInto(Period period);
+  Future<bool> copyPreviousPeriodBudgetsInto(Period period);
 
   /// Obtains categories transactions total for given period.
   ///
