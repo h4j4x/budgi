@@ -21,8 +21,8 @@ extension DateTimeExtension on DateTime {
     return add(Duration.zero);
   }
 
-  String toApiString() {
-    return '${year.toString().padLeft(4, '0')}${month.toString().padLeft(2, '0')}${day.toString().padLeft(2, '0')}';
+  String toDateString() {
+    return '${year.toString().padLeft(4, '0')}-${month.toString().padLeft(2, '0')}-${day.toString().padLeft(2, '0')}';
   }
 }
 

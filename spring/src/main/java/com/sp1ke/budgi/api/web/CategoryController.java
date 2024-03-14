@@ -82,8 +82,8 @@ public class CategoryController {
     }
 
     @PostMapping("/category-budget")
-    ResponseEntity<ApiCategoryBudget> createBudget(@AuthenticationPrincipal AuthUser principal,
-                                                   @RequestBody ApiCategoryBudget budget) {
+    ResponseEntity<ApiCategoryBudget> saveBudget(@AuthenticationPrincipal AuthUser principal,
+                                                 @RequestBody ApiCategoryBudget budget) {
         var apiCategoryBudget = categoryBudgetService.save(principal.userId(), budget, false);
         return ResponseEntity.status(201).body(apiCategoryBudget);
     }

@@ -37,26 +37,24 @@ class BudgetSpringService implements BudgetService {
     bool showZeroAmount = false,
   }) async {
     try {
-      final list = await _httpClient.jsonGet<List<Map<String, Object>>>(
+      final page = await _httpClient.jsonGetPage<dynamic>(
         authService: authService,
+        page: 0,
+        pageSize: 9999,
         data: {
-          fromDateField: period.from.toApiString(),
-          toDateField: period.to.toApiString(),
+          fromDateField: period.from.toDateString(),
+          toDateField: period.to.toDateString(),
         },
+        mapper: (item) => item,
       );
-      final categoryCodes = list
+      final categoryCodes = page
           .map((item) {
             return item[categoryCodeField] as String?;
           })
           .whereType<String>()
           .toSet();
-      final categories =
-          (await categoryService.listCategories(includingCodes: categoryCodes))
-              .content;
-      return list
-          .map((map) => _SpringBudget.from(map, categories))
-          .whereType<Budget>()
-          .toList();
+      final categories = (await categoryService.listCategories(includingCodes: categoryCodes)).content;
+      return page.map((map) => _SpringBudget.from(map, categories)).whereType<Budget>().toList();
     } on SocketException catch (_) {
       throw NoServerError();
     }
@@ -68,7 +66,20 @@ class BudgetSpringService implements BudgetService {
     required Period period,
     required double amount,
   }) async {
-    return _SpringBudget(category: category, period: period, amount: amount);
+    final budget = _SpringBudget(category: category, period: period, amount: amount);
+    final errors = budgetValidator.validate(budget);
+    if (errors.isNotEmpty) {
+      throw ValidationError(errors);
+    }
+    try {
+      final response = await _httpClient.jsonPost<Map<String, dynamic>>(
+        authService: authService,
+        data: budget.toMap(),
+      );
+      return _SpringBudget.from(response, [category])!;
+    } on SocketException catch (_) {
+      throw NoServerError();
+    }
   }
 
   @override
@@ -77,8 +88,7 @@ class BudgetSpringService implements BudgetService {
     required Period period,
   }) async {
     try {
-      await _httpClient.delete(
-          authService: authService, path: '/${category.code}');
+      await _httpClient.delete(authService: authService, path: '/${category.code}');
     } on SocketException catch (_) {
       throw NoServerError();
     } catch (e) {
@@ -101,13 +111,10 @@ class BudgetSpringService implements BudgetService {
   @override
   Future<bool> copyPreviousPeriodBudgetsInto(Period period) async {
     try {
-      await _httpClient.jsonPost(
-          authService: authService,
-          path: '/copy-previous-period',
-          data: {
-            fromDateField: period.from.toApiString(),
-            toDateField: period.to.toApiString(),
-          });
+      await _httpClient.jsonPost(authService: authService, path: '/copy-previous-period', data: {
+        fromDateField: period.from.toDateString(),
+        toDateField: period.to.toDateString(),
+      });
       return true;
     } catch (_) {
       return false;
@@ -117,10 +124,9 @@ class BudgetSpringService implements BudgetService {
   @override
   Future<bool> periodHasChanged(Period period) async {
     try {
-      final count = await _httpClient
-          .jsonGet<int>(authService: authService, path: '/count', data: {
-        fromDateField: period.from.toApiString(),
-        toDateField: period.to.toApiString(),
+      final count = await _httpClient.jsonGet<int>(authService: authService, path: '/count', data: {
+        fromDateField: period.from.toDateString(),
+        toDateField: period.to.toDateString(),
       });
       return count < 1;
     } catch (_) {
@@ -148,8 +154,8 @@ class _SpringBudget implements Budget {
   Map<String, Object> toMap() {
     return <String, Object>{
       categoryCodeField: category.code,
-      fromDateField: period.from.toString(),
-      toDateField: period.to.toString(),
+      fromDateField: period.from.toDateString(),
+      toDateField: period.to.toDateString(),
       amountField: amount,
     };
   }
@@ -157,21 +163,14 @@ class _SpringBudget implements Budget {
   static _SpringBudget? from(dynamic raw, List<Category> categories) {
     if (raw is Map<String, dynamic>) {
       final categoryCode = raw[categoryCodeField] as String?;
-      final category =
-          categories.where((c) => c.code == categoryCode).firstOrNull;
+      final category = categories.where((c) => c.code == categoryCode).firstOrNull;
       final fromDateStr = raw[fromDateField] as String?;
       final fromDate = DateTime.tryParse(fromDateStr ?? '');
       final toDateStr = raw[toDateField] as String?;
       final toDate = DateTime.tryParse(toDateStr ?? '');
       final amount = raw[amountField] as double?;
-      if (category != null &&
-          fromDate != null &&
-          toDate != null &&
-          amount != null) {
-        return _SpringBudget(
-            category: category,
-            period: Period(from: fromDate, to: toDate),
-            amount: amount);
+      if (category != null && fromDate != null && toDate != null && amount != null) {
+        return _SpringBudget(category: category, period: Period(from: fromDate, to: toDate), amount: amount);
       }
     }
     return null;

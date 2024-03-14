@@ -134,7 +134,7 @@ class DataPage<T> with Iterable<T> implements Iterator<T> {
 
   @override
   Iterator<T> get iterator {
-    return this;
+    return content.iterator;
   }
 
   @override
