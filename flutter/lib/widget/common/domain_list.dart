@@ -19,7 +19,7 @@ class DomainList<T, K> extends StatelessWidget {
   final bool loadingNextPage;
   final ItemBuilder<T> itemBuilder;
   final RowCellBuilder<T> itemCellBuilder;
-  final Function(int) onPageNavigation;
+  final void Function(int) onPageNavigation;
   final Set<K>? selectedKeys;
   final Function(K, bool)? onKeySelect;
   final KeyFinder<T, K>? keyOf;
@@ -39,6 +39,22 @@ class DomainList<T, K> extends StatelessWidget {
     this.onKeySelect,
     this.keyOf,
   });
+
+  DomainList.list({
+    super.key,
+    required this.actions,
+    required List<T> list,
+    required this.tableColumns,
+    required this.initialLoading,
+    required this.loadingNextPage,
+    required this.itemBuilder,
+    required this.itemCellBuilder,
+    this.selectedKeys,
+    this.onKeySelect,
+    this.keyOf,
+  })  : scrollController = ScrollController(),
+        dataPage = DataPage(content: list),
+        onPageNavigation = ((_) {});
 
   @override
   Widget build(BuildContext context) {
@@ -68,16 +84,13 @@ class DomainList<T, K> extends StatelessWidget {
           itemBuilder: (_, index) {
             if (index < dataPage.length) {
               final item = dataPage[index];
-              final selected = selectedKeys != null &&
-                  keyOf != null &&
-                  selectedKeys!.contains(keyOf!(item));
+              final selected = selectedKeys != null && keyOf != null && selectedKeys!.contains(keyOf!(item));
               return itemBuilder(context, item, index, selected);
             }
             if (index == dataPage.length) {
               return TextDivider(
                 color: Theme.of(context).primaryColor,
-                text: L10n.of(context)
-                    .pageInfo(dataPage.pageNumber + 1, dataPage.totalElements),
+                text: L10n.of(context).pageInfo(dataPage.pageNumber + 1, dataPage.totalElements),
               );
             }
             return loadingItem(context);
@@ -87,14 +100,12 @@ class DomainList<T, K> extends StatelessWidget {
             if (isLastPageItem) {
               return TextDivider(
                 color: Theme.of(context).primaryColor,
-                text: L10n.of(context)
-                    .pageEnd(dataPage.pageNumberOfIndex(index) + 1),
+                text: L10n.of(context).pageEnd(dataPage.pageNumberOfIndex(index) + 1),
               );
             }
             return const Divider();
           },
-          itemCount:
-              dataPage.length + (loadingNextPage && !initialLoading ? 2 : 1),
+          itemCount: dataPage.length + (loadingNextPage && !initialLoading ? 2 : 1),
         ),
       ],
     );
@@ -130,16 +141,13 @@ class DomainList<T, K> extends StatelessWidget {
   Widget sliverToolbar() {
     final items = <Widget>[];
     if (loadingNextPage || initialLoading) {
-      items.add(Padding(
-          padding: const EdgeInsets.only(right: 8.0),
-          child: AppIcon.loadingOfSize(14.0)));
+      items.add(Padding(padding: const EdgeInsets.only(right: 8.0), child: AppIcon.loadingOfSize(14.0)));
     }
     if (actions.isNotEmpty) {
       items.addAll(actions);
     }
     if (items.isNotEmpty) {
-      return SliverAppBar(
-          actions: items, elevation: .0, backgroundColor: Colors.transparent);
+      return SliverAppBar(actions: items, elevation: .0, backgroundColor: Colors.transparent);
     }
     return Container();
   }

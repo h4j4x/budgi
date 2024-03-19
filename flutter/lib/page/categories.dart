@@ -11,6 +11,7 @@ import '../model/error/validation.dart';
 import '../model/fetch_mode.dart';
 import '../model/table.dart';
 import '../service/category.dart';
+import '../util/collection.dart';
 import '../util/ui.dart';
 import '../widget/common/domain_list.dart';
 import 'category.dart';
@@ -65,8 +66,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
 
   void scrollListener() {
     if (dataPage.hasNextPage &&
-        scrollController.offset >=
-            scrollController.position.maxScrollExtent - 10 &&
+        scrollController.offset >= scrollController.position.maxScrollExtent - 10 &&
         !scrollController.position.outOfRange) {
       loadData(FetchMode.nextPage);
     }
@@ -89,11 +89,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
       tableColumns: <TableColumn>[
         TableColumn(key: _tableCodeCell, label: l10n.code, widthPercent: 10),
         TableColumn(key: _tableNameCell, label: l10n.categoryName),
-        TableColumn(
-            key: 'icons',
-            label: '',
-            fixedWidth: 100,
-            alignment: Alignment.center),
+        TableColumn(key: 'icons', label: '', fixedWidth: 100, alignment: Alignment.center),
       ],
       initialLoading: initialLoading,
       loadingNextPage: loading,
@@ -175,12 +171,9 @@ class _CategoriesPageState extends State<CategoriesPage> {
           : null,
       onLongPress: !loading
           ? () {
-              if (selectedCodes.contains(category.code)) {
-                selectedCodes.remove(category.code);
-              } else {
-                selectedCodes.add(category.code);
-              }
-              setState(() {});
+              setState(() {
+                selectedCodes.xAdd(category.code);
+              });
             }
           : null,
     );
@@ -195,19 +188,11 @@ class _CategoriesPageState extends State<CategoriesPage> {
           children: [
             IconButton(
               icon: AppIcon.edit,
-              onPressed: !loading
-                  ? () {
-                      editCategory(category);
-                    }
-                  : null,
+              onPressed: !loading ? () => editCategory(category) : null,
             ),
             IconButton(
               icon: AppIcon.delete(context),
-              onPressed: !loading
-                  ? () {
-                      deleteCategory(category);
-                    }
-                  : null,
+              onPressed: !loading ? () => deleteCategory(category) : null,
             ),
           ],
         ),

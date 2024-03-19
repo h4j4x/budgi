@@ -7,3 +7,14 @@ extension AppIterable<T> on Iterable<T> {
     }
   }
 }
+
+extension AppSet<T> on Set<T> {
+  // Add the items if not contained, remove it if exists.
+  void xAdd(T item) {
+    if (contains(item)) {
+      remove(item);
+    } else {
+      add(item);
+    }
+  }
+}

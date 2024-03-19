@@ -11,6 +11,7 @@ import '../model/error/wallet.dart';
 import '../model/fetch_mode.dart';
 import '../model/table.dart';
 import '../service/wallet.dart';
+import '../util/collection.dart';
 import '../util/ui.dart';
 import '../widget/common/domain_list.dart';
 import 'wallet.dart';
@@ -69,8 +70,7 @@ class _WalletsPageState extends State<WalletsPage> {
 
   void scrollListener() {
     if (dataPage.hasNextPage &&
-        scrollController.offset >=
-            scrollController.position.maxScrollExtent - 10 &&
+        scrollController.offset >= scrollController.position.maxScrollExtent - 10 &&
         !scrollController.position.outOfRange) {
       loadData(FetchMode.nextPage);
     }
@@ -91,20 +91,11 @@ class _WalletsPageState extends State<WalletsPage> {
       actions: actions(),
       dataPage: dataPage,
       tableColumns: <TableColumn>[
-        TableColumn(
-            key: _tableIconCell,
-            label: '',
-            fixedWidth: 50,
-            alignment: Alignment.center),
+        TableColumn(key: _tableIconCell, label: '', fixedWidth: 50, alignment: Alignment.center),
         TableColumn(key: _tableCodeCell, label: l10n.code, widthPercent: 10),
-        TableColumn(
-            key: _tableTypeCell, label: l10n.walletType, widthPercent: 20),
+        TableColumn(key: _tableTypeCell, label: l10n.walletType, widthPercent: 20),
         TableColumn(key: _tableNameCell, label: l10n.walletName),
-        TableColumn(
-            key: 'icons',
-            label: '',
-            fixedWidth: 100,
-            alignment: Alignment.center),
+        TableColumn(key: 'icons', label: '', fixedWidth: 100, alignment: Alignment.center),
       ],
       initialLoading: initialLoading,
       loadingNextPage: loading,
@@ -191,12 +182,9 @@ class _WalletsPageState extends State<WalletsPage> {
           : null,
       onLongPress: !loading
           ? () {
-              if (selectedCodes.contains(wallet.code)) {
-                selectedCodes.remove(wallet.code);
-              } else {
-                selectedCodes.add(wallet.code);
-              }
-              setState(() {});
+              setState(() {
+                selectedCodes.xAdd(wallet.code);
+              });
             }
           : null,
     );
