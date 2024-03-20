@@ -18,7 +18,7 @@ class L10nEn extends L10n {
   String get appTitle => 'Budg1';
 
   @override
-  String get budgetAmount => 'Budget amount';
+  String get budgetAmount => 'Amount';
 
   @override
   String get budgetAmountCategoryHint => 'Select budget category';
@@ -35,6 +35,17 @@ class L10nEn extends L10n {
   String get budgetAmountHint => 'Enter budget amount...';
 
   @override
+  String get budgetDelete => 'Delete budget';
+
+  @override
+  String budgetDeleteConfirm(String name) {
+    return 'Confirm to delete budget $name.';
+  }
+
+  @override
+  String get budgetDeleteSelectedConfirm => 'Confirm to delete selected budgets.';
+
+  @override
   String get budgetsAmounts => 'Budgets amounts';
 
   @override
@@ -42,6 +53,9 @@ class L10nEn extends L10n {
 
   @override
   String get budgetsCategoryAmount => 'Budget category amount';
+
+  @override
+  String get budgetsDelete => 'Delete budgets';
 
   @override
   String get cancelAction => 'Cancel';

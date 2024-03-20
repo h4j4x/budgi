@@ -99,6 +99,25 @@ class BudgetSpringService implements BudgetService {
   }
 
   @override
+  Future<void> deleteBudgets({
+    required Set<String> categoriesCodes,
+    required Period period,
+  }) async {
+    if (categoriesCodes.isEmpty) {
+      return Future.value();
+    }
+    try {
+      await _httpClient.delete(authService: authService, path: '/batch?codes=${categoriesCodes.join(',')}');
+    } on SocketException catch (_) {
+      throw NoServerError();
+    } catch (e) {
+      throw ValidationError({
+        'budget': BudgetError.invalidCategory,
+      });
+    }
+  }
+
+  @override
   Future<Map<Budget, double>> categoriesTransactionsTotal({
     required Period period,
     bool expensesTransactions = true,

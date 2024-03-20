@@ -112,7 +112,7 @@ abstract class L10n {
   /// No description provided for @budgetAmount.
   ///
   /// In en, this message translates to:
-  /// **'Budget amount'**
+  /// **'Amount'**
   String get budgetAmount;
 
   /// No description provided for @budgetAmountCategoryHint.
@@ -139,6 +139,24 @@ abstract class L10n {
   /// **'Enter budget amount...'**
   String get budgetAmountHint;
 
+  /// No description provided for @budgetDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete budget'**
+  String get budgetDelete;
+
+  /// No description provided for @budgetDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm to delete budget {name}.'**
+  String budgetDeleteConfirm(String name);
+
+  /// No description provided for @budgetDeleteSelectedConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm to delete selected budgets.'**
+  String get budgetDeleteSelectedConfirm;
+
   /// No description provided for @budgetsAmounts.
   ///
   /// In en, this message translates to:
@@ -156,6 +174,12 @@ abstract class L10n {
   /// In en, this message translates to:
   /// **'Budget category amount'**
   String get budgetsCategoryAmount;
+
+  /// No description provided for @budgetsDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete budgets'**
+  String get budgetsDelete;
 
   /// No description provided for @cancelAction.
   ///

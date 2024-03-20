@@ -7,6 +7,7 @@ import '../../model/domain/category_amount.dart';
 import '../../model/period.dart';
 import '../../model/sort.dart';
 import '../../service/budget.dart';
+import '../../util/number.dart';
 import '../common/month_field.dart';
 import '../common/responsive.dart';
 import '../common/sort_field.dart';
@@ -42,9 +43,7 @@ class _CategoriesExpensesState extends State<CategoriesExpenses> {
     setState(() {
       loading = true;
     });
-    final values = await DI()
-        .get<BudgetService>()
-        .categoriesTransactionsTotal(period: period);
+    final values = await DI().get<BudgetService>().categoriesTransactionsTotal(period: period);
     amounts.clear();
     amounts.addAll(values.keys);
     amountsMap.clear();
@@ -121,9 +120,7 @@ class _CategoriesExpensesState extends State<CategoriesExpenses> {
           return Center(
             child: Padding(
               padding: const EdgeInsets.all(8),
-              child: loading
-                  ? const CircularProgressIndicator.adaptive()
-                  : Text(L10n.of(context).nothingHere),
+              child: loading ? const CircularProgressIndicator.adaptive() : Text(L10n.of(context).nothingHere),
             ),
           );
         }
@@ -142,8 +139,7 @@ class _CategoriesExpensesState extends State<CategoriesExpenses> {
     final diff = budget - amount;
     return ListTile(
       title: Text(item.category.name),
-      subtitle: Text(
-          '\$${budget.toStringAsFixed(2)} - \$${amount.toStringAsFixed(2)} = \$${diff.toStringAsFixed(2)}'),
+      subtitle: Text('${budget.asMoneyString} - ${amount.asMoneyString} = ${diff.asMoneyString}'),
     );
   }
 }

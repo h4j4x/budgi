@@ -13,7 +13,7 @@
     }
   },
   "appTitle": "Budg1",
-  "budgetAmount": "Budget amount",
+  "budgetAmount": "Amount",
   "budgetAmountCategoryHint": "Select budget category",
   "budgetAmountDelete": "Delete budget amount",
   "budgetAmountDeleteConfirm": "Confirm to delete budget amount of {name}.",
@@ -25,9 +25,20 @@
     }
   },
   "budgetAmountHint": "Enter budget amount...",
+  "budgetDelete": "Delete budget",
+  "budgetDeleteConfirm": "Confirm to delete budget {name}.",
+  "@budgetDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "budgetDeleteSelectedConfirm": "Confirm to delete selected budgets.",
   "budgetsAmounts": "Budgets amounts",
   "budgetsCategoriesAmounts": "Budgets categories amounts",
   "budgetsCategoryAmount": "Budget category amount",
+  "budgetsDelete": "Delete budgets",
   "cancelAction": "Cancel",
   "categories": "Categories",
   "categoriesDelete": "Delete categories",

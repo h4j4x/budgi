@@ -5,6 +5,7 @@ import '../../l10n/l10n.dart';
 import '../../model/domain/transaction.dart';
 import '../../model/item_action.dart';
 import '../../util/function.dart';
+import '../../util/number.dart';
 import '../../util/ui.dart';
 import '../common/sliver_center.dart';
 
@@ -49,7 +50,6 @@ class TransactionList extends StatelessWidget {
 
   Widget listItem(BuildContext context, Transaction item) {
     final transactionType = item.transactionType.l10n(context);
-    final amount = item.amount.toStringAsFixed(2);
     return ListTile(
       leading: Row(
         mainAxisSize: MainAxisSize.min,
@@ -61,7 +61,7 @@ class TransactionList extends StatelessWidget {
           ),
         ],
       ),
-      title: Text('${item.category.name}. $transactionType \$$amount'),
+      title: Text('${item.category.name}. $transactionType ${item.amount.asMoneyString}'),
       subtitle: Text('${item.wallet.name}. ${item.description}'),
       trailing: IconButton(
         icon: AppIcon.delete(context),

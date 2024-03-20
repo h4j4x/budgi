@@ -7,6 +7,7 @@ import '../../model/period.dart';
 import '../../model/sort.dart';
 import '../../model/domain/wallet.dart';
 import '../../service/wallet.dart';
+import '../../util/number.dart';
 import '../common/month_field.dart';
 import '../common/responsive.dart';
 import '../common/sort_field.dart';
@@ -42,8 +43,7 @@ class _WalletsBalanceState extends State<WalletsBalance> {
     setState(() {
       loading = true;
     });
-    final values =
-        await DI().get<WalletService>().walletsBalance(period: period);
+    final values = await DI().get<WalletService>().walletsBalance(period: period);
     wallets.clear();
     wallets.addAll(values.keys);
     walletsMap.clear();
@@ -120,9 +120,7 @@ class _WalletsBalanceState extends State<WalletsBalance> {
           return Center(
             child: Padding(
               padding: const EdgeInsets.all(8),
-              child: loading
-                  ? const CircularProgressIndicator.adaptive()
-                  : Text(L10n.of(context).nothingHere),
+              child: loading ? const CircularProgressIndicator.adaptive() : Text(L10n.of(context).nothingHere),
             ),
           );
         }
@@ -140,7 +138,7 @@ class _WalletsBalanceState extends State<WalletsBalance> {
     return ListTile(
       leading: item.walletType.icon(),
       title: Text(item.name),
-      subtitle: Text('\$${amount.toStringAsFixed(2)}'),
+      subtitle: Text(amount.asMoneyString),
     );
   }
 }

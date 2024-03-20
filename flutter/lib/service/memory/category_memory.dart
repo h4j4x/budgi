@@ -61,11 +61,7 @@ class CategoryMemoryService implements CategoryService, BudgetService {
         return excludingCodes!.contains(wallet.code);
       });
     }
-    if (list.isNotEmpty &&
-        page != null &&
-        page >= 0 &&
-        pageSize != null &&
-        pageSize > 0) {
+    if (list.isNotEmpty && page != null && page >= 0 && pageSize != null && pageSize > 0) {
       final offset = page * pageSize;
       list = list.sublist(offset, offset + pageSize);
     }
@@ -109,8 +105,7 @@ class CategoryMemoryService implements CategoryService, BudgetService {
 
     final periodKey = period.toString();
     _values[periodKey] ??= <Budget>{};
-    _values[periodKey]!
-        .removeWhere((amount) => amount.category.code == category.code);
+    _values[periodKey]!.removeWhere((amount) => amount.category.code == category.code);
     _values[periodKey]!.add(budget);
     return Future.value(budget);
   }
@@ -163,6 +158,18 @@ class CategoryMemoryService implements CategoryService, BudgetService {
     return Future.value();
   }
 
+  @override
+  Future<void> deleteBudgets({
+    required Set<String> categoriesCodes,
+    required Period period,
+  }) {
+    _saveLastUsed(period);
+
+    final set = _values[period.toString()] ?? {};
+    set.removeWhere((budget) => categoriesCodes.contains(budget.category.code));
+    return Future.value();
+  }
+
   void _saveLastUsed(Period period) {
     final periodKey = period.toString();
     if (!_periods.contains(periodKey)) {
@@ -212,9 +219,7 @@ class CategoryMemoryService implements CategoryService, BudgetService {
     final map = <Budget, double>{};
     final budgets = _values[period.toString()] ?? {};
     for (var transaction in transactions) {
-      final budget = budgets
-          .where((amount) => amount.category == transaction.category)
-          .toList();
+      final budget = budgets.where((amount) => amount.category == transaction.category).toList();
       if (budget.length == 1) {
         map[budget.first] = (map[budget.first] ?? 0) + transaction.signedAmount;
       }
@@ -242,9 +247,7 @@ class _Category implements Category {
     if (identical(this, other)) {
       return true;
     }
-    return other is _Category &&
-        runtimeType == other.runtimeType &&
-        code == other.code;
+    return other is _Category && runtimeType == other.runtimeType && code == other.code;
   }
 
   @override
@@ -270,9 +273,7 @@ class _Budget implements Budget {
     if (identical(this, other)) {
       return true;
     }
-    return other is _Budget &&
-        runtimeType == other.runtimeType &&
-        category == other.category;
+    return other is _Budget && runtimeType == other.runtimeType && category == other.category;
   }
 
   @override

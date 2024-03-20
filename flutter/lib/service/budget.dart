@@ -31,6 +31,14 @@ abstract class BudgetService {
     required Period period,
   });
 
+  /// period dates are inclusive.
+  ///
+  /// Should save given period as last used.
+  Future<void> deleteBudgets({
+    required Set<String> categoriesCodes,
+    required Period period,
+  });
+
   /// returns true if previous used period is different from given one.
   ///
   /// Should NOT save given period as last used.

@@ -7,15 +7,13 @@ import '../l10n/l10n.dart';
 import '../model/domain/category_amount.dart';
 import '../model/error/budget.dart';
 import '../model/error/validation.dart';
-import '../model/item_action.dart';
 import '../model/period.dart';
 import '../model/table.dart';
 import '../service/budget.dart';
 import '../util/collection.dart';
+import '../util/number.dart';
 import '../util/ui.dart';
 import '../widget/common/domain_list.dart';
-import '../widget/common/month_field.dart';
-import '../widget/domain/budget_list.dart';
 import 'budget.dart';
 
 class BudgetsPage extends StatefulWidget {
@@ -86,7 +84,12 @@ class _BudgetsPageState extends State<BudgetsPage> {
   Widget body() {
     final l10n = L10n.of(context);
     return DomainList<Budget, String>.list(
-      actions: actions(),
+      actions: [
+        IconButton(
+          onPressed: loadList,
+          icon: AppIcon.reload,
+        ),
+      ],
       list: list,
       tableColumns: <TableColumn>[
         TableColumn(key: _tableCodeCell, label: l10n.code, widthPercent: 10),
@@ -118,23 +121,12 @@ class _BudgetsPageState extends State<BudgetsPage> {
       selected: selected,
       leading: selected ? AppIcon.selected : null,
       title: Text(item.category.name),
-      subtitle: Text('\$${item.amount.toStringAsFixed(2)}'),
+      subtitle: Text(item.amount.asMoneyString),
       trailing: IconButton(
         icon: AppIcon.delete(context),
-        onPressed: () async {
-          final l10n = L10n.of(context);
-          final confirm = await context.confirm(
-            title: l10n.budgetAmountDelete,
-            description: l10n.budgetAmountDeleteConfirm(item.category.name),
-          );
-          if (confirm && context.mounted) {
-            onItemAction(context, item, ItemAction.delete);
-          }
-        },
+        onPressed: () => deleteBudget(item),
       ),
-      onTap: () {
-        onItemAction(context, item, ItemAction.select);
-      },
+      onTap: () => editBudget(item),
       onLongPress: !loading
           ? () {
               setState(() {
@@ -145,87 +137,11 @@ class _BudgetsPageState extends State<BudgetsPage> {
     );
   }
 
-  Widget body1() {
-    if (loading) {
-      return loadingBody();
-    }
-    return CustomScrollView(
-      slivers: [
-        toolbar(),
-        BudgetList(
-          list: list,
-          enabled: !loading,
-          onItemAction: onItemAction,
-        ),
-      ],
-    );
-  }
-
-  Widget toolbar() {
-    return SliverAppBar(
-      toolbarHeight: kToolbarHeight + 16,
-      title: Container(
-        constraints: const BoxConstraints(maxWidth: 200),
-        child: MonthFieldWidget(period: period),
-      ),
-      actions: [
-        IconButton(
-          onPressed: loadList,
-          icon: AppIcon.reload,
-        ),
-      ],
-    );
-  }
-
-  Widget loadingBody() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const CircularProgressIndicator.adaptive(),
-          if (loadingMessage != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: Text(loadingMessage!),
-            ),
-        ],
-      ),
-    );
-  }
-
-  void onItemAction(
-    BuildContext context,
-    Budget item,
-    ItemAction action,
-  ) async {
-    switch (action) {
-      case ItemAction.select:
-        {
-          await context.push(
-            BudgetPage.route,
-            extra: BudgetData.fromPeriod(
-              budget: item,
-              period: period,
-            ),
-          );
-          break;
-        }
-      case ItemAction.delete:
-        {
-          await DI().get<BudgetService>().deleteBudget(
-                category: item.category,
-                period: period,
-              );
-          break;
-        }
-    }
-    loadList();
-  }
-
   Widget cellItem(String key, Budget budget) {
     return switch (key) {
       _tableCodeCell => categoryCodeWidget(budget),
       _tableNameCell => Text(budget.category.name),
+      _tableAmountCell => Text(budget.amount.asMoneyString),
       _ => Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -264,7 +180,7 @@ class _BudgetsPageState extends State<BudgetsPage> {
   void deleteBudget(Budget budget) async {
     final l10n = L10n.of(context);
     final confirm = await context.confirm(
-      title: l10n.categoryDelete,
+      title: l10n.budgetDelete,
       description: l10n.budgetDeleteConfirm(budget.category.name),
     );
     if (confirm && context.mounted) {
@@ -274,10 +190,7 @@ class _BudgetsPageState extends State<BudgetsPage> {
 
   void doDeleteBudget(Budget budget) async {
     try {
-      await DI().get<BudgetService>().deleteBudget(
-            category: budget.category,
-            period: period,
-          );
+      await DI().get<BudgetService>().deleteBudget(category: budget.category, period: period);
     } on ValidationError<BudgetError> catch (e) {
       if (e.errors.containsKey('budget') && mounted) {
         context.showError(e.errors['budget']!.l10n(context));
@@ -300,7 +213,7 @@ class _BudgetsPageState extends State<BudgetsPage> {
 
   void doDeleteSelected() async {
     try {
-      await DI().get<BudgetService>().deleteBudgets(codes: selectedCodes);
+      await DI().get<BudgetService>().deleteBudgets(categoriesCodes: selectedCodes, period: period);
     } on ValidationError<BudgetError> catch (e) {
       if (e.errors.containsKey('budget') && mounted) {
         context.showError(e.errors['budget']!.l10n(context));
