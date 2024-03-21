@@ -36,7 +36,7 @@ services:
       retries: 3
       start_period: 5s
 
- budgi:
+  budgi:
     image: ghcr.io/h4j4x/budgi:latest
     restart: unless-stopped
     environment:
@@ -62,14 +62,25 @@ services:
       retries: 3
       start_period: 5s
 
+  budgi-app:
+    image: ghcr.io/h4j4x/budgi-app:latest
+    restart: unless-stopped
+    environment:
+      - DATA_PROVIDER=spring
+      - SPRING_URL=http://budgi:8080/api/v1
+    ports:
+      - '3000:3000'
+    depends_on:
+      budgi:
+        condition: service_healthy
+
   nginx:
     image: nginx:alpine
     restart: unless-stopped
     volumes:
       - ./cfg/nginx:/etc/nginx/conf.d
-      - ./www:/var/www
     ports:
-      - "80:80"
+      - '80:80'
     depends_on:
       budgi:
         condition: service_healthy

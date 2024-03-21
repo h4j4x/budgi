@@ -1,0 +1,9 @@
+.dart_tool/
+.idea/
+android/
+build/
+linux/
+macos/
+test/
+windows/
+config.json
