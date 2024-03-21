@@ -7,7 +7,7 @@ Budg1 Spring project.
 ## Technology Stack
 
 - [Java SDK 21](https://www.oracle.com/java/technologies/downloads/#java21).
-- [SpringBoot 3.2.1](https://spring.io/projects/spring-boot/).
+- [SpringBoot 3](https://spring.io/projects/spring-boot/).
 - [JWT](https://jwt.io/) using [jwtk-jjwt](https://github.com/jwtk/jjwt).
 - [Postgres](https://www.postgresql.org/).
 - [Redis](https://redis.io/docs/get-started/).
