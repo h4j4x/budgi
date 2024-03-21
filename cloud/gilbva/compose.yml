@@ -67,6 +67,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./cfg/nginx:/etc/nginx/conf.d
+      - ./www:/var/www
     ports:
       - "80:80"
     depends_on:
