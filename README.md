@@ -9,5 +9,5 @@ Budg1 project.
 ## Deploy Docker
 
 ```shell
-wget -O- https://raw.githubusercontent.com/h4j4x/budgi/main/cloud/gilbva/deploy.sh | bash
+wget -O- https://raw.githubusercontent.com/h4j4x/budgi/main/cloud/docker/deploy.sh | bash
 ```
