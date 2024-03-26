@@ -10,6 +10,7 @@ import '../../model/error/validation.dart';
 import '../../model/fields.dart';
 import '../../model/period.dart';
 import '../../model/sort.dart';
+import '../../util/datetime.dart';
 import '../auth.dart';
 import '../category.dart';
 import '../transaction.dart';
@@ -45,7 +46,7 @@ class TransactionSpringService extends TransactionService {
     int? pageSize,
   }) async {
     try {
-      final dataPage = await _httpClient.jsonGetPage<Map<String, Object>>(
+      final dataPage = await _httpClient.jsonGetPage<Map<String, dynamic>>(
         authService: authService,
         page: page,
         pageSize: pageSize,
@@ -57,18 +58,14 @@ class TransactionSpringService extends TransactionService {
           })
           .whereType<String>()
           .toSet();
-      final categories =
-          (await categoryService.listCategories(includingCodes: categoryCodes))
-              .content;
+      final categories = (await categoryService.listCategories(includingCodes: categoryCodes)).content;
       final walletCodes = dataPage.content
           .map((item) {
             return item[walletCodeField] as String?;
           })
           .whereType<String>()
           .toSet();
-      final wallets =
-          (await walletService.listWallets(includingCodes: walletCodes))
-              .content;
+      final wallets = (await walletService.listWallets(includingCodes: walletCodes)).content;
       return DataPage<Transaction>(
         content: dataPage.content
             .map((map) {
@@ -191,23 +188,19 @@ class _SpringTransaction extends Transaction {
       transactionStatusField: transactionStatus.name,
       amountField: amount,
       descriptionField: description,
-      dateTimeField: dateTime.toString(),
+      dateTimeField: dateTime.toDateTimeString(),
     };
   }
 
-  static _SpringTransaction? from(
-      dynamic raw, List<Category> categories, List<Wallet> wallets) {
+  static _SpringTransaction? from(dynamic raw, List<Category> categories, List<Wallet> wallets) {
     if (raw is Map<String, dynamic>) {
       final code = raw[codeField] as String?;
       final categoryCode = raw[categoryCodeField] as String?;
-      final category =
-          categories.where((c) => c.code == categoryCode).firstOrNull;
+      final category = categories.where((c) => c.code == categoryCode).firstOrNull;
       final walletCode = raw[walletCodeField] as String?;
       final wallet = wallets.where((w) => w.code == walletCode).firstOrNull;
-      final transactionType =
-          TransactionType.tryParse(raw[transactionTypeField]);
-      final transactionStatus =
-          TransactionStatus.tryParse(raw[transactionStatusField]);
+      final transactionType = TransactionType.tryParse(raw[transactionTypeField]);
+      final transactionStatus = TransactionStatus.tryParse(raw[transactionStatusField]);
       final amount = raw[amountField] as double?;
       final description = raw[descriptionField] as String?;
       final dateTimeStr = raw[dateTimeField] as String?;

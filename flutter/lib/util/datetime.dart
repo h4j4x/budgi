@@ -21,8 +21,12 @@ extension DateTimeExtension on DateTime {
     return add(Duration.zero);
   }
 
-  String toDateString() {
-    return '${year.toString().padLeft(4, '0')}-${month.toString().padLeft(2, '0')}-${day.toString().padLeft(2, '0')}';
+  String toDateString() => '${_n(year, 4)}-${_n(month)}-${_n(day)}';
+
+  String toDateTimeString() {
+    var offset = timeZoneOffset.inHours < 0 ? '-' : '+';
+    offset += '${_n(timeZoneOffset.inHours.abs())}:${_n(timeZoneOffset.inMinutes.abs() % 60)}';
+    return '${toDateString()}T${_n(hour)}:${_n(minute)}:${_n(second)}$offset';
   }
 }
 
@@ -31,9 +35,10 @@ String formatDateTimePeriod(
   required Period period,
 }) {
   final l10n = L10n.of(context);
-  if (period.from.month == period.to.month &&
-      period.from.year == period.to.year) {
+  if (period.from.month == period.to.month && period.from.year == period.to.year) {
     return l10n.dateMonthYear(period.from);
   }
   return 'TODO';
 }
+
+String _n(int value, [int size = 2]) => value.toString().padLeft(size, '0');

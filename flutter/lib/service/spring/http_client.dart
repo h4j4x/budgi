@@ -180,7 +180,7 @@ class ApiHttpClient {
       if (codeField != key || value is! String || value.isNotEmpty) {
         map[key] = value;
       } else {
-        debugPrint('Http discarding key $key value $value');
+        debugPrint('Http discarding key: <$key> value: <$value>');
       }
     });
     return jsonEncode(map);
