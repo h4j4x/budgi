@@ -42,6 +42,7 @@ services:
       - DATASOURCE_USERNAME=budgi
       - DATASOURCE_PASSWORD=budgi
       - DATASOURCE_DRIVER=org.postgresql.Driver
+      - DATASOURCE_SCHEMA=budgi
       - DATABASE_CLEAN_ON_START=true
       - REDIS_HOST=redis
       - REDIS_PORT=6379

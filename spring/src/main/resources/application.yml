@@ -42,12 +42,14 @@ spring:
     openInView: false
     properties:
       hibernate:
+        defaultSchema: ${DATASOURCE_SCHEMA:public}
         formatSql: true
     showSql: false
   liquibase:
     changeLog: classpath:data/changelog-master.yml
     databaseChangeLogLockTable: changelog_lock
     databaseChangeLogTable: changelogs
+    defaultSchema: ${DATASOURCE_SCHEMA:public}
     dropFirst: ${DATABASE_CLEAN_ON_START:false}
 springdoc:
   apiDocs:
