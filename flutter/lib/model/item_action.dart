@@ -1,4 +1,0 @@
-enum ItemAction {
-  select,
-  delete,
-}

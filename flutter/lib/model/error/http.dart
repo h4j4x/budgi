@@ -1,1 +1,0 @@
-class NoServerError extends Error {}

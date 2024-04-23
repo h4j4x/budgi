@@ -1,8 +1,0 @@
-[Desktop Entry]
-Name=Budg1
-Comment=Budg1 App
-Exec=budgi
-Icon=${SNAP}/meta/gui/budgi.png
-Terminal=false
-Type=Application
-Categories=Productivity;
