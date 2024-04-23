@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: budgi
+  name: budgi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: budgi
+  template:
+    metadata:
+      labels:
+        app: budgi
+    spec:
+      containers:
+        - image: ghcr.io/h4j4x/budgi:latest
+          name: budgi
+          ports:
+            - containerPort: 8080
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: budgi
+spec:
+  type: LoadBalancer
+  selector:
+    app: budgi
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: NodePort
