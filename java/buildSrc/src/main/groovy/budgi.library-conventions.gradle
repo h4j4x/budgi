@@ -1,5 +1,5 @@
 plugins {
     id 'budgi.common-conventions'
 
-    id 'application'
+    id 'java-library'
 }
