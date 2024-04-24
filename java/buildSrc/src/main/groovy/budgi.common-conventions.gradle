@@ -2,6 +2,7 @@ plugins {
     id 'java'
 }
 
+group = 'com.spike.budgi'
 version = '0.0.1'
 
 repositories {
@@ -9,9 +10,9 @@ repositories {
 }
 
 dependencies {
-    constraints {
-        implementation 'org.apache.commons:commons-text:1.11.0'
-    }
+    compileOnly 'com.github.spotbugs:spotbugs-annotations:4.8.4'
+
+    implementation 'jakarta.validation:jakarta.validation-api:3.1.0-M2'
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
 
@@ -28,5 +29,11 @@ tasks.named('test') {
     useJUnitPlatform()
     testLogging {
         events = ['passed', 'skipped', 'failed']
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
     }
 }

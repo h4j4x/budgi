@@ -4,4 +4,4 @@ plugins {
 
 rootProject.name = 'budgi'
 
-include('domain', 'app', 'list', 'utilities')
+include('util', 'domain')

@@ -1,5 +1,0 @@
-plugins {
-    id 'budgi.common-conventions'
-
-    id 'application'
-}
