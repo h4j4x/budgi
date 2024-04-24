@@ -5,9 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import java.time.OffsetDateTime;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -16,24 +14,26 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Getter
 @MappedSuperclass
 @NoArgsConstructor
+@Setter
 @SuperBuilder(toBuilder = true)
 public abstract class JpaBase {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Size(min = 2, max = 50)
+    @Size(max = 50, min = 2)
     @Column(length = 50, nullable = false)
     private String code;
 
     @CreationTimestamp
-    @Column(updatable = false, name = "created_at")
+    @Column(name = "created_at", updatable = false)
     private OffsetDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
     private OffsetDateTime updatedAt;
 
+    @Builder.Default
     private boolean enabled = true;
 
     @PrePersist

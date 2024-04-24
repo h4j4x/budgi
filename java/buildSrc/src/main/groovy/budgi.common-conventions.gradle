@@ -27,6 +27,7 @@ java {
 
 tasks.named('test') {
     useJUnitPlatform()
+    jvmArgs("-XX:+EnableDynamicAgentLoading")
     testLogging {
         events = ['passed', 'skipped', 'failed']
     }

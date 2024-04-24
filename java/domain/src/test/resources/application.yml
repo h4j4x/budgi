@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    driverClassName: org.h2.Driver
+    url: jdbc:h2:mem:budgi;DB_CLOSE_DELAY=-1
+    username: budgi
+    password: budgi
+  jackson:
+    defaultPropertyInclusion: non_null
+    deserialization:
+      failOnUnknownProperties: false
+    serialization:
+      failOnEmptyBeans: false
+  jpa:
+    hibernate:
+      ddlAuto: update
+    open-in-view: false

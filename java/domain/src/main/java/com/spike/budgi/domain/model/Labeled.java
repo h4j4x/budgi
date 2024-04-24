@@ -1,4 +1,4 @@
-package com.spike.budgi.domain;
+package com.spike.budgi.domain.model;
 
 public interface Labeled extends Base {
     String getLabel();
