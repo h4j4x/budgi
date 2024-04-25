@@ -1,6 +1,7 @@
 package com.spike.budgi.domain;
 
 import com.spike.budgi.domain.error.ConflictException;
+import com.spike.budgi.domain.error.NotFoundException;
 import com.spike.budgi.domain.jpa.JpaUser;
 import com.spike.budgi.domain.model.User;
 import com.spike.budgi.domain.repo.UserRepo;
@@ -21,8 +22,8 @@ public class UserService {
 
     @NotNull
     public User createUser(@NotNull User user) throws ConflictException {
-        var byEmail = userRepo.findByCode(user.getCode());
-        if (byEmail.isPresent()) {
+        var byCode = userRepo.findByCode(user.getCode());
+        if (byCode.isPresent()) {
             throw new ConflictException("User code already registered.");
         }
 
@@ -34,7 +35,7 @@ public class UserService {
             .codeType(user.getCodeType())
             .password(user.getPassword())
             .build();
-        ValidatorUtil.validate(validator, user);
+        ValidatorUtil.validate(validator, jpaUser);
 
         return userRepo.save(jpaUser);
     }
@@ -45,15 +46,15 @@ public class UserService {
     }
 
     @NotNull
-    public User updateUser(@NotNull String code, @NotNull User user) throws ConflictException {
+    public User updateUser(@NotNull String code, @NotNull User user) throws ConflictException, NotFoundException {
         var byCode = userRepo.findByCode(code);
         if (byCode.isEmpty()) {
-            throw new ValidationException("User code is not valid.");
+            throw new NotFoundException("User code is not valid.");
         }
 
         if (!code.equals(user.getCode())) {
-            var byEmail = userRepo.findByCode(user.getCode());
-            if (byEmail.isPresent()) {
+            var duplicated = userRepo.findByCode(user.getCode());
+            if (duplicated.isPresent()) {
                 throw new ConflictException("User code already registered.");
             }
         }
@@ -66,7 +67,7 @@ public class UserService {
             .codeType(user.getCodeType())
             .password(user.getPassword())
             .build();
-        ValidatorUtil.validate(validator, user);
+        ValidatorUtil.validate(validator, jpaUser);
 
         return userRepo.save(jpaUser);
     }

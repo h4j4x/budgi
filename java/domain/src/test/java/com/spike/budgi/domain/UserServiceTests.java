@@ -1,6 +1,7 @@
 package com.spike.budgi.domain;
 
 import com.spike.budgi.domain.error.ConflictException;
+import com.spike.budgi.domain.error.NotFoundException;
 import com.spike.budgi.domain.jpa.JpaUser;
 import com.spike.budgi.domain.model.UserCodeType;
 import com.spike.budgi.domain.repo.UserRepo;
@@ -82,7 +83,7 @@ public class UserServiceTests {
     }
 
     @Test
-    void testUpdateUser() throws ConflictException {
+    void testUpdateUser() throws ConflictException, NotFoundException {
         var inUser = JpaUser.builder()
             .name("Test")
             .codeType(UserCodeType.EMAIL)
