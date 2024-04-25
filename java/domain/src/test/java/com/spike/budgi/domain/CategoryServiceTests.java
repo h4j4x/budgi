@@ -87,6 +87,12 @@ public class CategoryServiceTests {
         assertTrue(updatedCategory.isPresent());
         assertEquals(requestCategory.getCode(), updatedCategory.get().getCode());
         assertEquals(requestCategory.getLabel(), updatedCategory.get().getLabel());
+
+        var categories = categoryRepo.findByUser(user);
+        assertFalse(categories.isEmpty());
+        assertEquals(1, categories.size());
+        assertEquals(requestCategory.getCode(), categories.getFirst().getCode());
+        assertEquals(requestCategory.getLabel(), categories.getFirst().getLabel());
     }
 
     private JpaUser createUser() {
