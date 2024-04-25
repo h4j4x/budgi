@@ -1,6 +1,7 @@
 package com.spike.budgi.domain;
 
 import com.spike.budgi.domain.error.ConflictException;
+import com.spike.budgi.domain.error.NotFoundException;
 import com.spike.budgi.domain.jpa.JpaUser;
 import com.spike.budgi.domain.model.UserCodeType;
 import com.spike.budgi.domain.repo.UserRepo;
@@ -35,14 +36,14 @@ public class UserServiceTests {
     }
 
     @Test
-    void testSaveNewValidUser() throws ConflictException {
+    void testCreateValidUser() throws ConflictException {
         var inUser = JpaUser.builder()
             .name("Test")
             .codeType(UserCodeType.EMAIL)
             .code("test@mail.com")
             .password("test")
             .build();
-        var savedUser = userService.saveUser(inUser, true);
+        var savedUser = userService.createUser(inUser);
         assertEquals(inUser.getCode(), savedUser.getCode());
         assertEquals(inUser.getName(), savedUser.getName());
 
@@ -52,18 +53,57 @@ public class UserServiceTests {
     }
 
     @Test
-    public void testSaveInvalidEmailThrowsValidation() {
+    public void testCreateInvalidEmailThrowsValidation() {
         var inUser = JpaUser.builder()
             .codeType(UserCodeType.EMAIL)
             .code("test")
             .build();
         var validationException = assertThrows(ValidationException.class,
-            () -> userService.saveUser(inUser, true));
+            () -> userService.createUser(inUser));
         assertEquals("User email must be valid.", validationException.getMessage());
 
         inUser.setCode("test@mail.com");
         validationException = assertThrows(ValidationException.class,
-            () -> userService.saveUser(inUser, true));
+            () -> userService.createUser(inUser));
         assertEquals("User name is required.", validationException.getMessage());
+    }
+
+    @Test
+    void testCreateExistentUserCode() {
+        var inUser = JpaUser.builder()
+            .name("Test")
+            .codeType(UserCodeType.EMAIL)
+            .code("test@mail.com")
+            .password("test")
+            .build();
+        userRepo.save(inUser);
+        var conflictException = assertThrows(ConflictException.class,
+            () -> userService.createUser(inUser));
+        assertEquals("User code already registered.", conflictException.getMessage());
+    }
+
+    @Test
+    void testUpdateUser() throws ConflictException, NotFoundException {
+        var inUser = JpaUser.builder()
+            .name("Test")
+            .codeType(UserCodeType.EMAIL)
+            .code("test@mail.com")
+            .password("test")
+            .build();
+        userService.createUser(inUser);
+
+        var requestUser = inUser.toBuilder()
+            .name("Updated")
+            .code("updated@mail.com")
+            .password("updated")
+            .build();
+        userService.updateUser(inUser.getCode(), requestUser);
+        var updatedUser = userService.findUser(inUser.getCode());
+        assertTrue(updatedUser.isEmpty());
+        updatedUser = userService.findUser(requestUser.getCode());
+        assertTrue(updatedUser.isPresent());
+        assertEquals(requestUser.getCode(), updatedUser.get().getCode());
+        assertEquals(requestUser.getName(), updatedUser.get().getName());
+        assertEquals(requestUser.getPassword(), updatedUser.get().getPassword());
     }
 }
