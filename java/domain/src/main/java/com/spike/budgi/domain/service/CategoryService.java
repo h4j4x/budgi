@@ -1,4 +1,4 @@
-package com.spike.budgi.domain;
+package com.spike.budgi.domain.service;
 
 import com.spike.budgi.domain.error.ConflictException;
 import com.spike.budgi.domain.error.NotFoundException;

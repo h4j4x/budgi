@@ -4,7 +4,6 @@ import com.spike.budgi.util.StringUtil;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import java.time.OffsetDateTime;
-import javax.annotation.OverridingMethodsMustInvokeSuper;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.CreationTimestamp;
@@ -37,7 +36,6 @@ public abstract class JpaBase {
     private boolean enabled = true;
 
     @PrePersist
-    @OverridingMethodsMustInvokeSuper
     protected void prePersist() {
         if (StringUtil.isBlank(code)) {
             code = StringUtil.randomString(6);
