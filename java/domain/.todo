@@ -12,7 +12,7 @@ account
   enabled: bool required
 
   type: string enum required (debit, credit, cash)
-  quota: double positive
+  quota: double zero or positive
   to_pay: double zero or positive
   payment_day: short nullable
 
