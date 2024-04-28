@@ -3,26 +3,27 @@ package com.spike.budgi.domain.service;
 import com.spike.budgi.domain.error.ConflictException;
 import com.spike.budgi.domain.error.NotFoundException;
 import com.spike.budgi.domain.jpa.JpaCategory;
-import com.spike.budgi.domain.jpa.JpaUser;
 import com.spike.budgi.domain.model.Category;
 import com.spike.budgi.domain.model.User;
 import com.spike.budgi.domain.repo.CategoryRepo;
 import com.spike.budgi.domain.repo.UserRepo;
-import com.spike.budgi.util.ValidatorUtil;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
+import java.util.function.Supplier;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
-public class CategoryService {
-    private final UserRepo userRepo;
-
+public class CategoryService extends BaseService {
     private final CategoryRepo categoryRepo;
 
     private final Validator validator;
+
+    public CategoryService(UserRepo userRepo, CategoryRepo categoryRepo, Validator validator) {
+        super(userRepo);
+        this.categoryRepo = categoryRepo;
+        this.validator = validator;
+    }
 
     @NotNull
     public Category createCategory(@NotNull User user, @NotNull Category category) throws ConflictException, NotFoundException {
@@ -32,13 +33,9 @@ public class CategoryService {
             throw new ConflictException("Category code already registered.");
         }
 
-        var jpaCategory = JpaCategory.builder()
-            .user(jpaUser)
-            .code(category.getCode())
-            .label(category.getLabel())
-            .description(category.getDescription())
-            .build();
-        ValidatorUtil.validate(validator, jpaCategory);
+        var jpaCategory = build(category, JpaCategory::builder);
+        jpaCategory.setUser(jpaUser);
+        jpaCategory.validate(validator);
 
         return categoryRepo.save(jpaCategory);
     }
@@ -64,17 +61,18 @@ public class CategoryService {
             }
         }
 
-        var jpaCategory = byCode.get().toBuilder()
-            .code(category.getCode())
-            .label(category.getLabel())
-            .description(category.getDescription())
-            .build();
-        ValidatorUtil.validate(validator, jpaCategory);
+        var jpaCategory = build(category, () -> byCode.get().toBuilder());
+        jpaCategory.validate(validator);
 
         return categoryRepo.save(jpaCategory);
     }
 
-    private JpaUser findUser(@NotNull User user) throws NotFoundException {
-        return userRepo.findByCode(user.getCode()).orElseThrow(() -> new NotFoundException("User code is not valid."));
+    private JpaCategory build(@NotNull Category category,
+                              @NotNull Supplier<JpaCategory.JpaCategoryBuilder<?, ?>> builderSupplier) {
+        return builderSupplier.get()
+            .code(category.getCode())
+            .label(category.getLabel())
+            .description(category.getDescription())
+            .build();
     }
 }

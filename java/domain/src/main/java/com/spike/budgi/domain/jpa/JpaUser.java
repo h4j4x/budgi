@@ -2,7 +2,10 @@ package com.spike.budgi.domain.jpa;
 
 import com.spike.budgi.domain.model.User;
 import com.spike.budgi.domain.model.UserCodeType;
+import com.spike.budgi.util.ValidatorUtil;
 import jakarta.persistence.*;
+import jakarta.validation.ValidationException;
+import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -33,4 +36,13 @@ public class JpaUser extends JpaBase implements User {
     @Size(max = 500, min = 3, message = "User password must have between 3 and 500 characters length.")
     @Column(length = 500)
     private String password;
+
+    @Override
+    public void validate(Validator validator) {
+        switch (codeType) {
+            case null -> throw new ValidationException("User code type is required.");
+            case EMAIL -> ValidatorUtil.validateEmail(getCode(), "User email must be valid.");
+        }
+        User.super.validate(validator);
+    }
 }

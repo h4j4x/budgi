@@ -3,6 +3,7 @@ package com.spike.budgi.domain.jpa;
 import com.spike.budgi.domain.model.Category;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,6 +20,7 @@ import lombok.experimental.SuperBuilder;
 })
 public class JpaCategory extends JpaBase implements Category {
     @ManyToOne(optional = false)
+    @NotNull(message = "Category user is required.")
     @JoinColumn(name = "user_id", nullable = false)
     private JpaUser user;
 

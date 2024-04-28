@@ -4,6 +4,8 @@ import com.spike.budgi.domain.converter.CurrencyConverter;
 import com.spike.budgi.domain.model.Account;
 import com.spike.budgi.domain.model.AccountType;
 import jakarta.persistence.*;
+import jakarta.validation.ValidationException;
+import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -26,6 +28,7 @@ import lombok.experimental.SuperBuilder;
 })
 public class JpaAccount extends JpaBase implements Account {
     @ManyToOne(optional = false)
+    @NotNull(message = "Account user is required.")
     @JoinColumn(name = "user_id", nullable = false)
     private JpaUser user;
 
@@ -65,5 +68,13 @@ public class JpaAccount extends JpaBase implements Account {
         super.prePersist();
         quota = quota.setScale(2, RoundingMode.HALF_UP);
         toPay = toPay.setScale(2, RoundingMode.HALF_UP);
+    }
+
+    @Override
+    public void validate(Validator validator) {
+        if (AccountType.CREDIT.equals(accountType) && paymentDay == null) {
+            throw new ValidationException("Account payment day is required for type credit.");
+        }
+        Account.super.validate(validator);
     }
 }

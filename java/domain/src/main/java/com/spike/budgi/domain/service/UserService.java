@@ -5,11 +5,10 @@ import com.spike.budgi.domain.error.NotFoundException;
 import com.spike.budgi.domain.jpa.JpaUser;
 import com.spike.budgi.domain.model.User;
 import com.spike.budgi.domain.repo.UserRepo;
-import com.spike.budgi.util.ValidatorUtil;
-import jakarta.validation.ValidationException;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
 import java.util.Optional;
+import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,15 +26,8 @@ public class UserService {
             throw new ConflictException("User code already registered.");
         }
 
-        validateUserCode(user);
-
-        var jpaUser = JpaUser.builder()
-            .name(user.getName())
-            .code(user.getCode())
-            .codeType(user.getCodeType())
-            .password(user.getPassword())
-            .build();
-        ValidatorUtil.validate(validator, jpaUser);
+        var jpaUser = build(user, JpaUser::builder);
+        jpaUser.validate(validator);
 
         return userRepo.save(jpaUser);
     }
@@ -59,23 +51,19 @@ public class UserService {
             }
         }
 
-        validateUserCode(user);
+        var jpaUser = build(user, () -> byCode.get().toBuilder());
+        jpaUser.validate(validator);
 
-        var jpaUser = byCode.get().toBuilder()
+        return userRepo.save(jpaUser);
+    }
+
+    private JpaUser build(@NotNull User user,
+                          @NotNull Supplier<JpaUser.JpaUserBuilder<?, ?>> builderSupplier) {
+        return builderSupplier.get()
             .name(user.getName())
             .code(user.getCode())
             .codeType(user.getCodeType())
             .password(user.getPassword())
             .build();
-        ValidatorUtil.validate(validator, jpaUser);
-
-        return userRepo.save(jpaUser);
-    }
-
-    private void validateUserCode(@NotNull User user) {
-        switch (user.getCodeType()) {
-            case null -> throw new ValidationException("User code type is required.");
-            case EMAIL -> ValidatorUtil.validateEmail(user.getCode(), "User email must be valid.");
-        }
     }
 }
