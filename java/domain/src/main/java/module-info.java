@@ -1,6 +1,7 @@
 module budgi.domain {
     exports com.spike.budgi.domain.error;
     exports com.spike.budgi.domain.model;
+    exports com.spike.budgi.domain.jpa;
     exports com.spike.budgi.domain.repo;
     exports com.spike.budgi.domain.service;
 
