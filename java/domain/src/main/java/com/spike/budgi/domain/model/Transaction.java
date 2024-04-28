@@ -3,7 +3,7 @@ package com.spike.budgi.domain.model;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.Currency;
-import java.util.List;
+import java.util.Set;
 
 public interface Transaction extends Base, Validatable {
     User getUser();
@@ -14,7 +14,7 @@ public interface Transaction extends Base, Validatable {
 
     Account getAccount();
 
-    List<Category> getCategories();
+    Set<Category> getCategories();
 
     String getDescription();
 

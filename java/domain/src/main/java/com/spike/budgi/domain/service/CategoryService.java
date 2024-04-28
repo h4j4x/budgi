@@ -3,6 +3,7 @@ package com.spike.budgi.domain.service;
 import com.spike.budgi.domain.error.ConflictException;
 import com.spike.budgi.domain.error.NotFoundException;
 import com.spike.budgi.domain.jpa.JpaCategory;
+import com.spike.budgi.domain.jpa.JpaUser;
 import com.spike.budgi.domain.model.Category;
 import com.spike.budgi.domain.model.User;
 import com.spike.budgi.domain.repo.CategoryRepo;
@@ -33,8 +34,7 @@ public class CategoryService extends BaseService {
             throw new ConflictException("Category code already registered.");
         }
 
-        var jpaCategory = build(category, JpaCategory::builder);
-        jpaCategory.setUser(jpaUser);
+        var jpaCategory = build(jpaUser, category, JpaCategory::builder);
         jpaCategory.validate(validator);
 
         return categoryRepo.save(jpaCategory);
@@ -61,16 +61,18 @@ public class CategoryService extends BaseService {
             }
         }
 
-        var jpaCategory = build(category, () -> byCode.get().toBuilder());
+        var jpaCategory = build(jpaUser, category, () -> byCode.get().toBuilder());
         jpaCategory.validate(validator);
 
         return categoryRepo.save(jpaCategory);
     }
 
-    private JpaCategory build(@NotNull Category category,
+    private JpaCategory build(@NotNull JpaUser user,
+                              @NotNull Category category,
                               @NotNull Supplier<JpaCategory.JpaCategoryBuilder<?, ?>> builderSupplier) {
         return builderSupplier.get()
             .code(category.getCode())
+            .user(user)
             .label(category.getLabel())
             .description(category.getDescription())
             .build();

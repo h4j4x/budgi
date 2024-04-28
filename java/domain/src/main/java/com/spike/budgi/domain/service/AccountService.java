@@ -3,6 +3,7 @@ package com.spike.budgi.domain.service;
 import com.spike.budgi.domain.error.ConflictException;
 import com.spike.budgi.domain.error.NotFoundException;
 import com.spike.budgi.domain.jpa.JpaAccount;
+import com.spike.budgi.domain.jpa.JpaUser;
 import com.spike.budgi.domain.model.Account;
 import com.spike.budgi.domain.model.User;
 import com.spike.budgi.domain.repo.AccountRepo;
@@ -39,8 +40,7 @@ public class AccountService extends BaseService {
             throw new ConflictException("Account code already registered.");
         }
 
-        var jpaAccount = build(account, JpaAccount::builder);
-        jpaAccount.setUser(jpaUser);
+        var jpaAccount = build(jpaUser, account, JpaAccount::builder);
         jpaAccount.validate(validator);
 
         return accountRepo.save(jpaAccount);
@@ -67,16 +67,18 @@ public class AccountService extends BaseService {
             }
         }
 
-        var jpaAccount = build(account, () -> byCode.get().toBuilder());
+        var jpaAccount = build(jpaUser, account, () -> byCode.get().toBuilder());
         jpaAccount.validate(validator);
 
         return accountRepo.save(jpaAccount);
     }
 
-    private JpaAccount build(@NotNull Account account,
+    private JpaAccount build(@NotNull JpaUser user,
+                             @NotNull Account account,
                              @NotNull Supplier<JpaAccount.JpaAccountBuilder<?, ?>> builderSupplier) {
         return builderSupplier.get()
             .code(account.getCode())
+            .user(user)
             .label(account.getLabel())
             .description(account.getDescription())
             .accountType(account.getAccountType())
