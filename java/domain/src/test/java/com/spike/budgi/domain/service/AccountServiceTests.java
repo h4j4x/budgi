@@ -1,11 +1,10 @@
 package com.spike.budgi.domain.service;
 
+import com.spike.budgi.domain.TestApplication;
 import com.spike.budgi.domain.error.ConflictException;
 import com.spike.budgi.domain.error.NotFoundException;
 import com.spike.budgi.domain.jpa.JpaAccount;
-import com.spike.budgi.domain.jpa.JpaUser;
 import com.spike.budgi.domain.model.AccountType;
-import com.spike.budgi.domain.model.UserCodeType;
 import com.spike.budgi.domain.repo.AccountRepo;
 import com.spike.budgi.domain.repo.UserRepo;
 import jakarta.validation.ValidationException;
@@ -45,7 +44,7 @@ public class AccountServiceTests {
 
     @Test
     void testCreateValidAccount() throws ConflictException, NotFoundException {
-        var user = createUser();
+        var user = TestApplication.createUser(userRepo);
 
         var inAccount = JpaAccount.builder()
             .code("test")
@@ -54,11 +53,13 @@ public class AccountServiceTests {
             .accountType(AccountType.CASH)
             .build();
         var savedAccount = accountService.createAccount(user, inAccount);
+        assertNotNull(savedAccount.getCreatedAt());
         assertEquals(inAccount.getCode(), savedAccount.getCode());
         assertEquals(inAccount.getLabel(), savedAccount.getLabel());
         assertEquals(inAccount.getAccountType(), savedAccount.getAccountType());
 
         var repoAccount = accountRepo.findByUserAndCode(user, inAccount.getCode()).orElseThrow();
+        assertNotNull(repoAccount.getCreatedAt());
         assertEquals(inAccount.getCode(), repoAccount.getCode());
         assertEquals(inAccount.getLabel(), repoAccount.getLabel());
         assertEquals(inAccount.getAccountType(), repoAccount.getAccountType());
@@ -66,14 +67,16 @@ public class AccountServiceTests {
         var categories = accountRepo.findByUser(user);
         assertFalse(categories.isEmpty());
         assertEquals(1, categories.size());
-        assertEquals(inAccount.getCode(), categories.getFirst().getCode());
-        assertEquals(inAccount.getLabel(), categories.getFirst().getLabel());
-        assertEquals(inAccount.getAccountType(), categories.getFirst().getAccountType());
+        var first = categories.getFirst();
+        assertNotNull(first.getCreatedAt());
+        assertEquals(inAccount.getCode(), first.getCode());
+        assertEquals(inAccount.getLabel(), first.getLabel());
+        assertEquals(inAccount.getAccountType(), first.getAccountType());
     }
 
     @Test
     void testUpdateAccount() throws ConflictException, NotFoundException {
-        var user = createUser();
+        var user = TestApplication.createUser(userRepo);
 
         var inAccount = JpaAccount.builder()
             .code("test")
@@ -107,7 +110,7 @@ public class AccountServiceTests {
 
     @Test
     void testCreateCreditAccountValidatesPaymentDay() {
-        var user = createUser();
+        var user = TestApplication.createUser(userRepo);
 
         var account = JpaAccount.builder()
             .code("test")
@@ -118,15 +121,5 @@ public class AccountServiceTests {
         var validationException = assertThrows(ValidationException.class,
             () -> accountService.createAccount(user, account));
         assertEquals("Account payment day is required for type credit.", validationException.getMessage());
-    }
-
-    private JpaUser createUser() {
-        var user = JpaUser.builder()
-            .name("Test")
-            .codeType(UserCodeType.EMAIL)
-            .code("test@mail.com")
-            .password("test")
-            .build();
-        return userRepo.save(user);
     }
 }

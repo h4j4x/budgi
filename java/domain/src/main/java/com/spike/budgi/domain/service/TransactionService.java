@@ -10,6 +10,7 @@ import com.spike.budgi.domain.repo.AccountRepo;
 import com.spike.budgi.domain.repo.TransactionRepo;
 import com.spike.budgi.domain.repo.UserRepo;
 import com.spike.budgi.util.ObjectUtil;
+import jakarta.persistence.EntityManagerFactory;
 import jakarta.validation.ValidationException;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
@@ -27,12 +28,15 @@ public class TransactionService extends BaseService {
 
     private final Validator validator;
 
+    private final EntityManagerFactory entityManagerFactory;
+
     public TransactionService(UserRepo userRepo, AccountRepo accountRepo, TransactionRepo transactionRepo,
-                              Validator validator) {
+                              Validator validator, EntityManagerFactory entityManagerFactory) {
         super(userRepo);
         this.accountRepo = accountRepo;
         this.transactionRepo = transactionRepo;
         this.validator = validator;
+        this.entityManagerFactory = entityManagerFactory;
     }
 
     @NotNull
@@ -50,9 +54,28 @@ public class TransactionService extends BaseService {
     }
 
     @NotNull
-    public List<Transaction> findAccounts(@NotNull User user, OffsetDateTime from, OffsetDateTime to) throws NotFoundException {
+    public List<Transaction> findTransactions(@NotNull User user, OffsetDateTime from, OffsetDateTime to) throws NotFoundException {
         var jpaUser = findUser(user);
-        return Collections.emptyList(); // TODO
+        try (var entityManager = entityManagerFactory.createEntityManager()) {
+            var builder = entityManager.getCriteriaBuilder();
+            var query = builder.createQuery(JpaTransaction.class);
+            var root = query.from(JpaTransaction.class);
+
+            var where = builder.equal(root.get("user"), jpaUser);
+            if (from != null) {
+                where = builder.and(where, builder.greaterThanOrEqualTo(root.get("createdAt"), from));
+            }
+            if (to != null) {
+                where = builder.and(where, builder.lessThanOrEqualTo(root.get("createdAt"), to));
+            }
+
+            query = query.select(root)
+                .distinct(true)
+                .where(where);
+            return entityManager.createQuery(query).getResultStream()
+                .map(jpaTransaction -> (Transaction) jpaTransaction)
+                .toList();
+        }
     }
 
     @NotNull

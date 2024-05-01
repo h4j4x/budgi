@@ -44,6 +44,7 @@ public class UserServiceTests {
             .password("test")
             .build();
         var savedUser = userService.createUser(inUser);
+        assertNotNull(savedUser.getCreatedAt());
         assertEquals(inUser.getCode(), savedUser.getCode());
         assertEquals(inUser.getName(), savedUser.getName());
 

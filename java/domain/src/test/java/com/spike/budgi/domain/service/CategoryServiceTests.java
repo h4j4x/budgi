@@ -1,10 +1,9 @@
 package com.spike.budgi.domain.service;
 
+import com.spike.budgi.domain.TestApplication;
 import com.spike.budgi.domain.error.ConflictException;
 import com.spike.budgi.domain.error.NotFoundException;
 import com.spike.budgi.domain.jpa.JpaCategory;
-import com.spike.budgi.domain.jpa.JpaUser;
-import com.spike.budgi.domain.model.UserCodeType;
 import com.spike.budgi.domain.repo.CategoryRepo;
 import com.spike.budgi.domain.repo.UserRepo;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,7 +42,7 @@ public class CategoryServiceTests {
 
     @Test
     void testCreateValidCategory() throws ConflictException, NotFoundException {
-        var user = createUser();
+        var user = TestApplication.createUser(userRepo);
 
         var inCategory = JpaCategory.builder()
             .code("test")
@@ -51,6 +50,7 @@ public class CategoryServiceTests {
             .description("Test")
             .build();
         var savedCategory = categoryService.createCategory(user, inCategory);
+        assertNotNull(savedCategory.getCreatedAt());
         assertEquals(inCategory.getCode(), savedCategory.getCode());
         assertEquals(inCategory.getLabel(), savedCategory.getLabel());
 
@@ -67,7 +67,7 @@ public class CategoryServiceTests {
 
     @Test
     void testUpdateCategory() throws ConflictException, NotFoundException {
-        var user = createUser();
+        var user = TestApplication.createUser(userRepo);
 
         var inCategory = JpaCategory.builder()
             .code("test")
@@ -93,15 +93,5 @@ public class CategoryServiceTests {
         assertEquals(1, categories.size());
         assertEquals(requestCategory.getCode(), categories.getFirst().getCode());
         assertEquals(requestCategory.getLabel(), categories.getFirst().getLabel());
-    }
-
-    private JpaUser createUser() {
-        var user = JpaUser.builder()
-            .name("Test")
-            .codeType(UserCodeType.EMAIL)
-            .code("test@mail.com")
-            .password("test")
-            .build();
-        return userRepo.save(user);
     }
 }
