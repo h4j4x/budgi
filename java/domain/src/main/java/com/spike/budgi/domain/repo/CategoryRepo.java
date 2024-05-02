@@ -13,4 +13,6 @@ public interface CategoryRepo extends CrudRepository<JpaCategory, Long> {
     Optional<JpaCategory> findByUserAndCode(@NotNull JpaUser user, @NotNull String code);
 
     List<JpaCategory> findByUser(@NotNull JpaUser jpaUser);
+
+    List<JpaCategory> findByUserAndCodeIn(@NotNull JpaUser user, @NotNull List<String> codes);
 }

@@ -4,15 +4,18 @@ import com.spike.budgi.domain.TestApplication;
 import com.spike.budgi.domain.error.ConflictException;
 import com.spike.budgi.domain.error.NotFoundException;
 import com.spike.budgi.domain.jpa.JpaAccount;
+import com.spike.budgi.domain.jpa.JpaCategory;
 import com.spike.budgi.domain.jpa.JpaTransaction;
 import com.spike.budgi.domain.jpa.JpaUser;
 import com.spike.budgi.domain.model.AccountType;
 import com.spike.budgi.domain.repo.AccountRepo;
+import com.spike.budgi.domain.repo.CategoryRepo;
 import com.spike.budgi.domain.repo.TransactionRepo;
 import com.spike.budgi.domain.repo.UserRepo;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.Currency;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,15 +29,19 @@ public class TransactionServiceTests {
 
     final AccountRepo accountRepo;
 
+    final CategoryRepo categoryRepo;
+
     final TransactionRepo transactionRepo;
 
     final TransactionService transactionService;
 
     @Autowired
-    public TransactionServiceTests(UserRepo userRepo, AccountRepo accountRepo, TransactionRepo transactionRepo,
+    public TransactionServiceTests(UserRepo userRepo, AccountRepo accountRepo,
+                                   CategoryRepo categoryRepo, TransactionRepo transactionRepo,
                                    TransactionService transactionService) {
         this.userRepo = userRepo;
         this.accountRepo = accountRepo;
+        this.categoryRepo = categoryRepo;
         this.transactionRepo = transactionRepo;
         this.transactionService = transactionService;
     }
@@ -42,6 +49,7 @@ public class TransactionServiceTests {
     @BeforeEach
     void beforeEach() {
         transactionRepo.deleteAll();
+        categoryRepo.deleteAll();
         accountRepo.deleteAll();
         userRepo.deleteAll();
     }
@@ -49,6 +57,7 @@ public class TransactionServiceTests {
     @Test
     void contextLoad() {
         assertNotNull(userRepo);
+        assertNotNull(categoryRepo);
         assertNotNull(accountRepo);
         assertNotNull(transactionRepo);
         assertNotNull(transactionService);
@@ -58,16 +67,21 @@ public class TransactionServiceTests {
     void testCreateValidTransaction() throws ConflictException, NotFoundException {
         var user = TestApplication.createUser(userRepo);
         var account = createAccount(user);
+        var category = createCategory(user);
 
         var inTransaction = JpaTransaction.builder()
             .code("test")
             .account(account)
+            .categories(Set.of(category))
             .description("Test")
             .amount(BigDecimal.TEN)
             .build();
         var savedTransaction = transactionService.createTransaction(user, inTransaction);
         assertNotNull(savedTransaction.getCreatedAt());
         assertNotNull(savedTransaction.getAccount());
+        assertEquals(1, savedTransaction.getCategories().size());
+        var savedCategory = savedTransaction.getCategories().iterator().next();
+        assertEquals(category.getCode(), savedCategory.getCode());
         assertEquals(inTransaction.getCode(), savedTransaction.getCode());
         assertEquals(inTransaction.getDescription(), savedTransaction.getDescription());
         assertEquals(account.getCode(), savedTransaction.getAccount().getCode());
@@ -103,5 +117,16 @@ public class TransactionServiceTests {
             .toPay(BigDecimal.ZERO)
             .build();
         return accountRepo.save(account);
+    }
+
+    @NotNull
+    private JpaCategory createCategory(@NotNull JpaUser user) {
+        var category = JpaCategory.builder()
+            .code("test")
+            .user(user)
+            .label("Test")
+            .description("Test")
+            .build();
+        return categoryRepo.save(category);
     }
 }

@@ -54,7 +54,7 @@ public class UserServiceTests {
     }
 
     @Test
-    public void testCreateInvalidEmailThrowsValidation() {
+    void testCreateInvalidEmailThrowsValidation() {
         var inUser = JpaUser.builder()
             .codeType(UserCodeType.EMAIL)
             .code("test")

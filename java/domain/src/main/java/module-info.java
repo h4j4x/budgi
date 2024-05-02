@@ -12,4 +12,5 @@ module budgi.domain {
     requires org.hibernate.orm.core;
     requires spring.context;
     requires spring.data.commons;
+    requires spring.data.jpa;
 }
