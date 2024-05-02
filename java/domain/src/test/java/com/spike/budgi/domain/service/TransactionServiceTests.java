@@ -8,12 +8,12 @@ import com.spike.budgi.domain.jpa.JpaCategory;
 import com.spike.budgi.domain.jpa.JpaTransaction;
 import com.spike.budgi.domain.jpa.JpaUser;
 import com.spike.budgi.domain.model.AccountType;
-import com.spike.budgi.domain.repo.AccountRepo;
-import com.spike.budgi.domain.repo.CategoryRepo;
-import com.spike.budgi.domain.repo.TransactionRepo;
-import com.spike.budgi.domain.repo.UserRepo;
+import com.spike.budgi.domain.model.TransactionFilter;
+import com.spike.budgi.domain.repo.*;
+import com.spike.budgi.util.DateTimeUtil;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.util.Currency;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,17 +31,21 @@ public class TransactionServiceTests {
 
     final CategoryRepo categoryRepo;
 
+    final CategoryExpenseRepo categoryExpenseRepo;
+
     final TransactionRepo transactionRepo;
 
     final TransactionService transactionService;
 
     @Autowired
     public TransactionServiceTests(UserRepo userRepo, AccountRepo accountRepo,
-                                   CategoryRepo categoryRepo, TransactionRepo transactionRepo,
+                                   CategoryRepo categoryRepo, CategoryExpenseRepo categoryExpenseRepo,
+                                   TransactionRepo transactionRepo,
                                    TransactionService transactionService) {
         this.userRepo = userRepo;
         this.accountRepo = accountRepo;
         this.categoryRepo = categoryRepo;
+        this.categoryExpenseRepo = categoryExpenseRepo;
         this.transactionRepo = transactionRepo;
         this.transactionService = transactionService;
     }
@@ -49,6 +53,7 @@ public class TransactionServiceTests {
     @BeforeEach
     void beforeEach() {
         transactionRepo.deleteAll();
+        categoryExpenseRepo.deleteAll();
         categoryRepo.deleteAll();
         accountRepo.deleteAll();
         userRepo.deleteAll();
@@ -58,6 +63,7 @@ public class TransactionServiceTests {
     void contextLoad() {
         assertNotNull(userRepo);
         assertNotNull(categoryRepo);
+        assertNotNull(categoryExpenseRepo);
         assertNotNull(accountRepo);
         assertNotNull(transactionRepo);
         assertNotNull(transactionService);
@@ -75,6 +81,7 @@ public class TransactionServiceTests {
             .categories(Set.of(category))
             .description("Test")
             .amount(BigDecimal.TEN)
+            .completedAt(OffsetDateTime.now())
             .build();
         var savedTransaction = transactionService.createTransaction(user, inTransaction);
         assertNotNull(savedTransaction.getCreatedAt());
@@ -94,7 +101,7 @@ public class TransactionServiceTests {
         assertEquals(account.getCurrency(), repoTransaction.getCurrency());
         assertBigDecimalEquals(inTransaction.getAmount(), repoTransaction.getAmount());
 
-        var transactions = transactionService.findTransactions(user, null, null);
+        var transactions = transactionService.findTransactions(user, TransactionFilter.empty());
         assertFalse(transactions.isEmpty());
         assertEquals(1, transactions.size());
         var first = transactions.getFirst();
@@ -102,6 +109,15 @@ public class TransactionServiceTests {
         assertEquals(inTransaction.getDescription(), first.getDescription());
         assertEquals(account.getCurrency(), first.getCurrency());
         assertBigDecimalEquals(inTransaction.getAmount(), first.getAmount());
+
+        var period = transactionService.periodOf(repoTransaction);
+        assertNotNull(period);
+        var from = DateTimeUtil.toOffsetDateTime(period.from());
+        var to = DateTimeUtil.toOffsetDateTime(period.to());
+        var categoryExpense = categoryExpenseRepo.findByUserAndPeriod(user, from, to);
+        assertTrue(categoryExpense.isPresent());
+        assertEquals(savedTransaction.getCurrency(), categoryExpense.get().getCurrency());
+        assertBigDecimalEquals(savedTransaction.getAmount(), categoryExpense.get().getAmount());
     }
 
     @NotNull

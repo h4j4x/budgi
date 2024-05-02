@@ -1,34 +1,3 @@
-category
-  code: string unique inmutable
-  label: string
-  description: string
-
-account
-  code: string unique inmutable
-  label: string
-  description: string
-  created_at: date required inmutable
-  updated_at: date required
-  enabled: bool required
-
-  type: string enum required (debit, credit, cash)
-  quota: double zero or positive
-  to_pay: double zero or positive
-  payment_day: short nullable
-
-transaction
-  code: string unique inmutable
-  parent_code: string nullable inmutable relation to transaction
-  account_code: string required relation to account
-  categories_codes: string[] required relation to category
-  description: string
-
-  amount: double positive
-  created_at: date required
-  due_at: date nullable
-  completed_at: date nullable
-  enabled: bool required
-
 ----
 GIVEN
   category CAT1
@@ -36,9 +5,9 @@ GIVEN
 THEN
   transaction (account_code CC1, categories_codes [CAT1], amount 10)
 ASSERT
-  category CAT1 (expenses 10)
-  account CC1 (to_pay 10, balance 90)
-  transaction TRN1 (due_at 18/month or next_month/year, completed_at null)
+  - category CAT1 (expenses 10)
+  - account CC1 (to_pay 10, balance 90)
+  - transaction TRN1 (due_at 18/month or next_month/year, completed_at null)
 
 ----
 GIVEN
