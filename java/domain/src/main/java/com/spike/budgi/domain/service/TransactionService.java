@@ -164,8 +164,15 @@ public class TransactionService extends BaseService {
         var to = DateTimeUtil.toOffsetDateTime(period.to());
         var filter = TransactionFilter.of(from, to, category, true);
         var transactions = findTransactions(user, filter);
-        var expenses = transactions.stream().map(Transaction::getAmount)
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
+        var income = BigDecimal.ZERO;
+        var outcome = BigDecimal.ZERO;
+        for (var transaction : transactions) {
+            if (transaction.getAmount().compareTo(BigDecimal.ZERO) < 0) {
+                outcome = outcome.add(transaction.getAmount());
+            } else {
+                income = income.add(transaction.getAmount());
+            }
+        }
         var categoryExpense = categoryExpenseRepo.findByUserAndPeriod(user, from, to).orElse(new JpaCategoryExpense());
         categoryExpense = categoryExpense.toBuilder()
             .user(user)
@@ -173,7 +180,8 @@ public class TransactionService extends BaseService {
             .fromDateTime(from)
             .toDateTime(to)
             .currency(currency)
-            .amount(expenses)
+            .income(income)
+            .outcome(outcome)
             .build();
         categoryExpenseRepo.save(categoryExpense);
     }

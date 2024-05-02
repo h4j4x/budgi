@@ -117,7 +117,7 @@ public class TransactionServiceTests {
         var categoryExpense = categoryExpenseRepo.findByUserAndPeriod(user, from, to);
         assertTrue(categoryExpense.isPresent());
         assertEquals(savedTransaction.getCurrency(), categoryExpense.get().getCurrency());
-        assertBigDecimalEquals(savedTransaction.getAmount(), categoryExpense.get().getAmount());
+        assertBigDecimalEquals(savedTransaction.getAmount(), categoryExpense.get().getIncome());
     }
 
     @NotNull

@@ -35,9 +35,13 @@ public class JpaCategoryExpense extends JpaBase {
     @Convert(converter = CurrencyConverter.class)
     private Currency currency;
 
-    @NotNull(message = "Amount is required.")
+    @NotNull(message = "Income is required.")
     @Column(nullable = false, precision = 38, scale = 2)
-    private BigDecimal amount;
+    private BigDecimal income;
+
+    @NotNull(message = "Outcome is required.")
+    @Column(nullable = false, precision = 38, scale = 2)
+    private BigDecimal outcome;
 
     @Column(name = "from_date_time")
     private OffsetDateTime fromDateTime;
