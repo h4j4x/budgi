@@ -116,7 +116,7 @@ public class TransactionServiceTests {
         assertEquals(account.getCurrency(), first.getCurrency());
         assertBigDecimalEquals(inTransaction.getAmount(), first.getAmount());
 
-        var period = transactionService.periodOf(repoTransaction);
+        var period = repoTransaction.getDatePeriod();
         assertNotNull(period);
         var from = DateTimeUtil.toOffsetDateTime(period.from());
         var to = DateTimeUtil.toOffsetDateTime(period.to());
@@ -154,11 +154,12 @@ public class TransactionServiceTests {
     void testCreateTransactionWithDeferredMode() throws ConflictException, NotFoundException {
         var user = TestApplication.createUser(userRepo);
         var account = createAccount(user);
+        var category = createCategory(user);
 
         var inTransaction = JpaTransaction.builder()
             .code("test")
             .account(account)
-            .categories(Collections.emptySet())
+            .categories(Set.of(category))
             .description("Test")
             .amount(BigDecimal.valueOf(100))
             .build();
@@ -177,6 +178,16 @@ public class TransactionServiceTests {
             assertTrue(transaction.getCode().endsWith("_" + transactionsCount));
             assertEquals(dueAt, transaction.getDueAt());
             assertBigDecimalEquals(expectedTransactionAmount, transaction.getAmount());
+
+            var period = transaction.getDatePeriod();
+            assertNotNull(period);
+            var from = DateTimeUtil.toOffsetDateTime(period.from());
+            var to = DateTimeUtil.toOffsetDateTime(period.to());
+            var categoryExpense = categoryExpenseRepo.findByUserAndPeriod(user, from, to);
+            assertTrue(categoryExpense.isPresent());
+            assertEquals(transaction.getCurrency(), categoryExpense.get().getCurrency());
+            assertBigDecimalEquals(transaction.getAmount(), categoryExpense.get().getIncome());
+
             balance = balance.add(transaction.getAmount());
             transaction = transactionRepo.findByParent(transaction).orElse(null);
             dueAt = dueAt.plusMonths(1);

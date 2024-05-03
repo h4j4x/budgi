@@ -26,4 +26,6 @@ public interface Transaction extends Base, Validatable {
     LocalDate getDueAt();
 
     OffsetDateTime getCompletedAt();
+
+    DatePeriod getDatePeriod();
 }

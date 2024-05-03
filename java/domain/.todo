@@ -3,14 +3,14 @@ GIVEN
   category CAT1
   account CC1 (quota 100, type credit, payment_day 18)
 THEN
-  X transaction (account_code CC1, categories_codes [CAT1], amount 10) -> 10 months deferred starting 1 month later
+  transaction (account_code CC1, categories_codes [CAT1], amount 10) -> 10 months deferred starting 1 month later
 ASSERT
-  category CAT1 (expenses 10)
-  account CC1 (to_pay 10, balance 90)
-  transaction TRN1 (due_at 18/(month or next_month) + 1/year, completed_at null, parent_code null)
-  transaction TRN2 (due_at 18/(month or next_month) + 2/year, completed_at null, parent_code TRN1)
+  X category CAT1 (expenses 10)
+  X account CC1 (to_pay 10, balance 90)
+  X transaction TRN1 (due_at 18/(month or next_month) + 1/year, completed_at null, parent_code null)
+  X transaction TRN2 (due_at 18/(month or next_month) + 2/year, completed_at null, parent_code TRN1)
   ...
-  transaction TRN10 (due_at 18/(month or next_month) + 11/year, completed_at null, parent_code TRN9)
+  X transaction TRN10 (due_at 18/(month or next_month) + 11/year, completed_at null, parent_code TRN9)
   description of TRNX -> includes total_payment of 10, deferred to 10 months starting 18/X, ending 18/Y, 1 each month, to_pay difference from completed to total
 THEN
   delete TRNX -> will delete all TRN1 to TRN10

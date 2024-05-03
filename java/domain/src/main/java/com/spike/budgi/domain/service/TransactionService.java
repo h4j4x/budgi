@@ -101,14 +101,16 @@ public class TransactionService extends BaseService {
         jpaTransaction.validate(validator);
 
         jpaTransaction = transactionRepo.save(jpaTransaction);
-        updateAccountBalance(jpaUser, jpaTransaction.getCreatedAt());
-        var period = periodOf(jpaTransaction);
-        if (period != null) {
-            var categories = jpaTransaction.getCategories().stream()
-                .map(category -> (JpaCategory) category).collect(Collectors.toSet());
-            updateCategoriesExpenses(jpaUser, categories, period, jpaTransaction.getCurrency());
-        }
+        updateAssociated(jpaUser, jpaTransaction);
         return jpaTransaction;
+    }
+
+    private void updateAssociated(@NotNull JpaUser user, @NotNull JpaTransaction transaction) throws NotFoundException {
+        updateAccountBalance(user, transaction.getCreatedAt());
+        var period = transaction.getDatePeriod();
+        var categories = transaction.getCategories().stream()
+            .map(category -> (JpaCategory) category).collect(Collectors.toSet());
+        updateCategoriesExpenses(user, categories, period, transaction.getCurrency());
     }
 
     @NotNull
@@ -121,10 +123,10 @@ public class TransactionService extends BaseService {
 
             var where = builder.equal(root.get("user"), jpaUser);
             if (filter.from() != null) {
-                where = builder.and(where, builder.greaterThanOrEqualTo(root.get("createdAt"), filter.from()));
+                where = builder.and(where, builder.greaterThanOrEqualTo(root.get("dueAt"), filter.from()));
             }
             if (filter.to() != null) {
-                where = builder.and(where, builder.lessThan(root.get("createdAt"), filter.to()));
+                where = builder.and(where, builder.lessThan(root.get("dueAt"), filter.to()));
             }
 
             query = query.select(root)
@@ -156,7 +158,9 @@ public class TransactionService extends BaseService {
             null, null, null, null, () -> byCode.get().toBuilder());
         jpaTransaction.validate(validator);
 
-        return transactionRepo.save(jpaTransaction);
+        jpaTransaction = transactionRepo.save(jpaTransaction);
+        updateAssociated(jpaUser, jpaTransaction);
+        return jpaTransaction;
     }
 
     private JpaTransaction build(@NotNull JpaUser user,
@@ -190,11 +194,6 @@ public class TransactionService extends BaseService {
             .dueAt(ObjectUtil.firstNotNull(dueAt, transaction.getDueAt()))
             .completedAt(transaction.getCompletedAt())
             .build();
-    }
-
-    public DatePeriod periodOf(@NotNull JpaTransaction transaction) {
-        var from = transaction.getCreatedAt().toLocalDate().withDayOfMonth(1);
-        return new DatePeriod(from, from.plusMonths(1));
     }
 
     private void updateAccountBalance(@NotNull JpaUser user, @NotNull OffsetDateTime from) {

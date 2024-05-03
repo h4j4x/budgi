@@ -3,6 +3,7 @@ package com.spike.budgi.domain.jpa;
 import com.spike.budgi.domain.converter.CurrencyConverter;
 import com.spike.budgi.domain.model.AccountType;
 import com.spike.budgi.domain.model.Category;
+import com.spike.budgi.domain.model.DatePeriod;
 import com.spike.budgi.domain.model.Transaction;
 import com.spike.budgi.util.DateTimeUtil;
 import jakarta.persistence.*;
@@ -69,7 +70,7 @@ public class JpaTransaction extends JpaBase implements Transaction {
     @Column(nullable = false, precision = 38, scale = 2)
     private BigDecimal accountBalance;
 
-    @Column(name = "due_at")
+    @Column(name = "due_at", nullable = false)
     private LocalDate dueAt;
 
     @Column(name = "completed_at")
@@ -84,8 +85,24 @@ public class JpaTransaction extends JpaBase implements Transaction {
             accountBalance = BigDecimal.ZERO;
         }
         accountBalance = accountBalance.setScale(2, RoundingMode.HALF_UP);
-        if (AccountType.CREDIT.equals(account.getAccountType()) && dueAt == null) {
-            dueAt = DateTimeUtil.nextDayOfMonth(account.getPaymentDay());
+        checkDueAt();
+    }
+
+    @NotNull
+    @Override
+    public DatePeriod getDatePeriod() {
+        checkDueAt();
+        var from = dueAt.withDayOfMonth(1);
+        return new DatePeriod(from, from.plusMonths(1));
+    }
+
+    private void checkDueAt() {
+        if (dueAt == null) {
+            if (AccountType.CREDIT.equals(account.getAccountType())) {
+                dueAt = DateTimeUtil.nextDayOfMonth(account.getPaymentDay());
+            } else {
+                dueAt = LocalDate.now();
+            }
         }
     }
 }
