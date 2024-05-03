@@ -8,11 +8,13 @@ import com.spike.budgi.domain.jpa.JpaCategory;
 import com.spike.budgi.domain.jpa.JpaTransaction;
 import com.spike.budgi.domain.jpa.JpaUser;
 import com.spike.budgi.domain.model.AccountType;
+import com.spike.budgi.domain.model.DeferredMode;
 import com.spike.budgi.domain.model.TransactionFilter;
 import com.spike.budgi.domain.repo.*;
 import com.spike.budgi.util.DateTimeUtil;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.MonthDay;
 import java.time.OffsetDateTime;
 import java.util.Collections;
@@ -126,7 +128,7 @@ public class TransactionServiceTests {
     }
 
     @Test
-    void testTransactionUpdateAccountBalance() throws ConflictException, NotFoundException {
+    void testCreateTransaction_ThenUpdateAccountBalance() throws ConflictException, NotFoundException {
         var user = TestApplication.createUser(userRepo);
         var account = createAccount(user);
 
@@ -146,6 +148,41 @@ public class TransactionServiceTests {
             account = accountRepo.findByUserAndCode(user, account.getCode()).orElseThrow();
             assertBigDecimalEquals(BigDecimal.valueOf(balance), account.getBalance());
         }
+    }
+
+    @Test
+    void testCreateTransactionWithDeferredMode() throws ConflictException, NotFoundException {
+        var user = TestApplication.createUser(userRepo);
+        var account = createAccount(user);
+
+        var inTransaction = JpaTransaction.builder()
+            .code("test")
+            .account(account)
+            .categories(Collections.emptySet())
+            .description("Test")
+            .amount(BigDecimal.valueOf(100))
+            .build();
+        var deferredMode = new DeferredMode(10, 1);
+        var transaction = transactionService.createTransaction(user, inTransaction, deferredMode);
+        assertNotNull(transaction);
+
+        var expectedTransactionAmount = inTransaction.getAmount()
+            .divide(BigDecimal.valueOf(deferredMode.months()), RoundingMode.HALF_UP);
+        var balance = BigDecimal.ZERO;
+        var paymentDay = account.getPaymentDay();
+        var dueAt = DateTimeUtil.nextDayOfMonth(paymentDay, deferredMode.startDateTime().toLocalDate()).plusMonths(1);
+        var transactionsCount = 0;
+        do {
+            transactionsCount += 1;
+            assertTrue(transaction.getCode().endsWith("_" + transactionsCount));
+            assertEquals(dueAt, transaction.getDueAt());
+            assertBigDecimalEquals(expectedTransactionAmount, transaction.getAmount());
+            balance = balance.add(transaction.getAmount());
+            transaction = transactionRepo.findByParent(transaction).orElse(null);
+            dueAt = dueAt.plusMonths(1);
+        } while (transaction != null && balance.compareTo(inTransaction.getAmount()) < 0);
+        assertEquals(deferredMode.months(), transactionsCount);
+        assertBigDecimalEquals(balance, inTransaction.getAmount());
     }
 
     @NotNull

@@ -13,9 +13,9 @@ public class TestApplication {
     @NotNull
     public static JpaUser createUser(@NotNull UserRepo userRepo) {
         var user = JpaUser.builder()
-            .name("Test")
+            .name("Test " + System.currentTimeMillis())
             .codeType(UserCodeType.EMAIL)
-            .code("test@mail.com")
+            .code(System.currentTimeMillis() + "@mail.com")
             .password("test")
             .build();
         return userRepo.save(user);

@@ -10,11 +10,14 @@ import com.spike.budgi.domain.model.*;
 import com.spike.budgi.domain.repo.*;
 import com.spike.budgi.util.DateTimeUtil;
 import com.spike.budgi.util.ObjectUtil;
+import com.spike.budgi.util.StringUtil;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.validation.ValidationException;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.function.Supplier;
@@ -49,14 +52,52 @@ public class TransactionService extends BaseService {
     }
 
     @NotNull
+    public Transaction createTransaction(@NotNull User user, @NotNull Transaction transaction,
+                                         DeferredMode deferredMode) throws ConflictException, NotFoundException {
+        if (deferredMode == null || deferredMode.months() < 2) {
+            return createTransaction(user, transaction);
+        }
+
+        Transaction root = null;
+        JpaTransaction parent = null;
+        var code = ObjectUtil.firstNotNull(transaction.getCode(), StringUtil.randomString(4));
+        var amount = transaction.getAmount().divide(BigDecimal.valueOf(deferredMode.months()), RoundingMode.HALF_UP);
+        var months = 1;
+        while (months <= deferredMode.months()) {
+            LocalDate dueAt;
+            if (parent != null) {
+                dueAt = parent.getDueAt().plusMonths(1);
+            } else {
+                var deferredStart = deferredMode.startDateTime();
+                var paymentDay = transaction.getAccount().getPaymentDay();
+                dueAt = DateTimeUtil.nextDayOfMonth(paymentDay, deferredStart.toLocalDate()).plusMonths(1);
+            }
+            var saved = createTransaction(user, transaction, code + "_" + months, amount, dueAt, parent);
+            parent = (JpaTransaction) saved;
+            if (root == null) {
+                root = parent;
+            }
+            months += 1;
+        }
+        return root;
+    }
+
+    @NotNull
     public Transaction createTransaction(@NotNull User user, @NotNull Transaction transaction) throws ConflictException, NotFoundException {
+        return createTransaction(user, transaction, null, null, null, null);
+    }
+
+    @NotNull
+    private Transaction createTransaction(@NotNull User user, @NotNull Transaction transaction,
+                                          String code, BigDecimal amount, LocalDate dueAt,
+                                          JpaTransaction parent) throws ConflictException, NotFoundException {
         var jpaUser = findUser(user);
         var byCode = transactionRepo.findByUserAndCode(jpaUser, transaction.getCode());
         if (byCode.isPresent()) {
             throw new ConflictException("Transaction code already registered.");
         }
 
-        var jpaTransaction = build(jpaUser, transaction, JpaTransaction::builder);
+        var jpaTransaction = build(jpaUser, transaction, code, amount, dueAt, parent, JpaTransaction::builder);
         jpaTransaction.validate(validator);
 
         jpaTransaction = transactionRepo.save(jpaTransaction);
@@ -111,7 +152,8 @@ public class TransactionService extends BaseService {
             }
         }
 
-        var jpaTransaction = build(jpaUser, transaction, () -> byCode.get().toBuilder());
+        var jpaTransaction = build(jpaUser, transaction,
+            null, null, null, null, () -> byCode.get().toBuilder());
         jpaTransaction.validate(validator);
 
         return transactionRepo.save(jpaTransaction);
@@ -119,6 +161,8 @@ public class TransactionService extends BaseService {
 
     private JpaTransaction build(@NotNull JpaUser user,
                                  @NotNull Transaction transaction,
+                                 String code, BigDecimal amount, LocalDate dueAt,
+                                 JpaTransaction parent,
                                  @NotNull Supplier<JpaTransaction.JpaTransactionBuilder<?, ?>> builderSupplier) throws NotFoundException {
         if (transaction.getAccount() == null) {
             throw new ValidationException("Transaction account is required.");
@@ -131,15 +175,19 @@ public class TransactionService extends BaseService {
             categories = categoryRepo.findByUserAndCodeIn(user, categoriesCodes)
                 .stream().map(category -> (Category) category).toList();
         }
-        return builderSupplier.get()
-            .code(transaction.getCode())
+        var builder = builderSupplier.get()
+            .code(ObjectUtil.firstNotNull(code, transaction.getCode()))
             .user(user)
             .account(account)
-            .categories(new HashSet<>(categories))
+            .categories(new HashSet<>(categories));
+        if (parent != null) {
+            builder.parent(parent);
+        }
+        return builder
             .description(transaction.getDescription())
             .currency(ObjectUtil.firstNotNull(transaction.getCurrency(), account.getCurrency()))
-            .amount(transaction.getAmount())
-            .dueAt(transaction.getDueAt())
+            .amount(ObjectUtil.firstNotNull(amount, transaction.getAmount()))
+            .dueAt(ObjectUtil.firstNotNull(dueAt, transaction.getDueAt()))
             .completedAt(transaction.getCompletedAt())
             .build();
     }

@@ -8,9 +8,13 @@ import java.time.ZoneId;
 public class DateTimeUtil {
     @NotNull
     public static LocalDate nextDayOfMonth(@NotNull Short day) {
-        var now = LocalDate.now();
-        var dateTime = now.withDayOfMonth(day);
-        if (dateTime.isBefore(now)) {
+        return nextDayOfMonth(day, LocalDate.now());
+    }
+
+    @NotNull
+    public static LocalDate nextDayOfMonth(@NotNull Short day, @NotNull LocalDate date) {
+        var dateTime = date.withDayOfMonth(day);
+        if (dateTime.isBefore(date)) {
             dateTime = dateTime.plusMonths(1);
         }
         return dateTime;

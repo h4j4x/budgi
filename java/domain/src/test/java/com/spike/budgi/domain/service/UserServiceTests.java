@@ -6,7 +6,6 @@ import com.spike.budgi.domain.jpa.JpaUser;
 import com.spike.budgi.domain.model.UserCodeType;
 import com.spike.budgi.domain.repo.UserRepo;
 import jakarta.validation.ValidationException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,11 +23,6 @@ public class UserServiceTests {
         this.userService = userService;
     }
 
-    @BeforeEach
-    void beforeEach() {
-        userRepo.deleteAll();
-    }
-
     @Test
     void contextLoad() {
         assertNotNull(userRepo);
@@ -38,9 +32,9 @@ public class UserServiceTests {
     @Test
     void testCreateValidUser() throws ConflictException {
         var inUser = JpaUser.builder()
-            .name("Test")
+            .name("Test " + System.currentTimeMillis())
             .codeType(UserCodeType.EMAIL)
-            .code("test@mail.com")
+            .code(System.currentTimeMillis() + "@mail.com")
             .password("test")
             .build();
         var savedUser = userService.createUser(inUser);
