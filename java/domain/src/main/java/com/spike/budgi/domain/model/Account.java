@@ -16,7 +16,7 @@ public interface Account extends Base, Validatable {
 
     BigDecimal getQuota();
 
-    BigDecimal getToPay();
+    BigDecimal getBalance();
 
     Short getPaymentDay();
 }

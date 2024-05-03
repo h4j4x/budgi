@@ -65,6 +65,9 @@ public class JpaTransaction extends JpaBase implements Transaction {
     @Column(nullable = false, precision = 38, scale = 2)
     private BigDecimal amount;
 
+    @Column(nullable = false, precision = 38, scale = 2)
+    private BigDecimal accountBalance;
+
     @Column(name = "due_at")
     private OffsetDateTime dueAt;
 
@@ -76,6 +79,10 @@ public class JpaTransaction extends JpaBase implements Transaction {
     protected void prePersist() {
         super.prePersist();
         amount = amount.setScale(2, RoundingMode.HALF_UP);
+        if (accountBalance == null) {
+            accountBalance = BigDecimal.ZERO;
+        }
+        accountBalance = accountBalance.setScale(2, RoundingMode.HALF_UP);
         if (AccountType.CREDIT.equals(account.getAccountType()) && dueAt == null) {
             dueAt = DateTimeUtil.nextDayOfMonth(account.getPaymentDay());
         }

@@ -14,6 +14,7 @@ import com.spike.budgi.util.DateTimeUtil;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.Collections;
 import java.util.Currency;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -118,6 +119,30 @@ public class TransactionServiceTests {
         assertTrue(categoryExpense.isPresent());
         assertEquals(savedTransaction.getCurrency(), categoryExpense.get().getCurrency());
         assertBigDecimalEquals(savedTransaction.getAmount(), categoryExpense.get().getIncome());
+        assertBigDecimalEquals(BigDecimal.ZERO, categoryExpense.get().getOutcome());
+    }
+
+    @Test
+    void testTransactionUpdateAccountBalance() throws ConflictException, NotFoundException {
+        var user = TestApplication.createUser(userRepo);
+        var account = createAccount(user);
+
+        var amounts = new double[] {10, -5, -2, 15, -20};
+        var balance = .0;
+        for (var amount : amounts) {
+            transactionService.createTransaction(user, JpaTransaction.builder()
+                .code("trn" + amount)
+                .account(account)
+                .categories(Collections.emptySet())
+                .description("Transaction" + amount)
+                .amount(BigDecimal.valueOf(amount))
+                .completedAt(OffsetDateTime.now())
+                .build());
+            balance += amount;
+
+            account = accountRepo.findByUserAndCode(user, account.getCode()).orElseThrow();
+            assertBigDecimalEquals(BigDecimal.valueOf(balance), account.getBalance());
+        }
     }
 
     @NotNull
@@ -129,8 +154,6 @@ public class TransactionServiceTests {
             .description("Test")
             .accountType(AccountType.CASH)
             .currency(Currency.getInstance("USD"))
-            .quota(BigDecimal.ZERO)
-            .toPay(BigDecimal.ZERO)
             .build();
         return accountRepo.save(account);
     }

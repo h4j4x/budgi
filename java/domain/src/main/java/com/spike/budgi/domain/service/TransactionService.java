@@ -15,6 +15,7 @@ import jakarta.validation.ValidationException;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -59,12 +60,12 @@ public class TransactionService extends BaseService {
         jpaTransaction.validate(validator);
 
         jpaTransaction = transactionRepo.save(jpaTransaction);
+        updateAccountBalance(jpaUser, jpaTransaction.getCreatedAt());
         var period = periodOf(jpaTransaction);
         if (period != null) {
             var categories = jpaTransaction.getCategories().stream()
                 .map(category -> (JpaCategory) category).collect(Collectors.toSet());
             updateCategoriesExpenses(jpaUser, categories, period, jpaTransaction.getCurrency());
-            // update account balance & to_pay
         }
         return jpaTransaction;
     }
@@ -95,7 +96,8 @@ public class TransactionService extends BaseService {
     }
 
     @NotNull
-    public Transaction updateTransaction(@NotNull User user, @NotNull String code, @NotNull Transaction transaction) throws ConflictException, NotFoundException {
+    public Transaction updateTransaction(@NotNull User user, @NotNull String code,
+                                         @NotNull Transaction transaction) throws ConflictException, NotFoundException {
         var jpaUser = findUser(user);
         var byCode = transactionRepo.findByUserAndCode(jpaUser, code);
         if (byCode.isEmpty()) {
@@ -147,11 +149,38 @@ public class TransactionService extends BaseService {
         return new DatePeriod(from, from.plusMonths(1));
     }
 
+    private void updateAccountBalance(@NotNull JpaUser user, @NotNull OffsetDateTime from) {
+        var dateTime = transactionRepo.findPreviousCreatedAt(user, from).orElse(from);
+        var transactions = transactionRepo.findByUserAndCreatedAtGreaterEqual(user, dateTime);
+        BigDecimal balance = null;
+        JpaTransaction last = null;
+        for (var transaction : transactions) {
+            last = transaction;
+            if (balance == null) {
+                if (dateTime.equals(from)) {
+                    balance = BigDecimal.ZERO;
+                } else {
+                    balance = transaction.getAccountBalance();
+                    continue;
+                }
+            }
+            balance = balance.add(transaction.getAmount());
+            transaction.setAccountBalance(balance);
+        }
+        transactionRepo.saveAll(transactions);
+
+        if (last != null) {
+            var account = last.getAccount();
+            account.setBalance(balance);
+            accountRepo.save(account);
+        }
+    }
+
     private void updateCategoriesExpenses(@NotNull JpaUser user,
                                           @NotNull Set<JpaCategory> categories,
                                           @NotNull DatePeriod period,
                                           @NotNull Currency currency) throws NotFoundException {
-        for (JpaCategory category : categories) {
+        for (var category : categories) {
             updateCategoryExpenses(user, category, period, currency);
         }
     }

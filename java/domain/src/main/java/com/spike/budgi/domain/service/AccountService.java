@@ -84,7 +84,7 @@ public class AccountService extends BaseService {
             .accountType(account.getAccountType())
             .currency(ObjectUtil.firstNotNull(account.getCurrency(), configService.defaultCurrency()))
             .quota(ObjectUtil.firstNotNull(account.getQuota(), BigDecimal.ZERO))
-            .toPay(ObjectUtil.firstNotNull(account.getToPay(), BigDecimal.ZERO))
+            .balance(ObjectUtil.firstNotNull(account.getBalance(), BigDecimal.ZERO))
             .paymentDay(account.getPaymentDay())
             .build();
     }

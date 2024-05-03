@@ -8,7 +8,6 @@ import jakarta.validation.ValidationException;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -51,13 +50,11 @@ public class JpaAccount extends JpaBase implements Account {
     @Convert(converter = CurrencyConverter.class)
     private Currency currency;
 
-    @PositiveOrZero(message = "Account quota amount must be positive or zero.")
     @Column(nullable = false, precision = 38, scale = 2)
     private BigDecimal quota;
 
-    @PositiveOrZero(message = "Account to pay amount must be positive or zero.")
-    @Column(name = "to_pay", nullable = false, precision = 38, scale = 2)
-    private BigDecimal toPay;
+    @Column(nullable = false, precision = 38, scale = 2)
+    private BigDecimal balance;
 
     @Column(name = "payment_day", columnDefinition = "smallint")
     private Short paymentDay;
@@ -66,8 +63,14 @@ public class JpaAccount extends JpaBase implements Account {
     @PrePersist
     protected void prePersist() {
         super.prePersist();
+        if (quota == null) {
+            quota = BigDecimal.ZERO;
+        }
         quota = quota.setScale(2, RoundingMode.HALF_UP);
-        toPay = toPay.setScale(2, RoundingMode.HALF_UP);
+        if (balance == null) {
+            balance = BigDecimal.ZERO;
+        }
+        balance = balance.setScale(2, RoundingMode.HALF_UP);
     }
 
     @Override
