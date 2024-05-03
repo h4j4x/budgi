@@ -6,9 +6,7 @@ import com.spike.budgi.domain.model.AccountType;
 import jakarta.persistence.*;
 import jakarta.validation.ValidationException;
 import jakarta.validation.Validator;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Currency;
@@ -56,6 +54,8 @@ public class JpaAccount extends JpaBase implements Account {
     @Column(nullable = false, precision = 38, scale = 2)
     private BigDecimal balance;
 
+    @Min(1)
+    @Max(31)
     @Column(name = "payment_day", columnDefinition = "smallint")
     private Short paymentDay;
 

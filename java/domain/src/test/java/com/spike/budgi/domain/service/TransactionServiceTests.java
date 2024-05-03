@@ -13,6 +13,7 @@ import com.spike.budgi.domain.repo.*;
 import com.spike.budgi.util.DateTimeUtil;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.time.MonthDay;
 import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.Currency;
@@ -87,14 +88,16 @@ public class TransactionServiceTests {
         var savedTransaction = transactionService.createTransaction(user, inTransaction);
         assertNotNull(savedTransaction.getCreatedAt());
         assertNotNull(savedTransaction.getAccount());
+        assertNotNull(savedTransaction.getDueAt());
         assertEquals(1, savedTransaction.getCategories().size());
         var savedCategory = savedTransaction.getCategories().iterator().next();
         assertEquals(category.getCode(), savedCategory.getCode());
         assertEquals(inTransaction.getCode(), savedTransaction.getCode());
         assertEquals(inTransaction.getDescription(), savedTransaction.getDescription());
+        assertBigDecimalEquals(inTransaction.getAmount(), savedTransaction.getAmount());
         assertEquals(account.getCode(), savedTransaction.getAccount().getCode());
         assertEquals(account.getCurrency(), savedTransaction.getCurrency());
-        assertBigDecimalEquals(inTransaction.getAmount(), savedTransaction.getAmount());
+        assertEquals(DateTimeUtil.nextDayOfMonth(account.getPaymentDay()), savedTransaction.getDueAt());
 
         var repoTransaction = transactionRepo.findByUserAndCode(user, inTransaction.getCode()).orElseThrow();
         assertEquals(inTransaction.getCode(), repoTransaction.getCode());
@@ -152,8 +155,9 @@ public class TransactionServiceTests {
             .user(user)
             .label("Test")
             .description("Test")
-            .accountType(AccountType.CASH)
+            .accountType(AccountType.CREDIT)
             .currency(Currency.getInstance("USD"))
+            .paymentDay((short) (MonthDay.now().getDayOfMonth() + 1))
             .build();
         return accountRepo.save(account);
     }

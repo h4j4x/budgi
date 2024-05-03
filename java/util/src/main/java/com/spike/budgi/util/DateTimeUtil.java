@@ -7,8 +7,8 @@ import java.time.ZoneId;
 
 public class DateTimeUtil {
     @NotNull
-    public static OffsetDateTime nextDayOfMonth(@NotNull Short day) {
-        var now = OffsetDateTime.now();
+    public static LocalDate nextDayOfMonth(@NotNull Short day) {
+        var now = LocalDate.now();
         var dateTime = now.withDayOfMonth(day);
         if (dateTime.isBefore(now)) {
             dateTime = dateTime.plusMonths(1);

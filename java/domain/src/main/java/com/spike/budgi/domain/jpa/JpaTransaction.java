@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Currency;
 import java.util.Set;
@@ -69,7 +70,7 @@ public class JpaTransaction extends JpaBase implements Transaction {
     private BigDecimal accountBalance;
 
     @Column(name = "due_at")
-    private OffsetDateTime dueAt;
+    private LocalDate dueAt;
 
     @Column(name = "completed_at")
     private OffsetDateTime completedAt;
