@@ -12,7 +12,6 @@ import com.spike.budgi.domain.model.User;
 import com.spike.budgi.domain.repo.CategoryExpenseRepo;
 import com.spike.budgi.domain.repo.CategoryRepo;
 import com.spike.budgi.domain.repo.UserRepo;
-import com.spike.budgi.util.DateTimeUtil;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -94,13 +93,13 @@ public class CategoryService extends BaseService {
                                       @NotNull Currency currency,
                                       @NotNull BigDecimal income,
                                       @NotNull BigDecimal outcome) {
-        var categoryExpense = categoryExpenseRepo.findByUserAndPeriod(user, period.from(), period.to())
+        var categoryExpense = categoryExpenseRepo.findByUserAndPeriod(user, period.fromDateTime(), period.toDateTime())
             .orElse(new JpaCategoryExpense());
         categoryExpense = categoryExpense.toBuilder()
             .user(user)
             .category(category)
-            .fromDateTime(DateTimeUtil.toOffsetDateTime(period.from()))
-            .toDateTime(DateTimeUtil.toOffsetDateTime(period.to()))
+            .fromDateTime(period.fromDateTime())
+            .toDateTime(period.toDateTime())
             .currency(currency)
             .income(income)
             .outcome(outcome)
@@ -115,11 +114,5 @@ public class CategoryService extends BaseService {
             return new HashSet<>(categoryRepo.findByUserAndCodeIn(user, categoriesCodes));
         }
         return Collections.emptySet();
-    }
-
-    @NotNull
-    JpaCategory jpaCategory(@NotNull JpaUser jpaUser, @NotNull Category category) throws NotFoundException {
-        return categoryRepo.findByUserAndCode(jpaUser, category.getCode())
-            .orElseThrow(() -> new NotFoundException("Category not found"));
     }
 }

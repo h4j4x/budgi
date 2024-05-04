@@ -8,18 +8,13 @@ import com.spike.budgi.domain.jpa.JpaCategory;
 import com.spike.budgi.domain.jpa.JpaTransaction;
 import com.spike.budgi.domain.jpa.JpaUser;
 import com.spike.budgi.domain.model.AccountType;
-import com.spike.budgi.domain.model.DeferredMode;
 import com.spike.budgi.domain.model.TransactionFilter;
 import com.spike.budgi.domain.repo.*;
-import com.spike.budgi.util.DateTimeUtil;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.Currency;
 import java.util.Set;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -53,15 +48,6 @@ public class TransactionServiceTests {
         this.transactionService = transactionService;
     }
 
-    @BeforeEach
-    void beforeEach() {
-        transactionRepo.deleteAll();
-        categoryExpenseRepo.deleteAll();
-        categoryRepo.deleteAll();
-        accountRepo.deleteAll();
-        userRepo.deleteAll();
-    }
-
     @Test
     void contextLoad() {
         assertNotNull(userRepo);
@@ -88,7 +74,7 @@ public class TransactionServiceTests {
         var savedTransaction = transactionService.createTransaction(user, inTransaction);
         assertNotNull(savedTransaction.getCreatedAt());
         assertNotNull(savedTransaction.getAccount());
-        assertNotNull(savedTransaction.getDueAt());
+        assertNotNull(savedTransaction.getDateTime());
         assertEquals(1, savedTransaction.getCategories().size());
         var savedCategory = savedTransaction.getCategories().iterator().next();
         assertEquals(category.getCode(), savedCategory.getCode());
@@ -97,7 +83,6 @@ public class TransactionServiceTests {
         assertBigDecimalEquals(inTransaction.getAmount(), savedTransaction.getAmount());
         assertEquals(account.getCode(), savedTransaction.getAccount().getCode());
         assertEquals(account.getCurrency(), savedTransaction.getCurrency());
-        assertEquals(DateTimeUtil.nextDayOfMonth(account.getPaymentDay()), savedTransaction.getDueAt());
 
         var repoTransaction = transactionRepo.findByUserAndCode(user, inTransaction.getCode()).orElseThrow();
         assertEquals(inTransaction.getCode(), repoTransaction.getCode());
@@ -113,83 +98,45 @@ public class TransactionServiceTests {
         assertEquals(inTransaction.getDescription(), first.getDescription());
         assertEquals(account.getCurrency(), first.getCurrency());
         assertBigDecimalEquals(inTransaction.getAmount(), first.getAmount());
-
-        var period = repoTransaction.getDatePeriod();
-        assertNotNull(period);
-        var categoryExpense = categoryExpenseRepo.findByUserAndPeriod(user, period.from(), period.to());
-        assertTrue(categoryExpense.isPresent());
-        assertEquals(savedTransaction.getCurrency(), categoryExpense.get().getCurrency());
-        assertBigDecimalEquals(savedTransaction.getAmount(), categoryExpense.get().getIncome());
-        assertBigDecimalEquals(BigDecimal.ZERO, categoryExpense.get().getOutcome());
     }
 
     @Test
-    void testCreateTransaction_ThenUpdateAccountBalance() throws ConflictException, NotFoundException {
+    void testCreateTransaction_ThenUpdateAccountAndCategories() throws ConflictException, NotFoundException {
         var user = TestApplication.createUser(userRepo);
         var account = createAccount(user, AccountType.DEBIT);
-
-        var amounts = new double[] {10, -5, -2, 15, -20};
-        var balance = .0;
-        for (var amount : amounts) {
-            transactionService.createTransaction(user, JpaTransaction.builder()
-                .code("trn" + amount)
-                .account(account)
-                .categories(Collections.emptySet())
-                .description("Transaction" + amount)
-                .amount(BigDecimal.valueOf(amount))
-                .build());
-            balance += amount;
-
-            account = accountRepo.findByUserAndCode(user, account.getCode()).orElseThrow();
-            assertBigDecimalEquals(BigDecimal.valueOf(balance), account.getBalance());
-        }
-    }
-
-    @Test
-    void testCreateTransactionWithDeferredMode() throws ConflictException, NotFoundException {
-        var user = TestApplication.createUser(userRepo);
-        var account = createAccount(user, AccountType.CREDIT);
         var category = createCategory(user);
 
-        var inTransaction = JpaTransaction.builder()
-            .code("test")
-            .account(account)
-            .categories(Set.of(category))
-            .description("Test")
-            .amount(BigDecimal.valueOf(100))
-            .build();
-        var deferredMode = new DeferredMode(10, 1);
-        var transaction = transactionService.createTransaction(user, inTransaction, deferredMode);
-        assertNotNull(transaction);
-
-        account = accountRepo.findByUserAndCode(user, account.getCode()).orElseThrow();
-        assertBigDecimalEquals(BigDecimal.ZERO, account.getBalance());
-
-        var expectedTransactionAmount = inTransaction.getAmount()
-            .divide(BigDecimal.valueOf(deferredMode.months()), RoundingMode.HALF_UP);
+        var amounts = new double[] {10, -5, -2, 15, -20};
         var balance = BigDecimal.ZERO;
-        var paymentDay = account.getPaymentDay();
-        var dueAt = DateTimeUtil.nextDayOfMonth(paymentDay, deferredMode.startDateTime().toLocalDate()).plusMonths(1);
-        var transactionsCount = 0;
-        do {
-            transactionsCount += 1;
-            assertTrue(transaction.getCode().endsWith("_" + transactionsCount));
-            assertEquals(dueAt, transaction.getDueAt());
-            assertBigDecimalEquals(expectedTransactionAmount, transaction.getAmount());
+        var income = BigDecimal.ZERO;
+        var outcome = BigDecimal.ZERO;
+        for (var amount : amounts) {
+            BigDecimal theAmount = BigDecimal.valueOf(amount);
+            var transaction = transactionService.createTransaction(user, JpaTransaction.builder()
+                .code("trn" + amount)
+                .account(account)
+                .categories(Set.of(category))
+                .description("Transaction" + amount)
+                .amount(theAmount)
+                .build());
+            balance = balance.add(theAmount);
+            if (amount < 0) {
+                outcome = outcome.add(theAmount);
+            } else {
+                income = income.add(theAmount);
+            }
+
+            account = accountRepo.findByUserAndCode(user, account.getCode()).orElseThrow();
+            assertBigDecimalEquals(balance, account.getBalance());
 
             var period = transaction.getDatePeriod();
             assertNotNull(period);
-            var categoryExpense = categoryExpenseRepo.findByUserAndPeriod(user, period.from(), period.to());
+            var categoryExpense = categoryExpenseRepo.findByUserAndPeriod(user, period.fromDateTime(), period.toDateTime());
             assertTrue(categoryExpense.isPresent());
             assertEquals(transaction.getCurrency(), categoryExpense.get().getCurrency());
-            assertBigDecimalEquals(transaction.getAmount(), categoryExpense.get().getIncome());
-
-            balance = balance.add(transaction.getAmount());
-            transaction = transactionRepo.findByParent(transaction).orElse(null);
-            dueAt = dueAt.plusMonths(1);
-        } while (transaction != null && balance.compareTo(inTransaction.getAmount()) < 0);
-        assertEquals(deferredMode.months(), transactionsCount);
-        assertBigDecimalEquals(balance, inTransaction.getAmount());
+            assertBigDecimalEquals(income, categoryExpense.get().getIncome());
+            assertBigDecimalEquals(outcome, categoryExpense.get().getOutcome());
+        }
     }
 
     @NotNull

@@ -1,7 +1,6 @@
 package com.spike.budgi.domain.model;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Currency;
 import java.util.Set;
@@ -24,8 +23,6 @@ public interface Transaction extends Base, Validatable {
     BigDecimal getAmount();
 
     BigDecimal getAccountBalance();
-
-    LocalDate getDueAt();
 
     OffsetDateTime getDateTime();
 

@@ -14,10 +14,10 @@ import org.springframework.stereotype.Repository;
 public interface TransactionRepo extends CrudRepository<JpaTransaction, Long> {
     Optional<JpaTransaction> findByUserAndCode(@NotNull JpaUser user, @NotNull String code);
 
-    @Query("SELECT createdAt FROM JpaTransaction" +
+    @Query("SELECT dateTime FROM JpaTransaction" +
         " WHERE user = :user AND dateTime < :to" +
         " ORDER BY dateTime DESC LIMIT 1")
-    Optional<OffsetDateTime> findPreviousCreatedAtTo(@NotNull JpaUser user, @NotNull OffsetDateTime to);
+    Optional<OffsetDateTime> findPreviousDateTimeTo(@NotNull JpaUser user, @NotNull OffsetDateTime to);
 
     Optional<JpaTransaction> findByParent(@NotNull Transaction parent);
 }

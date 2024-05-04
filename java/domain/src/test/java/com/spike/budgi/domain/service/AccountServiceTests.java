@@ -8,7 +8,6 @@ import com.spike.budgi.domain.model.AccountType;
 import com.spike.budgi.domain.repo.AccountRepo;
 import com.spike.budgi.domain.repo.UserRepo;
 import jakarta.validation.ValidationException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,12 +26,6 @@ public class AccountServiceTests {
         this.userRepo = userRepo;
         this.accountRepo = accountRepo;
         this.accountService = accountService;
-    }
-
-    @BeforeEach
-    void beforeEach() {
-        accountRepo.deleteAll();
-        userRepo.deleteAll();
     }
 
     @Test

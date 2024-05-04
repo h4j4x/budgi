@@ -5,29 +5,29 @@ import com.spike.budgi.domain.error.NotFoundException;
 import com.spike.budgi.domain.jpa.JpaCategory;
 import com.spike.budgi.domain.jpa.JpaTransaction;
 import com.spike.budgi.domain.jpa.JpaUser;
-import com.spike.budgi.domain.model.*;
+import com.spike.budgi.domain.model.DatePeriod;
+import com.spike.budgi.domain.model.Transaction;
+import com.spike.budgi.domain.model.TransactionFilter;
+import com.spike.budgi.domain.model.User;
 import com.spike.budgi.domain.repo.AccountRepo;
 import com.spike.budgi.domain.repo.TransactionRepo;
 import com.spike.budgi.domain.repo.UserRepo;
-import com.spike.budgi.util.DateTimeUtil;
 import com.spike.budgi.util.ObjectUtil;
-import com.spike.budgi.util.StringUtil;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.validation.ValidationException;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.util.Currency;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class TransactionService extends BaseService {
     private final AccountRepo accountRepo;
 
@@ -51,84 +51,40 @@ public class TransactionService extends BaseService {
     }
 
     @NotNull
-    public Transaction createTransaction(@NotNull User user, @NotNull Transaction transaction,
-                                         DeferredMode deferredMode) throws ConflictException, NotFoundException {
-        if (transaction.getAccount() == null) {
-            throw new NotFoundException("Invalid transaction account.");
-        }
-        if (!AccountType.CREDIT.equals(transaction.getAccount().getAccountType())) {
-            throw new ConflictException("Only credit accounts can have deferred transactions.");
-        }
-        if (deferredMode == null || deferredMode.months() < 2) {
-            return createTransaction(user, transaction);
-        }
-
-        Transaction root = null;
-        JpaTransaction parent = null;
-        var code = ObjectUtil.firstNotNull(transaction.getCode(), StringUtil.randomString(4));
-        var amount = transaction.getAmount().divide(BigDecimal.valueOf(deferredMode.months()), RoundingMode.HALF_UP);
-        var months = 1;
-        while (months <= deferredMode.months()) {
-            LocalDate dueAt;
-            if (parent != null) {
-                dueAt = parent.getDueAt().plusMonths(1);
-            } else {
-                var deferredStart = deferredMode.startDateTime();
-                var paymentDay = transaction.getAccount().getPaymentDay();
-                dueAt = DateTimeUtil.nextDayOfMonth(paymentDay, deferredStart.toLocalDate()).plusMonths(1);
-            }
-            var saved = createTransaction(user, transaction, code + "_" + months, amount, dueAt, parent);
-            parent = (JpaTransaction) saved;
-            if (root == null) {
-                root = parent;
-            }
-            months += 1;
-        }
-        return root;
-    }
-
-    @NotNull
     public Transaction createTransaction(@NotNull User user, @NotNull Transaction transaction) throws ConflictException, NotFoundException {
-        return createTransaction(user, transaction, null, null, null, null);
-    }
-
-    @NotNull
-    private Transaction createTransaction(@NotNull User user, @NotNull Transaction transaction,
-                                          String code, BigDecimal amount, LocalDate dueAt,
-                                          JpaTransaction parent) throws ConflictException, NotFoundException {
         var jpaUser = findUser(user);
         var byCode = transactionRepo.findByUserAndCode(jpaUser, transaction.getCode());
         if (byCode.isPresent()) {
             throw new ConflictException("Transaction code already registered.");
         }
 
-        var jpaTransaction = build(jpaUser, transaction, code, amount, dueAt, parent, JpaTransaction::builder);
+        var jpaTransaction = build(jpaUser, transaction, JpaTransaction::builder);
         jpaTransaction.validate(validator);
 
         jpaTransaction = transactionRepo.save(jpaTransaction);
-        updateAssociated(jpaUser, jpaTransaction);
-        return jpaTransaction;
+        return updateAssociated(jpaTransaction);
     }
 
-    private void updateAssociated(@NotNull JpaUser user, @NotNull JpaTransaction transaction) throws NotFoundException {
-        updateAccountBalance(user, transaction.getCreatedAt());
+    @NotNull
+    private JpaTransaction updateAssociated(@NotNull JpaTransaction transaction) throws NotFoundException {
         var period = transaction.getDatePeriod();
         var categories = transaction.getCategories().stream()
             .map(category -> (JpaCategory) category).collect(Collectors.toSet());
         for (var category : categories) {
-            updateCategoryExpenses(user, category, period, transaction.getCurrency());
+            updateCategoryExpenses(category, period, transaction);
         }
+        return updateAccountBalance(transaction);
     }
 
     @NotNull
     public List<Transaction> findTransactions(@NotNull User user, TransactionFilter filter) throws NotFoundException {
-        return _findTransactions(user, filter)
+        return _findTransactions(user, filter).stream()
             .map(jpaTransaction -> (Transaction) jpaTransaction)
             .toList();
     }
 
     @NotNull
-    public Stream<JpaTransaction> _findTransactions(@NotNull User user, TransactionFilter filter) throws NotFoundException {
+    public List<JpaTransaction> _findTransactions(@NotNull User user, TransactionFilter filter) throws NotFoundException {
         var jpaUser = findUser(user);
         try (var entityManager = entityManagerFactory.createEntityManager()) {
             var builder = entityManager.getCriteriaBuilder();
@@ -137,25 +93,22 @@ public class TransactionService extends BaseService {
 
             var where = builder.equal(root.get("user"), jpaUser);
             if (filter.category() != null) {
-                var category = categoryService.jpaCategory(jpaUser, filter.category());
-                where = builder.and(where, builder.equal(root.get("category"), category));
+                var categories = root.join("categories");
+                var categoryWhere = builder.equal(categories.get("code"), filter.category().getCode());
+                where = builder.and(where, categoryWhere);
             }
             if (filter.from() != null) {
-                where = builder.and(where, builder.greaterThanOrEqualTo(root.get("dueAt"), filter.from()));
+                where = builder.and(where, builder.greaterThanOrEqualTo(root.get("dateTime"), filter.from()));
             }
             if (filter.to() != null) {
-                where = builder.and(where, builder.lessThan(root.get("dueAt"), filter.to()));
-            }
-            if (filter.completed() != null) {
-                var completedWhere = filter.completed()
-                    ? builder.isTrue(root.get("completed")) : builder.isFalse(root.get("completed"));
-                where = builder.and(where, completedWhere);
+                where = builder.and(where, builder.lessThan(root.get("dateTime"), filter.to()));
             }
 
             query = query.select(root)
                 .distinct(true)
+                .orderBy(builder.asc(root.get("dateTime")))
                 .where(where);
-            return entityManager.createQuery(query).getResultStream();
+            return entityManager.createQuery(query).getResultList();
         }
     }
 
@@ -175,19 +128,15 @@ public class TransactionService extends BaseService {
             }
         }
 
-        var jpaTransaction = build(jpaUser, transaction,
-            null, null, null, null, () -> byCode.get().toBuilder());
+        var jpaTransaction = build(jpaUser, transaction, () -> byCode.get().toBuilder());
         jpaTransaction.validate(validator);
 
         jpaTransaction = transactionRepo.save(jpaTransaction);
-        updateAssociated(jpaUser, jpaTransaction);
-        return jpaTransaction;
+        return updateAssociated(jpaTransaction);
     }
 
     private JpaTransaction build(@NotNull JpaUser user,
                                  @NotNull Transaction transaction,
-                                 String code, BigDecimal amount, LocalDate dueAt,
-                                 JpaTransaction parent,
                                  @NotNull Supplier<JpaTransaction.JpaTransactionBuilder<?, ?>> builderSupplier) throws NotFoundException {
         if (transaction.getAccount() == null) {
             throw new ValidationException("Transaction account is required.");
@@ -195,33 +144,30 @@ public class TransactionService extends BaseService {
         var account = accountRepo.findByUserAndCode(user, transaction.getAccount().getCode())
             .orElseThrow(() -> new NotFoundException("Transaction account is not valid."));
         var categories = categoryService.jpaCategories(user, transaction.getCategories());
-        var builder = builderSupplier.get()
-            .code(ObjectUtil.firstNotNull(code, transaction.getCode()))
+        return builderSupplier.get()
+            .code(transaction.getCode())
             .user(user)
             .account(account)
-            .categories(categories);
-        if (parent != null) {
-            builder.parent(parent);
-        }
-        return builder
+            .categories(categories)
             .description(transaction.getDescription())
             .currency(ObjectUtil.firstNotNull(transaction.getCurrency(), account.getCurrency()))
-            .amount(ObjectUtil.firstNotNull(amount, transaction.getAmount()))
-            .dueAt(ObjectUtil.firstNotNull(dueAt, transaction.getDueAt()))
+            .amount(transaction.getAmount())
             .dateTime(ObjectUtil.firstNotNull(transaction.getDateTime(), OffsetDateTime.now()))
             .build();
     }
 
-    private void updateAccountBalance(@NotNull JpaUser user, @NotNull OffsetDateTime from) throws NotFoundException {
-        var date = transactionRepo.findPreviousCreatedAtTo(user, from).orElse(from);
+    @NotNull
+    private JpaTransaction updateAccountBalance(@NotNull JpaTransaction saved) throws NotFoundException {
+        var toDateTime = saved.getDateTime().truncatedTo(ChronoUnit.SECONDS);
+        var date = transactionRepo.findPreviousDateTimeTo(saved.getUser(), toDateTime).orElse(toDateTime);
         var filter = TransactionFilter.of(date, OffsetDateTime.now());
-        var transactions = _findTransactions(user, filter).toList();
+        var transactions = _findTransactions(saved.getUser(), filter);
+        log.debug("Found {} transactions to update account balance of transaction {} with datetime {}",
+            transactions.size(), saved.getCode(), toDateTime);
         BigDecimal balance = null;
-        JpaTransaction last = null;
         for (var transaction : transactions) {
-            last = transaction;
             if (balance == null) {
-                if (date.equals(from)) {
+                if (transaction.getCode().equals(saved.getCode())) {
                     balance = BigDecimal.ZERO;
                 } else {
                     balance = transaction.getAccountBalance();
@@ -233,19 +179,18 @@ public class TransactionService extends BaseService {
         }
         transactionRepo.saveAll(transactions);
 
-        if (last != null) {
-            var account = last.getAccount();
-            account.setBalance(balance);
-            accountRepo.save(account);
-        }
+        var account = saved.getAccount();
+        account.setBalance(balance);
+        accountRepo.save(account);
+
+        return transactionRepo.findByUserAndCode(saved.getUser(), saved.getCode()).orElse(saved);
     }
 
-    private void updateCategoryExpenses(@NotNull JpaUser user,
-                                        @NotNull JpaCategory category,
+    private void updateCategoryExpenses(@NotNull JpaCategory category,
                                         @NotNull DatePeriod period,
-                                        @NotNull Currency currency) throws NotFoundException {
-        var filter = TransactionFilter.of(period, category, true);
-        var transactions = findTransactions(user, filter);
+                                        @NotNull JpaTransaction saved) throws NotFoundException {
+        var filter = TransactionFilter.of(period, category);
+        var transactions = findTransactions(saved.getUser(), filter);
         var income = BigDecimal.ZERO;
         var outcome = BigDecimal.ZERO;
         for (var transaction : transactions) {
@@ -255,6 +200,6 @@ public class TransactionService extends BaseService {
                 income = income.add(transaction.getAmount());
             }
         }
-        categoryService.updateCategoryExpense(user, category, period, currency, income, outcome);
+        categoryService.updateCategoryExpense(saved.getUser(), category, period, saved.getCurrency(), income, outcome);
     }
 }

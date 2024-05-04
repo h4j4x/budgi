@@ -6,7 +6,6 @@ import com.spike.budgi.domain.error.NotFoundException;
 import com.spike.budgi.domain.jpa.JpaCategory;
 import com.spike.budgi.domain.repo.CategoryRepo;
 import com.spike.budgi.domain.repo.UserRepo;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,12 +24,6 @@ public class CategoryServiceTests {
         this.userRepo = userRepo;
         this.categoryRepo = categoryRepo;
         this.categoryService = categoryService;
-    }
-
-    @BeforeEach
-    void beforeEach() {
-        categoryRepo.deleteAll();
-        userRepo.deleteAll();
     }
 
     @Test

@@ -14,3 +14,6 @@ spring:
     hibernate:
       ddlAuto: update
     open-in-view: false
+logging:
+  level:
+    com.spike.budgi.domain: debug

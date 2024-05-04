@@ -1,17 +1,14 @@
 package com.spike.budgi.domain.jpa;
 
 import com.spike.budgi.domain.converter.CurrencyConverter;
-import com.spike.budgi.domain.model.AccountType;
 import com.spike.budgi.domain.model.Category;
 import com.spike.budgi.domain.model.DatePeriod;
 import com.spike.budgi.domain.model.Transaction;
-import com.spike.budgi.util.DateTimeUtil;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.Currency;
@@ -49,7 +46,7 @@ public class JpaTransaction extends JpaBase implements Transaction {
     @JoinColumn(name = "account_id", nullable = false)
     private JpaAccount account;
 
-    @ManyToMany(targetEntity = JpaCategory.class)
+    @ManyToMany(targetEntity = JpaCategory.class, fetch = FetchType.EAGER)
     @JoinTable(name = "categories_transactions",
         joinColumns = @JoinColumn(name = "transaction_id", referencedColumnName = "id"),
         inverseJoinColumns = @JoinColumn(name = "category_id", referencedColumnName = "id")
@@ -72,9 +69,6 @@ public class JpaTransaction extends JpaBase implements Transaction {
     @Column(nullable = false, precision = 38, scale = 2)
     private BigDecimal accountBalance;
 
-    @Column(name = "due_at")
-    private LocalDate dueAt;
-
     @Column(name = "date_time", nullable = false)
     private OffsetDateTime dateTime;
 
@@ -87,9 +81,6 @@ public class JpaTransaction extends JpaBase implements Transaction {
             accountBalance = BigDecimal.ZERO;
         }
         accountBalance = accountBalance.setScale(2, RoundingMode.HALF_UP);
-        if (AccountType.CREDIT.equals(account.getAccountType())) {
-            dueAt = DateTimeUtil.nextDayOfMonth(account.getPaymentDay());
-        }
         if (dateTime == null) {
             dateTime = OffsetDateTime.now();
         }
