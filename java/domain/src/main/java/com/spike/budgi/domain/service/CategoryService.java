@@ -3,14 +3,20 @@ package com.spike.budgi.domain.service;
 import com.spike.budgi.domain.error.ConflictException;
 import com.spike.budgi.domain.error.NotFoundException;
 import com.spike.budgi.domain.jpa.JpaCategory;
+import com.spike.budgi.domain.jpa.JpaCategoryExpense;
 import com.spike.budgi.domain.jpa.JpaUser;
+import com.spike.budgi.domain.model.Base;
 import com.spike.budgi.domain.model.Category;
+import com.spike.budgi.domain.model.DatePeriod;
 import com.spike.budgi.domain.model.User;
+import com.spike.budgi.domain.repo.CategoryExpenseRepo;
 import com.spike.budgi.domain.repo.CategoryRepo;
 import com.spike.budgi.domain.repo.UserRepo;
+import com.spike.budgi.util.DateTimeUtil;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
-import java.util.List;
+import java.math.BigDecimal;
+import java.util.*;
 import java.util.function.Supplier;
 import org.springframework.stereotype.Service;
 
@@ -18,11 +24,15 @@ import org.springframework.stereotype.Service;
 public class CategoryService extends BaseService {
     private final CategoryRepo categoryRepo;
 
+    private final CategoryExpenseRepo categoryExpenseRepo;
+
     private final Validator validator;
 
-    public CategoryService(UserRepo userRepo, CategoryRepo categoryRepo, Validator validator) {
+    public CategoryService(UserRepo userRepo, CategoryRepo categoryRepo, CategoryExpenseRepo categoryExpenseRepo,
+                           Validator validator) {
         super(userRepo);
         this.categoryRepo = categoryRepo;
+        this.categoryExpenseRepo = categoryExpenseRepo;
         this.validator = validator;
     }
 
@@ -76,5 +86,40 @@ public class CategoryService extends BaseService {
             .label(category.getLabel())
             .description(category.getDescription())
             .build();
+    }
+
+    public void updateCategoryExpense(@NotNull JpaUser user,
+                                      @NotNull JpaCategory category,
+                                      @NotNull DatePeriod period,
+                                      @NotNull Currency currency,
+                                      @NotNull BigDecimal income,
+                                      @NotNull BigDecimal outcome) {
+        var categoryExpense = categoryExpenseRepo.findByUserAndPeriod(user, period.from(), period.to())
+            .orElse(new JpaCategoryExpense());
+        categoryExpense = categoryExpense.toBuilder()
+            .user(user)
+            .category(category)
+            .fromDateTime(DateTimeUtil.toOffsetDateTime(period.from()))
+            .toDateTime(DateTimeUtil.toOffsetDateTime(period.to()))
+            .currency(currency)
+            .income(income)
+            .outcome(outcome)
+            .build();
+        categoryExpenseRepo.save(categoryExpense);
+    }
+
+    @NotNull
+    Set<JpaCategory> jpaCategories(@NotNull JpaUser user, Set<Category> categories) {
+        if (categories != null) {
+            var categoriesCodes = categories.stream().map(Base::getCode).toList();
+            return new HashSet<>(categoryRepo.findByUserAndCodeIn(user, categoriesCodes));
+        }
+        return Collections.emptySet();
+    }
+
+    @NotNull
+    JpaCategory jpaCategory(@NotNull JpaUser jpaUser, @NotNull Category category) throws NotFoundException {
+        return categoryRepo.findByUserAndCode(jpaUser, category.getCode())
+            .orElseThrow(() -> new NotFoundException("Category not found"));
     }
 }

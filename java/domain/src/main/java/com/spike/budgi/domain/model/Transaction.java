@@ -23,9 +23,11 @@ public interface Transaction extends Base, Validatable {
 
     BigDecimal getAmount();
 
+    BigDecimal getAccountBalance();
+
     LocalDate getDueAt();
 
-    OffsetDateTime getCompletedAt();
+    OffsetDateTime getDateTime();
 
     DatePeriod getDatePeriod();
 }

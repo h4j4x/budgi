@@ -13,7 +13,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.Collections;
 import java.util.Currency;
+import java.util.HashSet;
 import java.util.Set;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -52,7 +54,7 @@ public class JpaTransaction extends JpaBase implements Transaction {
         joinColumns = @JoinColumn(name = "transaction_id", referencedColumnName = "id"),
         inverseJoinColumns = @JoinColumn(name = "category_id", referencedColumnName = "id")
     )
-    private Set<Category> categories;
+    private Set<JpaCategory> categories;
 
     @Column(length = 300)
     @Size(max = 300, message = "Transaction description must have 100 characters length maximum.")
@@ -70,11 +72,11 @@ public class JpaTransaction extends JpaBase implements Transaction {
     @Column(nullable = false, precision = 38, scale = 2)
     private BigDecimal accountBalance;
 
-    @Column(name = "due_at", nullable = false)
+    @Column(name = "due_at")
     private LocalDate dueAt;
 
-    @Column(name = "completed_at")
-    private OffsetDateTime completedAt;
+    @Column(name = "date_time", nullable = false)
+    private OffsetDateTime dateTime;
 
     @Override
     @PrePersist
@@ -85,24 +87,26 @@ public class JpaTransaction extends JpaBase implements Transaction {
             accountBalance = BigDecimal.ZERO;
         }
         accountBalance = accountBalance.setScale(2, RoundingMode.HALF_UP);
-        checkDueAt();
+        if (AccountType.CREDIT.equals(account.getAccountType())) {
+            dueAt = DateTimeUtil.nextDayOfMonth(account.getPaymentDay());
+        }
+        if (dateTime == null) {
+            dateTime = OffsetDateTime.now();
+        }
+    }
+
+    @Override
+    public Set<Category> getCategories() {
+        if (categories != null) {
+            return new HashSet<>(categories);
+        }
+        return Collections.emptySet();
     }
 
     @NotNull
     @Override
     public DatePeriod getDatePeriod() {
-        checkDueAt();
-        var from = dueAt.withDayOfMonth(1);
+        var from = dateTime.withDayOfMonth(1).toLocalDate();
         return new DatePeriod(from, from.plusMonths(1));
-    }
-
-    private void checkDueAt() {
-        if (dueAt == null) {
-            if (AccountType.CREDIT.equals(account.getAccountType())) {
-                dueAt = DateTimeUtil.nextDayOfMonth(account.getPaymentDay());
-            } else {
-                dueAt = LocalDate.now();
-            }
-        }
     }
 }
