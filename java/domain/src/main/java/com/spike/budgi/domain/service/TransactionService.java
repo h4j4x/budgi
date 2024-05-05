@@ -2,13 +2,9 @@ package com.spike.budgi.domain.service;
 
 import com.spike.budgi.domain.error.ConflictException;
 import com.spike.budgi.domain.error.NotFoundException;
-import com.spike.budgi.domain.jpa.JpaCategory;
 import com.spike.budgi.domain.jpa.JpaTransaction;
 import com.spike.budgi.domain.jpa.JpaUser;
-import com.spike.budgi.domain.model.DatePeriod;
-import com.spike.budgi.domain.model.Transaction;
-import com.spike.budgi.domain.model.TransactionFilter;
-import com.spike.budgi.domain.model.User;
+import com.spike.budgi.domain.model.*;
 import com.spike.budgi.domain.repo.AccountRepo;
 import com.spike.budgi.domain.repo.TransactionRepo;
 import com.spike.budgi.domain.repo.UserRepo;
@@ -22,7 +18,6 @@ import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -68,9 +63,7 @@ public class TransactionService extends BaseService {
     @NotNull
     private JpaTransaction updateAssociated(@NotNull JpaTransaction transaction) throws NotFoundException {
         var period = transaction.getDatePeriod();
-        var categories = transaction.getCategories().stream()
-            .map(category -> (JpaCategory) category).collect(Collectors.toSet());
-        for (var category : categories) {
+        for (var category : transaction.getCategories()) {
             updateCategoryExpenses(category, period, transaction);
         }
         return updateAccountBalance(transaction);
@@ -186,7 +179,7 @@ public class TransactionService extends BaseService {
         return transactionRepo.findByUserAndCode(saved.getUser(), saved.getCode()).orElse(saved);
     }
 
-    private void updateCategoryExpenses(@NotNull JpaCategory category,
+    private void updateCategoryExpenses(@NotNull Category category,
                                         @NotNull DatePeriod period,
                                         @NotNull JpaTransaction saved) throws NotFoundException {
         var filter = TransactionFilter.of(period, category);

@@ -8,8 +8,6 @@ import java.util.Set;
 public interface Transaction extends Base, Validatable {
     User getUser();
 
-    Transaction getParent();
-
     Transaction getTransfer();
 
     Account getAccount();

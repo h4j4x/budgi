@@ -88,16 +88,18 @@ public class CategoryService extends BaseService {
     }
 
     public void updateCategoryExpense(@NotNull JpaUser user,
-                                      @NotNull JpaCategory category,
+                                      @NotNull Category category,
                                       @NotNull DatePeriod period,
                                       @NotNull Currency currency,
                                       @NotNull BigDecimal income,
-                                      @NotNull BigDecimal outcome) {
+                                      @NotNull BigDecimal outcome) throws NotFoundException {
         var categoryExpense = categoryExpenseRepo.findByUserAndPeriod(user, period.fromDateTime(), period.toDateTime())
             .orElse(new JpaCategoryExpense());
+        var jpaCategory = categoryRepo.findByUserAndCode(user, category.getCode())
+            .orElseThrow(() -> new NotFoundException("Invalid category."));
         categoryExpense = categoryExpense.toBuilder()
             .user(user)
-            .category(category)
+            .category(jpaCategory)
             .fromDateTime(period.fromDateTime())
             .toDateTime(period.toDateTime())
             .currency(currency)

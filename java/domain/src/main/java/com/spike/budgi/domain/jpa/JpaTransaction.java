@@ -34,10 +34,6 @@ public class JpaTransaction extends JpaBase implements Transaction {
     private JpaUser user;
 
     @OneToOne
-    @JoinColumn(name = "parent_id")
-    private JpaTransaction parent;
-
-    @OneToOne
     @JoinColumn(name = "transfer_id")
     private JpaTransaction transfer;
 
