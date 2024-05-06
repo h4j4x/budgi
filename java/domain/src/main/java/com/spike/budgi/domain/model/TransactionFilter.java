@@ -9,8 +9,8 @@ public record TransactionFilter(OffsetDateTime from, OffsetDateTime to,
         return new TransactionFilter(null, null, null, null);
     }
 
-    public static TransactionFilter of(OffsetDateTime from, OffsetDateTime to) {
-        return new TransactionFilter(from, to, null, null);
+    public static TransactionFilter of(OffsetDateTime from, OffsetDateTime to, Account account) {
+        return new TransactionFilter(from, to, account, null);
     }
 
     public static TransactionFilter of(DatePeriod period, Category category) {

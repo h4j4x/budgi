@@ -24,5 +24,5 @@ public interface Transaction extends Base, Validatable {
 
     OffsetDateTime getDateTime();
 
-    DatePeriod getDatePeriod();
+    DatePeriod datePeriod();
 }

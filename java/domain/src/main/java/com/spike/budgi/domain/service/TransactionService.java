@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -62,7 +63,7 @@ public class TransactionService extends BaseService {
 
     @NotNull
     private JpaTransaction updateAssociated(@NotNull JpaTransaction transaction) throws NotFoundException {
-        var period = transaction.getDatePeriod();
+        var period = transaction.datePeriod();
         for (var category : transaction.getCategories()) {
             updateCategoryExpenses(category, period, transaction);
         }
@@ -77,7 +78,8 @@ public class TransactionService extends BaseService {
     }
 
     @NotNull
-    public List<JpaTransaction> _findTransactions(@NotNull User user, TransactionFilter filter) throws NotFoundException {
+    public List<JpaTransaction> _findTransactions(@NotNull User user,
+                                                  TransactionFilter filter) throws NotFoundException {
         var jpaUser = findUser(user);
         try (var entityManager = entityManagerFactory.createEntityManager()) {
             var builder = entityManager.getCriteriaBuilder();
@@ -85,6 +87,11 @@ public class TransactionService extends BaseService {
             var root = query.from(JpaTransaction.class);
 
             var where = builder.equal(root.get("user"), jpaUser);
+            if (filter.account() != null) {
+                var account = accountRepo.findByUserAndCode(jpaUser, filter.account().getCode())
+                    .orElseThrow(() -> new NotFoundException("Invalid account."));
+                where = builder.and(where, builder.equal(root.get("account"), account));
+            }
             if (filter.category() != null) {
                 var categories = root.join("categories");
                 var categoryWhere = builder.equal(categories.get("code"), filter.category().getCode());
@@ -128,6 +135,39 @@ public class TransactionService extends BaseService {
         return updateAssociated(jpaTransaction);
     }
 
+    @NotNull
+    public Transaction createTransfer(@NotNull User user,
+                                      @NotNull Account source,
+                                      @NotNull Account target,
+                                      @NotNull Set<Category> categories,
+                                      @NotNull String description,
+                                      @NotNull BigDecimal amount) throws NotFoundException {
+        var jpaUser = findUser(user);
+        var jpaCategories = categoryService.jpaCategories(jpaUser, categories);
+        var builder = JpaTransaction.builder()
+            .user(jpaUser)
+            .categories(jpaCategories)
+            .description(description)
+            .currency(source.getCurrency());
+
+        var accountSource = accountRepo.findByUserAndCode(jpaUser, source.getCode())
+            .orElseThrow(() -> new NotFoundException("Source account is not valid."));
+        var sourceTransaction = builder.account(accountSource).amount(amount.negate()).build();
+        sourceTransaction.validate(validator);
+        sourceTransaction = transactionRepo.save(sourceTransaction);
+        sourceTransaction = updateAssociated(sourceTransaction);
+
+        var accountTarget = accountRepo.findByUserAndCode(jpaUser, target.getCode())
+            .orElseThrow(() -> new NotFoundException("Target account is not valid."));
+        var targetTransaction = builder.account(accountTarget).amount(amount).transfer(sourceTransaction).build();
+        targetTransaction.validate(validator);
+        targetTransaction = transactionRepo.save(targetTransaction);
+        targetTransaction = updateAssociated(targetTransaction);
+
+        sourceTransaction.setTransfer(targetTransaction);
+        return transactionRepo.save(sourceTransaction);
+    }
+
     private JpaTransaction build(@NotNull JpaUser user,
                                  @NotNull Transaction transaction,
                                  @NotNull Supplier<JpaTransaction.JpaTransactionBuilder<?, ?>> builderSupplier) throws NotFoundException {
@@ -145,7 +185,7 @@ public class TransactionService extends BaseService {
             .description(transaction.getDescription())
             .currency(ObjectUtil.firstNotNull(transaction.getCurrency(), account.getCurrency()))
             .amount(transaction.getAmount())
-            .dateTime(ObjectUtil.firstNotNull(transaction.getDateTime(), OffsetDateTime.now()))
+            .dateTime(transaction.getDateTime())
             .build();
     }
 
@@ -153,10 +193,12 @@ public class TransactionService extends BaseService {
     private JpaTransaction updateAccountBalance(@NotNull JpaTransaction saved) throws NotFoundException {
         var toDateTime = saved.getDateTime().truncatedTo(ChronoUnit.SECONDS);
         var date = transactionRepo.findPreviousDateTimeTo(saved.getUser(), toDateTime).orElse(toDateTime);
-        var filter = TransactionFilter.of(date, OffsetDateTime.now());
+        var account = saved.getAccount();
+        var filter = TransactionFilter.of(date, OffsetDateTime.now(), account);
         var transactions = _findTransactions(saved.getUser(), filter);
         log.debug("Found {} transactions to update account balance of transaction {} with datetime {}",
             transactions.size(), saved.getCode(), toDateTime);
+
         BigDecimal balance = null;
         for (var transaction : transactions) {
             if (balance == null) {
@@ -172,7 +214,6 @@ public class TransactionService extends BaseService {
         }
         transactionRepo.saveAll(transactions);
 
-        var account = saved.getAccount();
         account.setBalance(balance);
         accountRepo.save(account);
 

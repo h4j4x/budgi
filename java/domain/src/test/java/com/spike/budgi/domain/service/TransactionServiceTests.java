@@ -13,6 +13,7 @@ import com.spike.budgi.domain.repo.*;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.Currency;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -129,7 +130,7 @@ public class TransactionServiceTests {
             account = accountRepo.findByUserAndCode(user, account.getCode()).orElseThrow();
             assertBigDecimalEquals(balance, account.getBalance());
 
-            var period = transaction.getDatePeriod();
+            var period = transaction.datePeriod();
             assertNotNull(period);
             var categoryExpense = categoryExpenseRepo.findByUserAndPeriod(user, period.fromDateTime(), period.toDateTime());
             assertTrue(categoryExpense.isPresent());
@@ -137,6 +138,36 @@ public class TransactionServiceTests {
             assertBigDecimalEquals(income, categoryExpense.get().getIncome());
             assertBigDecimalEquals(outcome, categoryExpense.get().getOutcome());
         }
+    }
+
+    @Test
+    void testCreateTransfer_ThenCreateTwoTransactions() throws NotFoundException {
+        var user = TestApplication.createUser(userRepo);
+        var sourceAccount = createAccount(user, AccountType.DEBIT);
+        var targetAccount = createAccount(user, AccountType.CASH);
+
+        var amount = BigDecimal.TEN;
+        String description = "Transfer";
+        var sourceTransaction = transactionService
+            .createTransfer(user, sourceAccount, targetAccount, Collections.emptySet(), description, amount);
+        assertEquals(description, sourceTransaction.getDescription());
+        assertNotNull(sourceTransaction.getAccount());
+        assertEquals(sourceAccount.getCode(), sourceTransaction.getAccount().getCode());
+        assertBigDecimalEquals(amount, sourceTransaction.getAmount().negate());
+
+        sourceAccount = accountRepo.findByUserAndCode(user, sourceAccount.getCode()).orElseThrow();
+        assertBigDecimalEquals(amount.negate(), sourceAccount.getBalance());
+
+        var targetTransaction = sourceTransaction.getTransfer();
+        assertNotNull(targetTransaction);
+        assertEquals(sourceTransaction, targetTransaction.getTransfer());
+        assertEquals(description, targetTransaction.getDescription());
+        assertNotNull(targetTransaction.getAccount());
+        assertEquals(targetAccount.getCode(), targetTransaction.getAccount().getCode());
+        assertBigDecimalEquals(amount, targetTransaction.getAmount());
+
+        targetAccount = accountRepo.findByUserAndCode(user, targetAccount.getCode()).orElseThrow();
+        assertBigDecimalEquals(amount, targetAccount.getBalance());
     }
 
     @NotNull

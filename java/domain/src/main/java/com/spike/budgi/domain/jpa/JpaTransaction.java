@@ -92,7 +92,7 @@ public class JpaTransaction extends JpaBase implements Transaction {
 
     @NotNull
     @Override
-    public DatePeriod getDatePeriod() {
+    public DatePeriod datePeriod() {
         var from = dateTime.withDayOfMonth(1).toLocalDate();
         return new DatePeriod(from, from.plusMonths(1));
     }
